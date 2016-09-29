@@ -1,5 +1,6 @@
 # 0929 added by liu
 *.mex*
+*.zip
 sourceinsight/
 
 # Windows image file caches
