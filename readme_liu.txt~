@@ -1,0 +1,92 @@
+sudo chmod +x board.bin firmware-5.bin
+
+dmesg | grep ath10k
+
+get the kernel version:
+uname -a
+
+cd /lib/firmware/ath10k/QCA6174/hw3.0
+
+sudo rmmod ath10k_pci ath10k_core
+sudo modprobe -v ath10k_core
+sudo modprobe -v ath10k_pci
+
+By default Ubuntu will use the open source video driver Nouveau for your NVIDIA graphics card. This driver lacks support for 3D acceleration and may not work with the very latest video cards or technologies from NVIDIA.
+
+An alternative to Nouveau are the closed source unified NVIDIA drivers, which are developed by NVIDIA. This driver provides excellent 3D acceleration and video card support. 
+
+=======================
+gpu driver
+Linux x64 (AMD64/EM64T) Display Driver
+Version: 	361.42 
+
+=========
+http://ubuntuforums.org/showthread.php?t=2263316
+https://github.com/BVLC/caffe/wiki/Ubuntu-15.10-Installation-Guide
+
+============
+ps -ef ==> current process list
+kill [process number]
+
+==========
+There is no uninstaller for MATLAB on UNIX or Linux. To remove MATLAB you simply need to delete the MATLAB installation following the instructions below:
+
+1. If you are running a license manager for MATLAB, shut down the license manager using the 'lmdown' script located in MATLAB's etc directory. If this folder does not exist, you are not running the FlexNet license manager. For example:
+
+ [root@localhost ~] /usr/local/MATLAB/R2010b/etc/lmdown
+
+2. You should also remove any license manager files in the /var/tmp directory. These files should begin with 'lm_TMW', ex:
+
+ [root@localhost ~] rm /var/tmp/lm_TMW*
+
+3. Remove the entire root MATLAB directory using the 'rm -rf' command, ex:
+
+ [root@localhost ~] rm -rf /usr/local/MATLAB/R2010b
+
+4. Remove any symlinks to MATLAB binaries on the path, ex:
+ [root@localhost ~] rm /usr/local/bin/matlab /usr/local/bin/mcc /usr/local/bin/mex /usr/local/bin/mbuild
+
+  0 Comments
+ Comment on this Answer
+Answer this question
+
+This place is reserved for an answer to the question.
+
+    To clarify the question, edit it.
+    To thank answerers, add your vote to helpful answers and accept the best one.
+    To ask for clarification, submit a comment to the question or answer.
+
+Body
+BoldItalicMonospacedBulleted listNumbered listCodeHyperlinkImageAttach fileHelp
+Preview
+Disable
+
+Related Content
+
+MATLAB Answers
+
+How do I prevent users from running lmdown, lmremove, or lmreread from a client machine?
+1 Answer
+
+Why do I get an error `GLIBCXX_3.4.9 not found' when starting the license manager?
+1 Answer
+
+Why do I get "License Manager Error -97"?
+3 Answers
+
+Entire Website
+
+Certain Designated Computer licenses do not allow you to use the local scheduler
+Bug Reports
+
+Uninstall MathWorks Products
+Documentation
+
+Shut Down a Job Manager Cluster
+Documentation
+MATLAB Academy
+
+New to MATLAB?
+Learn MATLAB today!
+
+
