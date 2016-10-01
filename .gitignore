@@ -1,7 +1,10 @@
 # 0929 added by liu
 *.mex*
 *.zip
+*.dll
+external/caffe/matlab/caffe_faster_rcnn_win
 sourceinsight/
+!external/code3.2.1/*.m
 
 # Windows image file caches
 Thumbs.db
@@ -14,7 +17,7 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # User Ingore
-models/
+#models/
 data/
 external/code3.2.1
 datasets/caltech/test

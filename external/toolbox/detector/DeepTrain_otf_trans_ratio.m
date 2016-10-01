@@ -166,8 +166,9 @@ for stage = 0:numel(opts.nWeak)-1
   
   % accumulate negatives from previous stages
   if( stage>0 )
-    n0=size(X0p,1); n1=max(opts.nNeg,opts.nAccNeg)-size(X0,1);
-    if(n0>n1 && n1>0), 
+    n0 = size(X0p,1); 
+    n1 = max(opts.nNeg,opts.nAccNeg)-size(X0,1);
+    if(n0 > n1 && n1 > 0), 
         sel_idx = randSample(n0,n1);
         X0p=X0p(sel_idx,:); 
         X0_score_p=X0_score_p(sel_idx,:); 
@@ -177,8 +178,8 @@ for stage = 0:numel(opts.nWeak)-1
         X0_score=[X0_score_p; X0_score]; 
     end %#ok<AGROW>
   end; 
-  X0p=X0;
-  X0_score_p=X0_score;
+  X0p = X0;
+  X0_score_p = X0_score;
   
   % train boosted clf
   detector.opts.pBoost.nWeak = opts.nWeak(stage+1);
@@ -200,13 +201,13 @@ for stage = 0:numel(opts.nWeak)-1
   % test each stage model except the last stage
   %liu@0929: 'show' 2-->0
   if stage < numel(opts.nWeak)-1
-      dataDir=opts.dataDir;
-      pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};
-      DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
-          'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
-          'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
-          'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
-          'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', true, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
+%       dataDir=opts.dataDir;
+%       pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};
+%       DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
+%           'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
+%           'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
+%           'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
+%           'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', true, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
       delete([opts.name 'Detector.mat']); % delete the tmp file
   end
   
@@ -331,9 +332,11 @@ if positive
             else
                 max_ols = zeros(size(rois(idx).gt));
             end
+            % selected index
             sel_idx = find(max_ols >= thres_lo & max_ols < thres_hi);
             
             % ignore the gt
+            %0930 masked for there is no ignores in widerfaces
             gt_idx = find(rois(idx).ignores < 1);
             sel_idx = setdiff(sel_idx, gt_idx);
             

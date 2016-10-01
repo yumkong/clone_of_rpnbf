@@ -1,0 +1,353 @@
+name: "VGG_ILSVRC_16"
+
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 224
+input_dim: 224
+
+input: "rois"
+input_dim: 1 # to be changed on-the-fly to num ROIs
+input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
+input_dim: 1
+input_dim: 1
+
+layer {
+	bottom: "data"
+	top: "conv1_1"
+	name: "conv1_1"
+	type: "Convolution"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_1"
+	name: "relu1_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_2"
+	name: "conv1_2"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "conv1_2"
+	name: "relu1_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "pool1"
+	name: "pool1"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool1"
+	top: "conv2_1"
+	name: "conv2_1"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_1"
+	name: "relu2_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_2"
+	name: "conv2_2"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "conv2_2"
+	name: "relu2_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "pool2"
+	name: "pool2"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool2"
+	top: "conv3_1"
+	name: "conv3_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_1"
+	name: "relu3_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_2"
+	name: "conv3_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_2"
+	name: "relu3_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_3"
+	name: "conv3_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_3"
+	top: "conv3_3"
+	name: "relu3_3"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_3"
+	top: "pool3"
+	name: "pool3"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 1
+	}
+}
+
+layer {
+	bottom: "pool3"
+	top: "conv4_1"
+	name: "conv4_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 2
+		kernel_size: 3
+		filter_stride: 2
+	}
+}
+
+layer {
+	bottom: "conv4_1"
+	top: "conv4_1"
+	name: "relu4_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv4_1"
+	top: "conv4_2"
+	name: "conv4_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 2
+		kernel_size: 3
+		filter_stride: 2
+	}
+}
+
+layer {
+	bottom: "conv4_2"
+	top: "conv4_2"
+	name: "relu4_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv4_2"
+	top: "conv4_3"
+	name: "conv4_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 2
+		kernel_size: 3
+		filter_stride: 2
+	}
+}
+
+layer {
+	bottom: "conv4_3"
+	top: "conv4_3"
+	name: "relu4_3"
+	type: "ReLU"
+}
+
+
+# ------------- roi layer --------
+
+layer {
+	bottom: "conv3_3"
+	bottom: "rois"
+	top: "roi_pool3"
+	name: "roi_pool3"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 7
+		pooled_h: 7
+		spatial_scale: 0.25  # (1/4)
+	}
+}
+
+layer {
+	bottom: "conv4_3"
+	bottom: "rois"
+	top: "roi_pool4_3"
+	name: "roi_pool4_3"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 7
+		pooled_h: 7
+		spatial_scale: 0.25  # (1/4)
+	}
+}
+
+layer {
+    bottom: "roi_pool3"
+	top: "roi_pool3_flat"
+	name: "roi_pool3_flat"
+	type: "Flatten"
+}
+
+layer {
+    bottom: "roi_pool4_3"
+	top: "roi_pool4_3_flat"
+	name: "roi_pool4_3_flat"
+	type: "Flatten"
+}
+
+layer {
+    bottom: "roi_pool3_flat"
+	bottom: "roi_pool4_3_flat"
+	top: "concat_feat"
+	name: "concat_feat"
+	type: "Concat"
+}
