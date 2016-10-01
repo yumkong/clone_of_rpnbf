@@ -7,7 +7,7 @@ function [feats] = rois_get_features_ratio(conf, caffe_net, im, boxes, max_rois_
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------
 
-    % 
+    % liu@1001: ratio = 1, so no bbox width and height changes
     outer_box_ratio = ratio;
     boxes_width_change = (boxes(:,3)-boxes(:,1))*(outer_box_ratio-1)/2;
     boxes(:,1) = boxes(:,1) - boxes_width_change;
@@ -70,7 +70,7 @@ function [feats] = rois_get_features_ratio(conf, caffe_net, im, boxes, max_rois_
 %         tic;
        
         if length(output_blobs) == 1 && length(size(output_blobs{1})) == 2
-            total_feats{i} = output_blobs{1}';
+            total_feats{i} = output_blobs{1}';   %'
         else
             for j = 1:length(output_blobs)
                 feats = output_blobs{j};
@@ -128,7 +128,7 @@ function [feat_rois, levels] = map_im_rois_to_feat_rois(conf, im_rois, scales)
         heights = im_rois(:, 4) - im_rois(:, 2) + 1;
         
         areas = widths .* heights;
-        scaled_areas = bsxfun(@times, areas(:), scales(:)'.^2);
+        scaled_areas = bsxfun(@times, areas(:), scales(:)'.^2);  %'
         levels = max(abs(scaled_areas - 224.^2), 2); 
     else
         levels = ones(size(im_rois, 1), 1);

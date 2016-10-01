@@ -284,7 +284,8 @@ function hs = draw( bb, col, lw, ls, prop, ids )
 % See also bbApply, bbApply>embed, rectangle
 [n,m]=size(bb); if(n==0), hs=[]; return; end
 if(nargin<2 || isempty(col)), col=[]; end
-if(nargin<3 || isempty(lw)), lw=2; end
+%liu@1001: change lw to 1 (previous 2)
+if(nargin<3 || isempty(lw)), lw=1; end
 if(nargin<4 || isempty(ls)), ls='-'; end
 if(nargin<5 || isempty(prop)), prop={}; end
 if(nargin<6 || isempty(ids)), ids=ones(1,n); end
@@ -295,9 +296,18 @@ tProp={'FontSize',10,'color','w','FontWeight','bold',...
 if(isempty(col)), if(k==1), col='g'; else col=hsv(k); end; end
 if(size(col,1)<k), ids=ones(1,n); end; hs=zeros(1,n);
 % draw rectangles and optionally labels
-for b=1:n, hs(b)=rectangle('Position',bb(b,1:4),prop{:},col(ids(b),:)); end
-if(m==4), return; end; hs=[hs zeros(1,n)]; bb=double(bb);
-for b=1:n, hs(b+n)=text(bb(b,1),bb(b,2),num2str(bb(b,5),4),tProp{:}); end
+for b = 1:n
+	hs(b) = rectangle('Position',bb(b,1:4),prop{:},col(ids(b),:)); 
+end
+% liu@1001: do not show the scores
+%if(m==4)
+%	return;
+%end 
+%hs = [hs zeros(1,n)];
+%bb = double(bb);
+%for b = 1:n
+%	hs(b+n)=text(bb(b,1),bb(b,2),num2str(bb(b,5),4),tProp{:}); 
+%end
 end
 
 function I = embed( I, bb, varargin )

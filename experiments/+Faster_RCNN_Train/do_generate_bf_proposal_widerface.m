@@ -15,7 +15,8 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
                                         'net_file',         model_stage.output_model_file, ...
                                         'cache_name',       model_stage.cache_name); 
                                
-    fprintf('Doing nms ... ');          
+    fprintf('Doing nms ... ');   
+    % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
     ave_per_image_topN = model_stage.nms.after_nms_topN;
     model_stage.nms.after_nms_topN = -1;
     aboxes                      = boxes_filter(aboxes, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN, conf.use_gpu);      
@@ -70,6 +71,7 @@ end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)
     % to speed up nms
+    % liu@1001: get the first per_nms_topN bboxes
     if per_nms_topN > 0
         aboxes = cellfun(@(x) x(1:min(size(x, 1), per_nms_topN), :), aboxes, 'UniformOutput', false);
     end

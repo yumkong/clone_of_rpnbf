@@ -82,7 +82,7 @@ end
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
 model.stage1_rpn.nms.nms_overlap_thres = 1;
-model.stage1_rpn.nms.after_nms_topN = 200;  %40
+model.stage1_rpn.nms.after_nms_topN = 500;  %40
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test);
 model.stage1_rpn.nms.nms_overlap_thres = 0.7;
 model.stage1_rpn.nms.after_nms_topN = 1000;
@@ -94,7 +94,7 @@ mkdir_if_missing(BF_cachedir);
 dataDir = fullfile('..','datasets','caltech');                % Caltech ==> to be replaced?
 posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
 addpath(fullfile('..', 'external', 'code3.2.1'));              % Caltech ==> to be replaced?
-%addpath(genpath('external/toolbox'));  % pitor's image and video toolbox
+%addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 addpath(fullfile('..','external', 'toolbox'));
 %BF_prototxt_path = fullfile('models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
 BF_prototxt_path = fullfile('..','models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
@@ -116,7 +116,7 @@ caffe_net.copy_from(final_model_path);
 caffe.set_mode_gpu();
 
 % set up opts for training detector (see acfTrain)
-opts=DeepTrain_otf_trans_ratio(); 
+opts = DeepTrain_otf_trans_ratio(); 
 opts.cache_dir = BF_cachedir;
 opts.name=fullfile(opts.cache_dir, 'DeepCaltech_otf');
 opts.nWeak=[64 128 256 512 1024 1536 2048];
@@ -171,10 +171,12 @@ opts.nms_thres = 0.5;
 img = imread(dataset.imdb_test.image_at(1));
 tic;
 tmp_box = roidb_test_BF.rois(1).boxes;
+% only keep (bg_hard_min_ratio X #boxes) random bbxes
 retain_num = round(size(tmp_box, 1) * opts.bg_hard_min_ratio(end));
 retain_idx = randperm(size(tmp_box, 1), retain_num);
 sel_idx = true(size(tmp_box, 1), 1);
 sel_idx = sel_idx(retain_idx);
+% doing nms to reduce boxes number ==> here bg_nums_thres is 1, so not do it
 if opts.bg_nms_thres < 1
     sel_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
     sel_scores = roidb_test_BF.rois(1).scores(sel_idx, :);
@@ -182,6 +184,8 @@ if opts.bg_nms_thres < 1
     sel_idx = sel_idx(nms_sel_idxes);
 end
 tmp_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
+% liu@1001: extract deep features from tmp_box
+% opts.max_rois_num_in_gpu = 3000, opts.ratio = 1
 feat = rois_get_features_ratio(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
 toc;
 opts.feat_len = length(feat);
@@ -191,6 +195,8 @@ opts.feat_len = length(feat);
 % for i = 1:length(fs)
 %     [~,train_gts{i}]=bbGt('bbLoad',fs{i},opts.pLoad);
 % end
+
+% get gt boxes
 train_gts = cell(length(dataset.roidb_train{1}.rois), 1);
 for i = 1:length(train_gts)
     % [x y x2 y2]
@@ -216,9 +222,12 @@ if 1 % set to 1 for visual
           scores = adaBoostApply(feat, detector.clf);
           bbs = [rois(i).boxes scores];
           % do nms
+          % nms_thres  = 0.5
           sel_idx = nms(bbs, opts.nms_thres);
           sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
-          sel_idx = intersect(sel_idx, find(bbs(:, end) > opts.cascThr));
+          % liu@1001: use a higher thresh to get rid of false alarms:  opts.cascThr = -1,  new set 5
+          %sel_idx = intersect(sel_idx, find(bbs(:, end) > opts.cascThr));
+          sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
           bbs = bbs(sel_idx, :);
           bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
           bbs(:, 4) = bbs(:, 4) - bbs(:, 2);

@@ -121,6 +121,7 @@ disp(opts);
 
 % load or initialize detector and begin logging
 nm=[opts.name 'Detector.mat']; 
+% liu@1001: if detector model already exists, just load and return it
 t=exist(nm,'file');
 if(t), 
     if(nargout), 
@@ -129,14 +130,22 @@ if(t),
     end; 
     return; 
 end
-t=fileparts(nm); if(~isempty(t) && ~exist(t,'dir')), mkdir(t); end
+
+% liu@1001: initialize detector
+t = fileparts(nm); 
+if(~isempty(t) && ~exist(t,'dir'))
+	mkdir(t); 
+end
 detector = struct( 'opts',opts, 'clf',[], 'info',[] );
-startTrain=clock; nm=[opts.name 'Log.txt'];
+
+% liu@1001: start logging
+startTrain=clock; 
+nm = [opts.name 'Log.txt'];
 if(exist(nm,'file')), diary(nm); diary('off'); delete(nm); end; diary(nm);
 RandStream.setGlobalStream(RandStream('mrg32k3a','Seed',opts.seed));
 
 % sample positives 
-[X1, X1_score, ~] = sampleWins( detector, 0, 1 );
+[X1, X1_score, ~] = sampleWins( detector, 0, 1 );  % detector  stage  positive
 X1 = single(X1);
 
 % iterate bootstraping and training
@@ -273,9 +282,10 @@ end
 
 function [feats, scores, sel_idxes] = sampleWins( detector, stage, positive )
 % Load or sample windows for training detector.
-opts=detector.opts; start=clock;
+opts = detector.opts; 
+start=clock;
 if( positive ), 
-    n=opts.nPos; 
+    n = opts.nPos; 
 else
     if stage == 0
         n = opts.first_nNeg;
@@ -304,11 +314,13 @@ if positive
         fg_feat_cell = cell(length(rois), 1);
         sel_idxes = cell(length(rois), 1);
         fg_score_cell = cell(length(rois), 1);
+        % n is Inf, so this will never happen
         if n < length(rois)
             error('Not implement yet.');
         end
-        gt_num = 0;
+        gt_num = 0;  % liu@1001: actually, it is the number of positive samples
         for idx = 1:length(rois)
+        	% printf info every for every 100 images
             if mod(idx, 100) == 0
                 fprintf('Pos: %d / %d (select %d gt)\n', idx, length(rois), gt_num);
             end
@@ -317,14 +329,22 @@ if positive
             
             % here we use the ols in dollar's code
             gt = opts.train_gts{idx};
-            gt = gt(gt(:,5)<1, :); % for fg, exlucde ignore gts when eval ols 
+            gt = gt(gt(:,5) < 1, :); % for fg, exlucde ignore gts when eval ols (Liu@1001: ?= evaluate occlusion)
             if ~isempty(gt)
                 boxes = zeros(size(rois(idx).boxes));
                 boxes(:, 1) = rois(idx).boxes(:, 1);
                 boxes(:, 2) = rois(idx).boxes(:, 2);
                 boxes(:, 3) = rois(idx).boxes(:, 3) - rois(idx).boxes(:, 1);
                 boxes(:, 4) = rois(idx).boxes(:, 4) - rois(idx).boxes(:, 2);
-                ols= bbGt('compOas',boxes,gt,gt(:,5));
+                % Computes (modified) overlap area between pairs of bbs.
+                % INPUTS
+				%  dt       - [mx4] detected bbs
+				%  gt       - [nx4] gt bbs
+				%  ig       - [nx1] 0/1 ignore flags (0 by default)
+				% OUTPUTS
+				%  oas      - [m x n] overlap area between each gt and each dt bb
+                ols = bbGt('compOas',boxes,gt,gt(:,5));
+                % liu@1001: for each dt, its maximum overlap with a gt
                 max_ols = max(ols, [], 2);
                 %             gt(:,3) = gt(:,3) + gt(:,1);
                 %             gt(:,4) = gt(:,4) + gt(:,2);
@@ -332,14 +352,14 @@ if positive
             else
                 max_ols = zeros(size(rois(idx).gt));
             end
-            % selected index
+            % selected index  (fg idx)
             sel_idx = find(max_ols >= thres_lo & max_ols < thres_hi);
             
-            % ignore the gt
-            %0930 masked for there is no ignores in widerfaces
+            % subtract the valid gts from sel_idx
             gt_idx = find(rois(idx).ignores < 1);
             sel_idx = setdiff(sel_idx, gt_idx);
-            
+
+            %liu@1001: fg_nms_thres is 1, so never do this
             if opts.fg_nms_thres < 1
                 sel_boxes = rois(idx).boxes(sel_idx, :);
                 nms_sel_idxes = nms([sel_boxes max_ols(sel_idx)], opts.fg_nms_thres);
@@ -347,7 +367,7 @@ if positive
             end
 %             showboxes2(im, rois(idx).boxes(sel_idx(nms_sel_idxes), :))
 
-            % is use gt?
+            %liu@1001:  fg_use_gt = true, so use gt
             if opts.fg_use_gt
                 sel_idx = union(sel_idx, gt_idx);
             end
@@ -358,6 +378,9 @@ if positive
             if ~isempty(sel_boxes)
                 im = imread(opts.imdb_train.image_at(idx)); 
                 sel_boxes = rois(idx).boxes(sel_idx, :); %showboxes2(im, sel_boxes)
+                % liu@1001: get the deep feature vector of all selected fg boxes
+                % liu@1001: max_rois_num_in_gpu -- how many roi features can be extract at one pass,
+                % if the total features are larger than this, will divide it into several parts to extract gradually
                 fg_feat_cell{idx} = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_boxes, opts.max_rois_num_in_gpu, opts.ratio);
 %                 assert(size(fg_feat_cell{idx}, 2)==opts.feat_len, sprintf('assert fail: feat_len should set to %d', size(fg_feat_cell{idx}, 2)));
                 fg_score_cell{idx} =  rois(idx).scores(sel_idx);
@@ -416,6 +439,7 @@ else
                sel_idx = sel_idx(retain_idx);
 %                sel_feat = sel_feat(retain_idx, :);
            end
+           %liu@1001: bg_nms_thres = 1,  so never do this
            if opts.bg_nms_thres < 1
                sel_box = rois(idx).boxes(sel_idx, :);
                sel_scores = rois(idx).scores(sel_idx, :);
