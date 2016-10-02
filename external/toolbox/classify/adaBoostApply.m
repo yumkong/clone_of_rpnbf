@@ -24,7 +24,7 @@ function hs = adaBoostApply( X, model, maxDepth, minWeight, nThreads )
 
 if(nargin<3 || isempty(maxDepth)), maxDepth=0; end
 if(nargin<4 || isempty(minWeight)), minWeight=0; end
-if(nargin<5 || isempty(nThreads)), nThreads=16; end
+if(nargin<5 || isempty(nThreads)), nThreads=2; end  %16
 if(maxDepth>0), model.child(model.depth>=maxDepth) = 0; end
 if(minWeight>0), model.child(model.weights<=minWeight) = 0; end
 nWeak=size(model.fids,2); N=size(X,1); hs=zeros(N,1); nt=nThreads;

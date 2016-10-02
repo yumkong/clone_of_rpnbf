@@ -5,9 +5,9 @@ clear mex;
 clear is_valid_handle; % to clear init_key
 run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 
-%0929 added: switch from '$root/experiments' to '$root', to run on puck with matlab -nojvm
+%0929 added: switch from '$root/experiments' to '$root', to run on puck
+%with matlab -nojvm
 %cd('..');  %
-cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
@@ -18,14 +18,14 @@ end
 opts.gpu_id                 = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
 
-exp_name = 'VGG16_widerface';
+exp_name = 'ZF_widerface';
 
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface(exp_name);
+model                       = Model.ZF_for_rpn_widerface(exp_name);
 % cache base
-cache_base_proposal         = 'rpn_widerface_VGG16';
+cache_base_proposal         = 'rpn_widerface_ZF';
 % set cache folder for each stage
 model                       = Faster_RCNN_Train.set_cache_folder_widerface(cache_base_proposal, model);
 % train/test data
@@ -34,9 +34,9 @@ dataset                     = [];
 cache_data_root = 'output';  %cache_data
 mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
-model_name_base = 'vgg16_conv5';  % ZF, vgg16_conv5
+model_name_base = 'ZF';  % ZF, vgg16_conv5
 % the dir holding intermediate data paticular
-cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
+cache_data_this_model_dir = fullfile(cache_data_root, model.stage1_rpn.cache_name);
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
 event_num                   = 3;
@@ -61,16 +61,16 @@ conf_proposal.exp_name = exp_name;
 % [conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                             = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
-output_map_name = 'output_map_conv5';  % output_map_conv4, output_map_conv5
-output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
+output_map_name = 'output_map_ZF';  % output_map_conv4, output_map_conv5
+output_map_save_name = fullfile(cache_data_root, output_map_name);
 [conf_proposal.output_width_map, conf_proposal.output_height_map] = proposal_calc_output_size(conf_proposal, ...
                                                                     model.stage1_rpn.test_net_def_file, output_map_save_name);
-conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'scales',  2.^[-1:5]);
+conf_proposal.anchors = proposal_generate_anchors(cache_data_root, 'scales',  2.^[-1:5]);
 
 %% read the RPN model
 imdbs_name = cell2mat(cellfun(@(x) x.name, dataset.imdb_train, 'UniformOutput', false));
-log_dir = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, imdbs_name);
-%log_dir = fullfile(pwd, 'output', model.stage1_rpn.cache_name, imdbs_name);
+%log_dir = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, imdbs_name);
+log_dir = fullfile(pwd, 'output', model.stage1_rpn.cache_name, imdbs_name);
 
 final_model_path = fullfile(log_dir, 'final');
 if exist(final_model_path, 'file')
@@ -91,13 +91,13 @@ roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_propos
 %% train the BF
 BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir');
 mkdir_if_missing(BF_cachedir);
-dataDir = fullfile('datasets','caltech');                % Caltech ==> to be replaced?
+dataDir = fullfile('..','datasets','caltech');                % Caltech ==> to be replaced?
 posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
-addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
-addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
-%addpath(fullfile('..','external', 'toolbox'));
-BF_prototxt_path = fullfile('models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
-%BF_prototxt_path = fullfile('..','models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
+addpath(fullfile('..', 'external', 'code3.2.1'));              % Caltech ==> to be replaced?
+%addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
+addpath(fullfile('..','external', 'toolbox'));
+%BF_prototxt_path = fullfile('models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
+BF_prototxt_path = fullfile('..','models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
 conf.test_max_size = conf_proposal.max_size;
@@ -242,24 +242,24 @@ if 1 % set to 1 for visual
 end
 
 % test detector and plot roc
-% method_name = 'RPN+BF';
-% folder1 = fullfile(pwd, 'output', exp_name, 'bf_cachedir', method_name);
-% folder2 = fullfile('..', 'external', 'code3.2.1', 'data-USA', 'res', method_name);
-% 
-% %liu@0929: 'show' 2-->0
-% if ~exist(folder1, 'dir')
-%     [~,~,gt,dt]=DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
-%         'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
-%         'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
-%         'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
-%         'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', false, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
-% end
-% 
-% copyfile(folder1, folder2);
-% tmp_dir = pwd;
-% cd(fullfile(pwd, 'external', 'code3.2.1'));
-% dbEval_RPNBF;
-% cd(tmp_dir);
+method_name = 'RPN+BF';
+folder1 = fullfile(pwd, 'output', exp_name, 'bf_cachedir', method_name);
+folder2 = fullfile('..', 'external', 'code3.2.1', 'data-USA', 'res', method_name);
+
+%liu@0929: 'show' 2-->0
+if ~exist(folder1, 'dir')
+    [~,~,gt,dt]=DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
+        'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
+        'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
+        'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
+        'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', false, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
+end
+
+copyfile(folder1, folder2);
+tmp_dir = pwd;
+cd(fullfile(pwd, 'external', 'code3.2.1'));
+dbEval_RPNBF;
+cd(tmp_dir);
 
 caffe.reset_all();
 end

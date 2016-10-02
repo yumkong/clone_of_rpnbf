@@ -1,7 +1,7 @@
 function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, roidb)
     
-    % cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
-    cache_dir = fullfile(pwd, 'output', model_stage.cache_name, imdb.name);
+    cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
+    %cache_dir = fullfile(pwd, 'output', model_stage.cache_name, imdb.name);
     save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF.mat']);
     if exist(save_roidb_name, 'file')
         ld = load(save_roidb_name);

@@ -13,8 +13,10 @@ function active_caffe_mex(gpu_id, caffe_version)
         caffe_version = 'caffe';
     end
     cur_dir = pwd;
-    %caffe_dir = fullfile(pwd, 'external', 'caffe', 'matlab', caffe_version);
-    caffe_dir = fullfile('..', 'external', 'caffe', 'matlab', caffe_version);
+    %liu@1002: when running with ordinary 'matlab' 
+    caffe_dir = fullfile(pwd, 'external', 'caffe', 'matlab', caffe_version);
+    %liu@1002: when running with 'matlab -nojvm'
+    %caffe_dir = fullfile('..', 'external', 'caffe', 'matlab', caffe_version);
     
     if ~exist(caffe_dir, 'dir')
         warning('Specified caffe folder (%s) is not exist, change to default one (%s)', ...

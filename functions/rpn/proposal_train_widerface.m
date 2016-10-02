@@ -15,7 +15,7 @@ function save_model_path = proposal_train_widerface(conf, imdb_train, roidb_trai
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           50,                 @isscalar);
+    ip.addParamValue('val_iters',           100,                 @isscalar);
     ip.addParamValue('val_interval',        1000,               @isscalar);%2000
     ip.addParamValue('snapshot_interval',...
                                             1000,              @isscalar); % 10000
@@ -40,8 +40,8 @@ function save_model_path = proposal_train_widerface(conf, imdb_train, roidb_trai
     
 %% try to find trained model
     imdbs_name = cell2mat(cellfun(@(x) x.name, imdb_train, 'UniformOutput', false));
-    %cache_dir = fullfile(pwd, 'output', opts.exp_name, 'rpn_cachedir', opts.cache_name, imdbs_name);
-    cache_dir = fullfile(pwd, 'output', opts.cache_name, imdbs_name);
+    cache_dir = fullfile(pwd, 'output', opts.exp_name, 'rpn_cachedir', opts.cache_name, imdbs_name);
+    %cache_dir = fullfile(pwd, 'output', opts.cache_name, imdbs_name);
     mkdir_if_missing(cache_dir);
 	save_model_path = fullfile(cache_dir, 'final');
     if exist(save_model_path, 'file')
