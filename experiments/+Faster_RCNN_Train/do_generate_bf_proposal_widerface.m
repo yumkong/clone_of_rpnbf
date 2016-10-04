@@ -39,7 +39,7 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     
     % ########## save the raw result (before BF) here #############
     if is_test
-        fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN.txt'), 'a');
+        fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN_11.txt'), 'a');
         assert(length(imdb.image_ids) == size(aboxes, 1));
         for i = 1:size(aboxes, 1)
             if ~isempty(aboxes{i})
