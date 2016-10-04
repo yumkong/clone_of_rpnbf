@@ -16,8 +16,10 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %0930 change caffe folder according to platform
 if ispc
     opts.caffe_version          = 'caffe_faster_rcnn_win';
+    cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn';
+    cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
@@ -76,11 +78,9 @@ fprintf('\n***************\nstage one RPN \n***************\n');
 model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 %% test
-% current no test is conducted since face detection and pedestrian
-% detection has different criterion for evaluation
-%cache_name = 'widerface';
-%method_name = 'RPN-ped';
-%Faster_RCNN_Train.do_proposal_test_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
+cache_name = 'widerface';
+method_name = 'RPN-ped';
+Faster_RCNN_Train.do_proposal_test_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
 
 end
 

@@ -85,10 +85,11 @@ end
 model.stage1_rpn.nms.per_nms_topN = -1;
 model.stage1_rpn.nms.nms_overlap_thres = 1;
 model.stage1_rpn.nms.after_nms_topN = 500;  %40
-roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test);
+is_test = true;
+roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
 model.stage1_rpn.nms.nms_overlap_thres = 0.7;
 model.stage1_rpn.nms.after_nms_topN = 1000;
-roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1});
+roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
 BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir');
@@ -115,8 +116,9 @@ caffe_log_file_base = fullfile(log_dir, 'caffe_log');
 caffe.init_log(caffe_log_file_base);
 caffe_net = caffe.Net(BF_prototxt_path, 'test');  % error here
 caffe_net.copy_from(final_model_path);
-% 1002: changed to cpu because gpu memory is insufficient
-caffe.set_mode_cpu();  %caffe.set_mode_gpu()
+% when gpu memory is insufficient, can use cpu instead, though slowly
+% caffe.set_mode_cpu();
+caffe.set_mode_gpu();
 
 % set up opts for training detector (see acfTrain)
 opts = DeepTrain_otf_trans_ratio(); 
@@ -215,7 +217,10 @@ opts.train_gts = train_gts;
 detector = DeepTrain_otf_trans_ratio( opts );
 
 % visual
-if 1 % set to 1 for visual
+%if 1 % set to 1 for visual
+    % ########## save the final result (after BF) here #############
+    cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
+    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e3-RPN+BF.txt'), 'a');
   rois = opts.roidb_test.rois;
   %imgNms=bbGt('getFiles',{[dataDir 'test/images']});
   for i = 1:length(rois)
@@ -224,25 +229,53 @@ if 1 % set to 1 for visual
           feat = rois_get_features_ratio(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
           scores = adaBoostApply(feat, detector.clf);
           bbs = [rois(i).boxes scores];
+ 
           % do nms
           % nms_thres  = 0.5
-          sel_idx = nms(bbs, opts.nms_thres);
+          %if i~=29
+          %sel_idx = nms(bbs, opts.nms_thres);
+          %end
+          sel_idx = (1:size(bbs,1))';
           sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+          
+          % ########## save the final result (after BF) here #############
+          %fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN+BF.txt'), 'a');
+            %for i = 1:size(aboxes, 1)
+            bbs = bbs(sel_idx, :);
+                if ~isempty(bbs)
+                    % filesep  '/' in linux and '\' in windows 
+                    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
+                    % [x1 y1 x2 y2] pascal VOC style
+                    for j = 1:size(bbs,1)
+                        %each row: [image_name score x1 y1 x2 y2]
+                        fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, bbs(j, 5), round(bbs(j, 1:4)));
+                    end
+                end
+                %if i == 29
+                disp(i);
+                %end
+            %end
+            %fclose(fid);
+            %fprintf('Done with saving RPN+BF detected boxes.\n');
+    
           % liu@1001: use a higher thresh to get rid of false alarms:  opts.cascThr = -1,  new set 5
           %sel_idx = intersect(sel_idx, find(bbs(:, end) > opts.cascThr));
-          sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
-          bbs = bbs(sel_idx, :);
-          bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
-          bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
-          if ~isempty(bbs)
-              %I=imread(imgNms{i});
-              figure(1); 
-              im(img);  %im(I)
-              bbApply('draw',bbs); pause();
-          end
+%           sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
+%           bbs = bbs(sel_idx, :);
+%           bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
+%           bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
+%           if ~isempty(bbs)
+%               %I=imread(imgNms{i});
+%               figure(1); 
+%               im(img);  %im(I)
+%               bbApply('draw',bbs); pause();
+%           end
       end
   end
-end
+  %1004 added
+  fclose(fid);
+  fprintf('Done with saving RPN+BF+nms detected boxes.\n');
+%end
 
 % test detector and plot roc
 % method_name = 'RPN+BF';
