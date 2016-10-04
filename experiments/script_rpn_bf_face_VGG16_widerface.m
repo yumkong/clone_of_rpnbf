@@ -7,13 +7,15 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 
 %0929 added: switch from '$root/experiments' to '$root', to run on puck with matlab -nojvm
 %cd('..');  %
-cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
+%cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
     opts.caffe_version          = 'caffe_faster_rcnn_win';
+    cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn';
+    cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
@@ -113,7 +115,8 @@ caffe_log_file_base = fullfile(log_dir, 'caffe_log');
 caffe.init_log(caffe_log_file_base);
 caffe_net = caffe.Net(BF_prototxt_path, 'test');  % error here
 caffe_net.copy_from(final_model_path);
-caffe.set_mode_gpu();
+% 1002: changed to cpu because gpu memory is insufficient
+caffe.set_mode_cpu();  %caffe.set_mode_gpu()
 
 % set up opts for training detector (see acfTrain)
 opts = DeepTrain_otf_trans_ratio(); 

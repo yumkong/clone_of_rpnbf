@@ -14,8 +14,10 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %0930 change caffe folder according to platform
 if ispc
     opts.caffe_version          = 'caffe_faster_rcnn_win';
+    cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn';
+    cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
@@ -38,7 +40,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'ZF';  % ZF, vgg16_conv5
 % the dir holding intermediate data paticular
-cache_data_this_model_dir = fullfile(cache_data_root, model.stage1_rpn.cache_name);
+cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
 event_num                   = 3;
@@ -64,10 +66,10 @@ conf_proposal.exp_name = exp_name;
 %                            = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
 output_map_name = 'output_map_ZF';  % output_map_conv4, output_map_conv5
-output_map_save_name = fullfile(cache_data_root, output_map_name);
+output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_map, conf_proposal.output_height_map] = proposal_calc_output_size(conf_proposal, ...
                                                                     model.stage1_rpn.test_net_def_file, output_map_save_name);
-conf_proposal.anchors = proposal_generate_anchors(cache_data_root, 'scales',  2.^[-1:5]);
+conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'scales',  2.^[-1:5]);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');

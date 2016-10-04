@@ -1,4 +1,4 @@
-function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, roidb)
+function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, roidb, is_test)
     
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
     %cache_dir = fullfile(pwd, 'output', model_stage.cache_name, imdb.name);
@@ -22,7 +22,7 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     aboxes                      = boxes_filter(aboxes, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN, conf.use_gpu);      
     fprintf(' Done.\n');  
     
-    % find the lower score threshold
+    % only use the first max_sample_num images to compute an "expected" lower bound thresh
     max_sample_num = 5000;
     sample_aboxes = aboxes(randperm(length(aboxes), min(length(aboxes), max_sample_num)));
     scores = zeros(ave_per_image_topN*length(sample_aboxes), 1);
@@ -36,7 +36,25 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     for i = 1:length(aboxes)
         aboxes{i} = aboxes{i}(aboxes{i}(:, end) > score_thresh, :);
     end
-
+    
+    % ########## save the raw result (before BF) here #############
+    if is_test
+        fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN.txt'), 'a');
+        assert(length(imdb.image_ids) == size(aboxes, 1));
+        for i = 1:size(aboxes, 1)
+            if ~isempty(aboxes{i})
+                sstr = strsplit(imdb.image_ids{i}, '\');
+                % [x1 y1 x2 y2] pascal VOC style
+                for j = 1:size(aboxes{i}, 1)
+                    %each row: [image_name score x1 y1 x2 y2]
+                    fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, aboxes{i}(j, 5), round(aboxes{i}(j, 1:4)));
+                end
+            end
+        end
+        fclose(fid);
+        fprintf('Done with saving RPN detected boxes.\n');
+    end
+    
     % eval the gt recall
     gt_num = 0;
     gt_re_num_5 = 0;
@@ -63,6 +81,7 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
 
     roidb_regions.boxes = aboxes;
     roidb_regions.images = imdb.image_ids;
+    % concatenate gt boxes and high-scoring dt boxes
     roidb_BF                   = roidb_from_proposal_score(imdb, roidb, roidb_regions, ...
             'keep_raw_proposal', false);
         
