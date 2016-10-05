@@ -334,8 +334,11 @@ if positive
                 boxes = zeros(size(rois(idx).boxes));
                 boxes(:, 1) = rois(idx).boxes(:, 1);
                 boxes(:, 2) = rois(idx).boxes(:, 2);
-                boxes(:, 3) = rois(idx).boxes(:, 3) - rois(idx).boxes(:, 1);
-                boxes(:, 4) = rois(idx).boxes(:, 4) - rois(idx).boxes(:, 2);
+                % 1004 changed
+                %boxes(:, 3) = rois(idx).boxes(:, 3) - rois(idx).boxes(:, 1);
+                %boxes(:, 4) = rois(idx).boxes(:, 4) - rois(idx).boxes(:, 2);
+                boxes(:, 3) = rois(idx).boxes(:, 3) - rois(idx).boxes(:, 1) + 1;
+                boxes(:, 4) = rois(idx).boxes(:, 4) - rois(idx).boxes(:, 2) + 1;
                 % Computes (modified) overlap area between pairs of bbs.
                 % INPUTS
 				%  dt       - [mx4] detected bbs
@@ -420,8 +423,11 @@ else
            boxes = zeros(size(rois(idx).boxes));
            boxes(:, 1) = rois(idx).boxes(:, 1);
            boxes(:, 2) = rois(idx).boxes(:, 2);
-           boxes(:, 3) = rois(idx).boxes(:, 3) - rois(idx).boxes(:, 1);
-           boxes(:, 4) = rois(idx).boxes(:, 4) - rois(idx).boxes(:, 2);
+           % 1004 changed
+           %boxes(:, 3) = rois(idx).boxes(:, 3) - rois(idx).boxes(:, 1);
+           %boxes(:, 4) = rois(idx).boxes(:, 4) - rois(idx).boxes(:, 2);
+           boxes(:, 3) = rois(idx).boxes(:, 3) - rois(idx).boxes(:, 1) + 1;
+           boxes(:, 4) = rois(idx).boxes(:, 4) - rois(idx).boxes(:, 2) + 1;
            ols= bbGt('compOas',boxes,gt,gt(:,5));
            max_ols = max(ols, [], 2);
            %             gt(:,3) = gt(:,3) + gt(:,1);

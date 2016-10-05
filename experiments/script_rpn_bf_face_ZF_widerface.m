@@ -159,8 +159,8 @@ opts.roidb_test = roidb_test_BF;
 opts.imdb_train = dataset.imdb_train{1};
 opts.imdb_test = dataset.imdb_test;
 opts.fg_thres_hi = 1;
-opts.fg_thres_lo = 0.8; %[lo, hi)
-opts.bg_thres_hi = 0.5;
+opts.fg_thres_lo = 0.7; %[lo, hi)  %1004: 0.8 --> 0.7
+opts.bg_thres_hi = 0.3;%1004: 0.5 --> 0.3
 opts.bg_thres_lo = 0; %[lo hi)
 opts.dataDir = dataDir;
 opts.caffe_net = caffe_net;
@@ -172,7 +172,7 @@ opts.bg_nms_thres = 1;
 opts.max_rois_num_in_gpu = 3000;
 opts.init_detector = '';
 opts.load_gt = false;
-opts.ratio = 1.0;
+opts.ratio = 2.0;  %1004: 1.0 -->2.0
 opts.nms_thres = 0.5;
 
 % forward an image to check error and get the feature length
