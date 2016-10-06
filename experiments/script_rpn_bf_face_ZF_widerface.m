@@ -248,7 +248,8 @@ detector = DeepTrain_otf_trans_ratio( opts );
             %for i = 1:size(aboxes, 1)
             bbs = bbs(sel_idx, :);
                 if ~isempty(bbs)
-                    sstr = strsplit(dataset.imdb_test.image_ids{i}, '\');
+                    % filesep  '/' in linux and '\' in windows 
+                    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
                     % [x1 y1 x2 y2] pascal VOC style
                     for j = 1:size(bbs,1)
                         %each row: [image_name score x1 y1 x2 y2]

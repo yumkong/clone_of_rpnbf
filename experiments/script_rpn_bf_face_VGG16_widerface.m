@@ -83,7 +83,7 @@ end
             
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
-model.stage1_rpn.nms.nms_overlap_thres = 1;
+model.stage1_rpn.nms.nms_overlap_thres = 0.5; %1004: 1-->0.5
 model.stage1_rpn.nms.after_nms_topN = 500;  %40
 is_test = true;
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
@@ -116,9 +116,12 @@ caffe_log_file_base = fullfile(log_dir, 'caffe_log');
 caffe.init_log(caffe_log_file_base);
 caffe_net = caffe.Net(BF_prototxt_path, 'test');  % error here
 caffe_net.copy_from(final_model_path);
-% when gpu memory is insufficient, can use cpu instead, though slowly
-% caffe.set_mode_cpu();
-caffe.set_mode_gpu();
+%1004 changed:
+if conf_proposal.use_gpu
+    caffe.set_mode_gpu();
+else
+    caffe.set_mode_cpu();
+end
 
 % set up opts for training detector (see acfTrain)
 opts = DeepTrain_otf_trans_ratio(); 
@@ -220,7 +223,7 @@ detector = DeepTrain_otf_trans_ratio( opts );
 %if 1 % set to 1 for visual
     % ########## save the final result (after BF) here #############
     cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
-    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e3-RPN+BF.txt'), 'a');
+    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e3-RPN+BF2.txt'), 'a');
   rois = opts.roidb_test.rois;
   %imgNms=bbGt('getFiles',{[dataDir 'test/images']});
   for i = 1:length(rois)
