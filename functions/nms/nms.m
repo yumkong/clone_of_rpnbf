@@ -36,12 +36,12 @@ if use_gpu
     else
         pick = nms_gpu_mex(single(boxes)', double(overlap));%'
     end
-    return;
+    return;   % after gpu computing, directly return
 end
     
 if size(boxes, 1) < 1000000
     pick = nms_mex(double(boxes), double(overlap));
-    return;
+    return;  % or after cpu computing, directly return
 end
 
 x1 = boxes(:,1);

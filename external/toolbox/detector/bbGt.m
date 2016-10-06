@@ -848,12 +848,18 @@ function oa = compOas( dt, gt, ig )
 % See also bbGt, bbGt>evalRes
 m=size(dt,1); n=size(gt,1); oa=zeros(m,n);
 if(nargin<3), ig=zeros(n,1); end
-de=dt(:,[1 2])+dt(:,[3 4]); da=dt(:,3).*dt(:,4);
-ge=gt(:,[1 2])+gt(:,[3 4]); ga=gt(:,3).*gt(:,4);
+%de=dt(:,[1 2])+dt(:,[3 4]); da=dt(:,3).*dt(:,4);
+%ge=gt(:,[1 2])+gt(:,[3 4]); ga=gt(:,3).*gt(:,4);
+%1004 changed x + w -1,  y + h -1
+de=dt(:,[1 2])+dt(:,[3 4])-1; da=dt(:,3).*dt(:,4);
+ge=gt(:,[1 2])+gt(:,[3 4])-1; ga=gt(:,3).*gt(:,4);
 for i=1:m
   for j=1:n
-    w=min(de(i,1),ge(j,1))-max(dt(i,1),gt(j,1)); if(w<=0), continue; end
-    h=min(de(i,2),ge(j,2))-max(dt(i,2),gt(j,2)); if(h<=0), continue; end
+  	%1004 changed
+    %w=min(de(i,1),ge(j,1))-max(dt(i,1),gt(j,1)); if(w<=0), continue; end
+    %h=min(de(i,2),ge(j,2))-max(dt(i,2),gt(j,2)); if(h<=0), continue; end
+    w=min(de(i,1),ge(j,1))-max(dt(i,1),gt(j,1))+1; if(w<=0), continue; end
+    h=min(de(i,2),ge(j,2))-max(dt(i,2),gt(j,2))+1; if(h<=0), continue; end
     t=w*h; if(ig(j)), u=da(i); else u=da(i)+ga(j)-t; end; oa(i,j)=t/u;
   end
 end

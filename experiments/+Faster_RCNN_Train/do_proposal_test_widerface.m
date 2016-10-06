@@ -24,23 +24,25 @@ function aboxes = do_proposal_test_widerface(conf, model_stage, imdb, roidb, cac
 
     fprintf('Preparing the results for widerface Precision-Recall (VOC-style) evaluation ...');
     % first prepare for gt
-    gt_im_num = length(roidb.rois);
-    objects = cell(gt_im_num, 1);
-    imgname = cell(gt_im_num, 1);
-    for kk = 1:gt_im_num
-        tmp_name = strsplit(imdb.image_ids{kk}, filesep);
-        imgname{kk} = tmp_name{2};
-        tmp_box = roidb.rois(kk).boxes;
-        objects{kk} = [tmp_box zeros(size(tmp_box, 1), 2)];
-    end
-    Annotations = struct('imgname', imgname, 'objects', objects);
-    
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);
-    save(fullfile(cache_dir, 'widerface_anno_e1-e3.mat'), 'Annotations');
     
+    annotation_save_name = fullfile(cache_dir, 'widerface_anno_e1-e3.mat');
+    if ~exist(annotation_save_name, 'file')
+        gt_im_num = length(roidb.rois);
+        objects = cell(gt_im_num, 1);
+        imgname = cell(gt_im_num, 1);
+        for kk = 1:gt_im_num
+            tmp_name = strsplit(imdb.image_ids{kk}, filesep);
+            imgname{kk} = tmp_name{2};
+            tmp_box = roidb.rois(kk).boxes;
+            objects{kk} = [tmp_box zeros(size(tmp_box, 1), 2)];
+        end
+        Annotations = struct('imgname', imgname, 'objects', objects);
+        save(annotation_save_name, 'Annotations');
+    end
     % then prepare for dt
-    fid = fopen(fullfile(cache_dir, 'VGG16_e1-e3.txt'), 'a');
+    fid = fopen(fullfile(cache_dir, sprintf('ZF_e1-e3-nms-%.1f.txt', model_stage.nms.nms_overlap_thres)), 'a');
     assert(length(imdb.image_ids) == size(aboxes, 1));
     for i = 1:size(aboxes, 1)
         if ~isempty(aboxes{i})
