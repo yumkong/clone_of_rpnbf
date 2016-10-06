@@ -83,7 +83,7 @@ end
             
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
-model.stage1_rpn.nms.nms_overlap_thres = 0.7;  %1004: 1 --> 0.5  --> 0.7
+model.stage1_rpn.nms.nms_overlap_thres = 0.5;  %1004: 1 --> 0.5  --> 0.7
 model.stage1_rpn.nms.after_nms_topN = 500;  %40
 is_test = true;
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
@@ -223,7 +223,7 @@ detector = DeepTrain_otf_trans_ratio( opts );
 %if 1 % set to 1 for visual
     % ########## save the final result (after BF) here #############
     cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
-    fid = fopen(fullfile(cache_dir1, 'ZF_e1-e3-RPN+BF_11.txt'), 'a');
+    fid = fopen(fullfile(cache_dir1, 'ZF_e1-e3-RPN+BF-ratio2.txt'), 'a');
   rois = opts.roidb_test.rois;
   %imgNms=bbGt('getFiles',{[dataDir 'test/images']});
   for i = 1:length(rois)
@@ -234,14 +234,14 @@ detector = DeepTrain_otf_trans_ratio( opts );
           bbs = [rois(i).boxes scores];
  
           % do nms
-          nms_thres  = 0.5;  %0.5 --> 0.3 --> 0.5
+          %nms_thres  = 0.5;  %0.5 --> 0.3 --> 0.5
           %if i ~= 30
           %sel_idx = nms(bbs, opts.nms_thres);
           % 1004 changed, set true to use gpu
-          sel_idx = nms(bbs, nms_thres, true);
+          %sel_idx = nms(bbs, nms_thres, true);
           %end
 
-          %sel_idx = (1:size(bbs,1))'; %'
+          sel_idx = (1:size(bbs,1))'; %'
           sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
           
           % ########## save the final result (after BF) here #############
@@ -267,14 +267,18 @@ detector = DeepTrain_otf_trans_ratio( opts );
           %sel_idx = intersect(sel_idx, find(bbs(:, end) > opts.cascThr));
 %           sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
 %           bbs = bbs(sel_idx, :);
-%           bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
-%           bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
-%           if ~isempty(bbs)
-%               %I=imread(imgNms{i});
-%               figure(1); 
-%               im(img);  %im(I)
-%               bbApply('draw',bbs); pause();
-%           end
+          %bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
+          %bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
+          % for pedestrian or other large object, 1 doesn't matter. But for
+          % face, it matters
+          bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+          bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+          if ~isempty(bbs)
+              %I=imread(imgNms{i});
+              figure(1); 
+              im(img);  %im(I)
+              bbApply('draw',bbs); pause();
+          end
       end
   end
   %1004 added
