@@ -78,7 +78,9 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf
 %% test
 cache_name = 'widerface';
 method_name = 'RPN-ped';
-Faster_RCNN_Train.do_proposal_test_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
+%1006 changed
+%Faster_RCNN_Train.do_proposal_test_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
+Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
 
 end
 

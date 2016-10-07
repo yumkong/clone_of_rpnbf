@@ -300,14 +300,14 @@ for b = 1:n
 	hs(b) = rectangle('Position',bb(b,1:4),prop{:},col(ids(b),:)); 
 end
 % liu@1001: do not show the scores
-%if(m==4)
-%	return;
-%end 
-%hs = [hs zeros(1,n)];
-%bb = double(bb);
-%for b = 1:n
-%	hs(b+n)=text(bb(b,1),bb(b,2),num2str(bb(b,5),4),tProp{:}); 
-%end
+if(m==4)
+	return;
+end 
+hs = [hs zeros(1,n)];
+bb = double(bb);
+for b = 1:n
+	hs(b+n)=text(bb(b,1),bb(b,2),num2str(bb(b,5),4),tProp{:}); 
+end
 end
 
 function I = embed( I, bb, varargin )

@@ -1,12 +1,63 @@
-function aboxes = do_proposal_test_widerface(conf, model_stage, imdb, roidb, cache_name, method_name)
+function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, cache_name, method_name)
     aboxes                      = proposal_test_widerface(conf, imdb, ...
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
                                         'cache_name',       model_stage.cache_name); 
-          
-    fprintf('Doing nms ... ');                                
+                               
+    fprintf('Doing nms ... ');   
+    % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
+    ave_per_image_topN = model_stage.nms.after_nms_topN;
+    model_stage.nms.after_nms_topN = -1;
     aboxes                      = boxes_filter(aboxes, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN, conf.use_gpu);      
+    fprintf(' Done.\n');  
     
+    % only use the first max_sample_num images to compute an "expected" lower bound thresh
+    max_sample_num = 5000;
+    sample_aboxes = aboxes(randperm(length(aboxes), min(length(aboxes), max_sample_num)));
+    scores = zeros(ave_per_image_topN*length(sample_aboxes), 1);
+    for i = 1:length(sample_aboxes)
+        s_scores = sort([scores; sample_aboxes{i}(:, end)], 'descend');
+        scores = s_scores(1:ave_per_image_topN*length(sample_aboxes));
+    end
+    score_thresh = scores(end);
+    fprintf('score_threshold:%f\n', score_thresh);
+    % drop the boxes which scores are lower than the threshold
+    show_image = true;
+    for i = 1:length(aboxes)
+        % draw to verify pseudoNMS
+        if show_image
+            img = imread(imdb.image_at(i));  
+            %draw before NMS
+            bbs = aboxes{i}(1:100,:);
+            bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+            bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+            if ~isempty(bbs)
+              %I=imread(imgNms{i});
+              figure(1); 
+              im(img);  %im(I)
+              bbApply('draw',bbs);
+            end
+        end
+        aboxes{i} = aboxes{i}(aboxes{i}(:, end) > score_thresh, :);
+        
+        %1006 added to do NPD-style nms
+        time = tic;
+        aboxes{i} = pseudoNMS(aboxes{i});
+        fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
+        if show_image
+            %draw after NMS
+            bbs = aboxes{i};
+            bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+            bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+            if ~isempty(bbs)
+              %I=imread(imgNms{i});
+              figure(2); 
+              im(img);  %im(I)
+              bbApply('draw',bbs);
+            end
+        end
+    end
+	
     % eval the gt recall
     gt_num = 0;
     gt_re_num = 0;
@@ -42,7 +93,8 @@ function aboxes = do_proposal_test_widerface(conf, model_stage, imdb, roidb, cac
         save(annotation_save_name, 'Annotations');
     end
     % then prepare for dt
-    fid = fopen(fullfile(cache_dir, sprintf('ZF_e1-e3-noNMS-%dk.txt', model_stage.nms.per_nms_topN/1000)), 'a');
+    %fid = fopen(fullfile(cache_dir, sprintf('ZF_e1-e3-noNMS-%dk.txt', model_stage.nms.per_nms_topN/1000)), 'a');
+    fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-newNMS6.txt'), 'a');
     assert(length(imdb.image_ids) == size(aboxes, 1));
     for i = 1:size(aboxes, 1)
         if ~isempty(aboxes{i})
@@ -102,6 +154,7 @@ end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)
     % to speed up nms
+    % liu@1001: get the first per_nms_topN bboxes
     if per_nms_topN > 0
         aboxes = cellfun(@(x) x(1:min(size(x, 1), per_nms_topN), :), aboxes, 'UniformOutput', false);
     end
