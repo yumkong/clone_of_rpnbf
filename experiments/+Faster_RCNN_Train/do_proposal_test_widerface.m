@@ -42,7 +42,8 @@ function aboxes = do_proposal_test_widerface(conf, model_stage, imdb, roidb, cac
         save(annotation_save_name, 'Annotations');
     end
     % then prepare for dt
-    fid = fopen(fullfile(cache_dir, sprintf('ZF_e1-e3-nms-%.1f.txt', model_stage.nms.nms_overlap_thres)), 'a');
+    %fid = fopen(fullfile(cache_dir, sprintf('ZF_e1-e3-nms-%.1f.txt', model_stage.nms.nms_overlap_thres)), 'a');
+    fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e3-nms-%.1f.txt', model_stage.nms.nms_overlap_thres)), 'a');
     assert(length(imdb.image_ids) == size(aboxes, 1));
     for i = 1:size(aboxes, 1)
         if ~isempty(aboxes{i})
@@ -55,7 +56,7 @@ function aboxes = do_proposal_test_widerface(conf, model_stage, imdb, roidb, cac
         end
     end
     fclose(fid);
-    fprintf('Done.');
+    fprintf('Done.\n');
     
 %     fprintf('Preparing the results for Caltech evaluation ...');
 %     %cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name);
