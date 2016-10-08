@@ -46,6 +46,15 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     scores = permute(scores, [3, 2, 1]);
     scores = scores(:);
     
+    %====== 1008 do nms around each anchors first (assume only one out of 7 is the best)
+    tmp = reshape(scores, 7, []);
+    [~,tmp2] = max(tmp,[], 1);
+    kept_score_idx = 7*(0:length(tmp2)-1)+tmp2;
+    kept_score_idx = kept_score_idx';
+    pred_boxes = pred_boxes(kept_score_idx, :);
+    scores = scores(kept_score_idx, :);
+    %====== end of 1008
+    
     box_deltas_ = box_deltas;
     anchors_ = anchors;
     scores_ = scores;
@@ -65,16 +74,16 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     [scores, scores_ind] = sort(scores, 'descend');
     pred_boxes = pred_boxes(scores_ind, :);
     
-%     image(im/255); 
-%     axis image;
-%     axis off;
-%     set(gcf, 'Color', 'white');
-%     endNum = sum(scores >= 0.9);
-%     for i = 1:endNum  % can be changed to any positive number to show different #proposals
-%         bbox = pred_boxes(i,:);
-%         rect = [bbox(:, 1), bbox(:, 2), bbox(:, 3)-bbox(:,1)+1, bbox(:,4)-bbox(2)+1];
-%         rectangle('Position', rect, 'LineWidth', 2, 'EdgeColor', [0 1 0]);
-%     end
+    image(im/255); 
+    axis image;
+    axis off;
+    set(gcf, 'Color', 'white');
+    endNum = sum(scores >= 0.9);
+    for i = 1:endNum  % can be changed to any positive number to show different #proposals
+        bbox = pred_boxes(i,:);
+        rect = [bbox(:, 1), bbox(:, 2), bbox(:, 3)-bbox(:,1)+1, bbox(:,4)-bbox(2)+1];
+        rectangle('Position', rect, 'LineWidth', 2, 'EdgeColor', [0 1 0]);
+    end
 %     saveName = sprintf('val_res\\img_%d_pro200',im_idx);
 %     export_fig(saveName, '-png', '-a1', '-native');
 %     fprintf('image %d saved.\n', im_idx);
