@@ -1,8 +1,8 @@
-function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, roidb, is_test)
+function roidb_BF = do_generate_bf_proposal_submit(conf, model_stage, imdb, roidb, is_test)
     
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
     %cache_dir = fullfile(pwd, 'output', model_stage.cache_name, imdb.name);
-    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF.mat']);
+    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF_submit.mat']);
     if exist(save_roidb_name, 'file')
         ld = load(save_roidb_name);
         roidb_BF = ld.roidb_BF;
@@ -13,7 +13,8 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     aboxes                      = proposal_test_widerface(conf, imdb, ...
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
-                                        'cache_name',       model_stage.cache_name); 
+                                        'cache_name',       model_stage.cache_name,...
+                                        'suffix',           '_submit'); 
                                
     fprintf('Doing nms ... ');   
     % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
@@ -42,24 +43,24 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     end
     
     % ########## save the raw result (before BF) here #############
-    if is_test
-        fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e3-RPN-keep-ave-%d-nms-op%d.txt',ave_per_image_topN, nms_option)), 'a');
-        %fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN_11.txt'), 'a');
-
-        assert(length(imdb.image_ids) == size(aboxes, 1));
-        for i = 1:size(aboxes, 1)
-            if ~isempty(aboxes{i})
-                sstr = strsplit(imdb.image_ids{i}, filesep);
-                % [x1 y1 x2 y2] pascal VOC style
-                for j = 1:size(aboxes{i}, 1)
-                    %each row: [image_name score x1 y1 x2 y2]
-                    fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, aboxes{i}(j, 5), round(aboxes{i}(j, 1:4)));
-                end
-            end
-        end
-        fclose(fid);
-        fprintf('Done with saving RPN detected boxes.\n');
-    end
+%     if is_test
+%         fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e3-RPN-keep-ave-%d-nms-op%d.txt',ave_per_image_topN, nms_option)), 'a');
+%         %fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN_11.txt'), 'a');
+% 
+%         assert(length(imdb.image_ids) == size(aboxes, 1));
+%         for i = 1:size(aboxes, 1)
+%             if ~isempty(aboxes{i})
+%                 sstr = strsplit(imdb.image_ids{i}, filesep);
+%                 % [x1 y1 x2 y2] pascal VOC style
+%                 for j = 1:size(aboxes{i}, 1)
+%                     %each row: [image_name score x1 y1 x2 y2]
+%                     fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, aboxes{i}(j, 5), round(aboxes{i}(j, 1:4)));
+%                 end
+%             end
+%         end
+%         fclose(fid);
+%         fprintf('Done with saving RPN detected boxes.\n');
+%     end
     
     % eval the gt recall
     gt_num = 0;
@@ -70,7 +71,8 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     for i = 1:length(roidb.rois)
         %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
         gts = roidb.rois(i).boxes;
-        if ~isempty(gts)
+        %if ~isempty(gts)
+        if ~isempty(gts) && ~isempty(aboxes{i})
             rois = aboxes{i}(:, 1:4);
             max_ols = max(boxoverlap(rois, gts));
             gt_num = gt_num + size(gts, 1);

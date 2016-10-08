@@ -57,7 +57,9 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     end
     
     % drop too small boxes
-    [pred_boxes, scores] = filter_boxes(conf.test_min_box_size-3, pred_boxes, scores);
+    %1006 changed to get rid of too small boxes
+    %[pred_boxes, scores] = filter_boxes(conf.test_min_box_size-3, pred_boxes, scores);
+    [pred_boxes, scores] = filter_boxes(conf.test_min_box_size, pred_boxes, scores);
     
     % sort
     [scores, scores_ind] = sort(scores, 'descend');

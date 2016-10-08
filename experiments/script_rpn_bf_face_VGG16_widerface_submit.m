@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface()
+function script_rpn_bf_face_VGG16_widerface_submit()
 
 clc;
 clear mex;
@@ -42,8 +42,9 @@ cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
 event_num                   = 3;
+event_num_test              = -1;  %1007 added: test all val images
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
-dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num_test, cache_data_this_model_dir, model_name_base);
 
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
@@ -86,10 +87,10 @@ model.stage1_rpn.nms.per_nms_topN = -1;
 model.stage1_rpn.nms.nms_overlap_thres = 1; %1004: 1-->0.5
 model.stage1_rpn.nms.after_nms_topN = 300;  %40
 is_test = true;
-roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
+roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_submit(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
 model.stage1_rpn.nms.nms_overlap_thres = 0.7;
 model.stage1_rpn.nms.after_nms_topN = 1000;
-roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
+roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_submit(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
 BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir');
@@ -280,34 +281,4 @@ detector = DeepTrain_otf_trans_ratio( opts );
   fprintf('Done with saving RPN+BF+nms detected boxes.\n');
 %end
 
-% test detector and plot roc
-% method_name = 'RPN+BF';
-% folder1 = fullfile(pwd, 'output', exp_name, 'bf_cachedir', method_name);
-% folder2 = fullfile('..', 'external', 'code3.2.1', 'data-USA', 'res', method_name);
-% 
-% %liu@0929: 'show' 2-->0
-% if ~exist(folder1, 'dir')
-%     [~,~,gt,dt]=DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
-%         'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
-%         'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
-%         'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
-%         'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', false, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
-% end
-% 
-% copyfile(folder1, folder2);
-% tmp_dir = pwd;
-% cd(fullfile(pwd, 'external', 'code3.2.1'));
-% dbEval_RPNBF;
-% cd(tmp_dir);
-
 caffe.reset_all();
-end
-
-function [anchors, output_width_map, output_height_map] = proposal_prepare_anchors(conf, cache_name, test_net_def_file)
-    [output_width_map, output_height_map] ...                           
-                                = proposal_calc_output_size_caltech(conf, test_net_def_file);
-    anchors                = proposal_generate_anchors_caltech(cache_name, ...
-                                    'scales',  2.6*(1.3.^(0:8)), ...
-                                    'ratios', [1 / 0.41], ...
-                                    'exp_name', conf.exp_name);
-end

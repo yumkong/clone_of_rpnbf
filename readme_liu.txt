@@ -34,3 +34,9 @@ dbEval_RPNBF;
 Error in run (line 96)
 evalin('caller', [script ';']);
 
+
+% ================ 1007: compare recall rate after NMS
+gt recall rate = 0.6276
+gt recall rate after nms-1 = 0.6168
+gt recall rate after nms-2 = 0.5689
+gt recall rate after nms-3 = 0.5547
