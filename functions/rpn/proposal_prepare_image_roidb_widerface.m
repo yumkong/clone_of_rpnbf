@@ -1,4 +1,4 @@
-function [image_roidb, bbox_means, bbox_stds] = proposal_prepare_image_roidb(conf, imdbs, roidbs, bbox_means, bbox_stds)
+function [image_roidb, bbox_means, bbox_stds] = proposal_prepare_image_roidb_widerface(conf, imdbs, roidbs, bbox_means, bbox_stds)
 % [image_roidb, bbox_means, bbox_stds] = proposal_prepare_image_roidb(conf, imdbs, roidbs, cache_img, bbox_means, bbox_stds)
 % --------------------------------------------------------
 % Faster R-CNN
