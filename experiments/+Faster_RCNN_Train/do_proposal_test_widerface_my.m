@@ -29,7 +29,7 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     
     %1007 tempararily use another cell to save bbox after nms
     aboxes_nms = cell(length(aboxes), 1);
-    nms_option = 1; %1, 2, 3
+    nms_option = 3; %1, 2, 3
     
     for i = 1:length(aboxes)
         
@@ -53,6 +53,9 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
         %1006 added to do NPD-style nms
         time = tic;
         % 1007 do nms
+        %if i == 102
+        %   fprintf('Hoori\n'); 
+        %end
         aboxes_nms{i} = pseudoNMS_v3(aboxes{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
@@ -92,10 +95,12 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
             gt_num = gt_num + size(gts, 1);
             gt_re_num = gt_re_num + sum(max_ols >= 0.5);
             %1007 added
-            rois_nms = aboxes_nms{i}(:, 1:4);
-            max_ols_nms = max(boxoverlap(rois_nms, gts));
-            gt_num_nms = gt_num_nms + size(gts, 1);
-            gt_re_num_nms = gt_re_num_nms + sum(max_ols_nms >= 0.5);
+            if ~isempty(aboxes_nms{i})
+                rois_nms = aboxes_nms{i}(:, 1:4);
+                max_ols_nms = max(boxoverlap(rois_nms, gts));
+                gt_num_nms = gt_num_nms + size(gts, 1);
+                gt_re_num_nms = gt_re_num_nms + sum(max_ols_nms >= 0.5);
+            end
         end
     end
     fprintf('gt recall rate = %.4f\n', gt_re_num / gt_num);
