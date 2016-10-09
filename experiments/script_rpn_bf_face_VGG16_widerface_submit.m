@@ -220,65 +220,51 @@ opts.train_gts = train_gts;
 % train BF detector
 detector = DeepTrain_otf_trans_ratio( opts );
 
-% visual
-%if 1 % set to 1 for visual
-    % ########## save the final result (after BF) here #############
-    cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
-    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e3-RPN+BF-keep-ave-300-nms-op3.txt'), 'a');
-  rois = opts.roidb_test.rois;
-  %imgNms=bbGt('getFiles',{[dataDir 'test/images']});
-  for i = 1:length(rois)
-      if ~isempty(rois(i).boxes)
-          img = imread(dataset.imdb_test.image_at(i));  
-          feat = rois_get_features_ratio(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
-          scores = adaBoostApply(feat, detector.clf);
-          bbs = [rois(i).boxes scores];
- 
-          % do nms
-          % nms_thres  = 0.5
-          %if i~=29
-          %sel_idx = nms(bbs, opts.nms_thres);
-          %end
-          sel_idx = (1:size(bbs,1))';
-          sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
-          
-          % ########## save the final result (after BF) here #############
-          %fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN+BF.txt'), 'a');
-            %for i = 1:size(aboxes, 1)
-            bbs = bbs(sel_idx, :);
-                if ~isempty(bbs)
-                    % filesep  '/' in linux and '\' in windows 
-                    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
-                    % [x1 y1 x2 y2] pascal VOC style
-                    for j = 1:size(bbs,1)
-                        %each row: [image_name score x1 y1 x2 y2]
-                        fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, bbs(j, 5), round(bbs(j, 1:4)));
-                    end
-                end
-                %if i == 29
-                disp(i);
-                %end
-            %end
-            %fclose(fid);
-            %fprintf('Done with saving RPN+BF detected boxes.\n');
-    
-          % liu@1001: use a higher thresh to get rid of false alarms:  opts.cascThr = -1,  new set 5
-          %sel_idx = intersect(sel_idx, find(bbs(:, end) > opts.cascThr));
-%           sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
-%           bbs = bbs(sel_idx, :);
-%           bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
-%           bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
-%           if ~isempty(bbs)
-%               %I=imread(imgNms{i});
-%               figure(1); 
-%               im(img);  %im(I)
-%               bbApply('draw',bbs); pause();
-%           end
-      end
-  end
+%===============  save the final result (after BF) here to submit to
+%widerface evaluation code
+SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
+mkdir_if_missing(SUBMIT_cachedir);
+
+show_image = false;
+rois = opts.roidb_test.rois;
+
+for i = 1:length(rois)
+    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
+    event_name = sstr{1};
+    event_dir = fullfile(SUBMIT_cachedir, event_name);
+    mkdir_if_missing(event_dir);
+    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
+    fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
+    if ~isempty(rois(i).boxes)
+        img = imread(dataset.imdb_test.image_at(i));  
+        feat = rois_get_features_ratio(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
+        scores = adaBoostApply(feat, detector.clf);
+        bbs = [rois(i).boxes scores];
+
+        sel_idx = (1:size(bbs,1))'; %'
+        sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+        % print the bbox number
+        fprintf(fid, '%d\n', numel(sel_idx));
+
+        bbs = bbs(sel_idx, :);
+        if ~isempty(bbs)
+            for j = 1:size(bbs,1)
+                %each row: [x1 y1 w h score]
+                fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+            end
+        end
+
+        if show_image && ~isempty(bbs)
+            figure(1); 
+            im(img);
+            bbApply('draw',bbs); pause();
+        end
+    end
+    fclose(fid);
+    fprintf('Done with saving image %d bboxes.\n', i);
+end
   %1004 added
-  fclose(fid);
-  fprintf('Done with saving RPN+BF+nms detected boxes.\n');
+  
 %end
 
 caffe.reset_all();

@@ -68,22 +68,22 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     % drop too small boxes
     %1006 changed to get rid of too small boxes
     %[pred_boxes, scores] = filter_boxes(conf.test_min_box_size-3, pred_boxes, scores);
-    [pred_boxes, scores] = filter_boxes(conf.test_min_box_size, pred_boxes, scores);
+    [pred_boxes, scores] = filter_boxes(conf.test_min_box_size-3, pred_boxes, scores);
     
     % sort
     [scores, scores_ind] = sort(scores, 'descend');
     pred_boxes = pred_boxes(scores_ind, :);
     
-    image(im/255); 
-    axis image;
-    axis off;
-    set(gcf, 'Color', 'white');
-    endNum = sum(scores >= 0.9);
-    for i = 1:endNum  % can be changed to any positive number to show different #proposals
-        bbox = pred_boxes(i,:);
-        rect = [bbox(:, 1), bbox(:, 2), bbox(:, 3)-bbox(:,1)+1, bbox(:,4)-bbox(2)+1];
-        rectangle('Position', rect, 'LineWidth', 2, 'EdgeColor', [0 1 0]);
-    end
+%     image(im/255); 
+%     axis image;
+%     axis off;
+%     set(gcf, 'Color', 'white');
+%     endNum = sum(scores >= 0.9);
+%     for i = 1:endNum  % can be changed to any positive number to show different #proposals
+%         bbox = pred_boxes(i,:);
+%         rect = [bbox(:, 1), bbox(:, 2), bbox(:, 3)-bbox(:,1)+1, bbox(:,4)-bbox(2)+1];
+%         rectangle('Position', rect, 'LineWidth', 2, 'EdgeColor', [0 1 0]);
+%     end
 %     saveName = sprintf('val_res\\img_%d_pro200',im_idx);
 %     export_fig(saveName, '-png', '-a1', '-native');
 %     fprintf('image %d saved.\n', im_idx);
