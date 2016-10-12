@@ -40,9 +40,9 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
             img = imread(imdb.image_at(i));  
             %draw before NMS
             bbs = aboxes{i};
-            bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-            bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
             if ~isempty(bbs)
+              bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+              bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
               %I=imread(imgNms{i});
               figure(1); 
               im(img);  %im(I)
@@ -62,9 +62,9 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
         if show_image
             %draw boxes after 'smart' NMS
             bbs = aboxes_nms{i};
-            bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-            bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
             if ~isempty(bbs)
+              bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+              bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
               %I=imread(imgNms{i});
               figure(2); 
               im(img);  %im(I)
@@ -74,10 +74,10 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     end
     
     % save bbox before nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_e1-e3-keep-ave-%d.txt', ave_per_image_topN));
+    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_e1-e3-ave-%d.txt', ave_per_image_topN));
     save_bbox_to_txt(aboxes, imdb.image_ids, bbox_save_name);
     % save bbox after nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_e1-e3-keep-ave-%d-nms-op%d.txt', ave_per_image_topN, nms_option));
+    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_e1-e3-ave-%d-nms-op%d.txt', ave_per_image_topN, nms_option));
     save_bbox_to_txt(aboxes_nms, imdb.image_ids, bbox_save_name);
 	
     % eval the gt recall

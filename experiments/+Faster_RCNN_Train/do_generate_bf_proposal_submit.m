@@ -39,7 +39,8 @@ function roidb_BF = do_generate_bf_proposal_submit(conf, model_stage, imdb, roid
         aboxes{i} = aboxes{i}(aboxes{i}(:, end) > score_thresh, :);
         % do NMS
         %aboxes{i} = pseudoNMS(aboxes{i});
-        aboxes{i} = pseudoNMS_v2(aboxes{i}, nms_option);
+        %aboxes{i} = pseudoNMS_v2(aboxes{i}, nms_option);
+        aboxes{i} = pseudoNMS_v3(aboxes{i}, nms_option);
     end
     
     % ########## save the raw result (before BF) here #############
@@ -71,15 +72,16 @@ function roidb_BF = do_generate_bf_proposal_submit(conf, model_stage, imdb, roid
     for i = 1:length(roidb.rois)
         %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
         gts = roidb.rois(i).boxes;
-        %if ~isempty(gts)
-        if ~isempty(gts) && ~isempty(aboxes{i})
-            rois = aboxes{i}(:, 1:4);
-            max_ols = max(boxoverlap(rois, gts));
+        if ~isempty(gts)
             gt_num = gt_num + size(gts, 1);
-            gt_re_num_5 = gt_re_num_5 + sum(max_ols >= 0.5);
-            gt_re_num_7 = gt_re_num_7 + sum(max_ols >= 0.7);
-            gt_re_num_8 = gt_re_num_8 + sum(max_ols >= 0.8);
-            gt_re_num_9 = gt_re_num_9 + sum(max_ols >= 0.9);
+            if ~isempty(aboxes{i})
+                rois = aboxes{i}(:, 1:4);
+                max_ols = max(boxoverlap(rois, gts));
+                gt_re_num_5 = gt_re_num_5 + sum(max_ols >= 0.5);
+                gt_re_num_7 = gt_re_num_7 + sum(max_ols >= 0.7);
+                gt_re_num_8 = gt_re_num_8 + sum(max_ols >= 0.8);
+                gt_re_num_9 = gt_re_num_9 + sum(max_ols >= 0.9);
+            end
         end
     end
     fprintf('gt recall rate (ol >0.5) = %.4f\n', gt_re_num_5 / gt_num);

@@ -40,3 +40,13 @@ gt recall rate = 0.6276
 gt recall rate after nms-1 = 0.6168
 gt recall rate after nms-2 = 0.5689
 gt recall rate after nms-3 = 0.5547
+
+% ================ 1010
+training set (wider e1-e3) statistics before BF [before NMS: -1, nms thresh: 0.7, after nms: 1000]
+score_threshold:0.006636
+gt recall rate (ol >0.5) = 0.5928
+gt recall rate (ol >0.7) = 0.2717
+gt recall rate (ol >0.8) = 0.1001
+gt recall rate (ol >0.9) = 0.0090
+gt_num: 23055
+

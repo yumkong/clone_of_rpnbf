@@ -47,12 +47,18 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     scores = scores(:);
     
     %====== 1008 do nms around each anchors first (assume only one out of 7 is the best)
-    tmp = reshape(scores, 7, []);
-    [~,tmp2] = max(tmp,[], 1);
-    kept_score_idx = 7*(0:length(tmp2)-1)+tmp2;
-    kept_score_idx = kept_score_idx';
-    pred_boxes = pred_boxes(kept_score_idx, :);
-    scores = scores(kept_score_idx, :);
+    %1009 found that only keeping one box out of 12 boxes doesnt have a
+    %good result, keep all 12 boxes and select the first 300 boxes is
+    %better
+%     anchor_num = size(conf.anchors, 1);
+%     %tmp = reshape(scores, 7, []);
+%     tmp = reshape(scores, anchor_num, []);
+%     [~,tmp2] = max(tmp,[], 1);
+%     %kept_score_idx = 7*(0:length(tmp2)-1)+tmp2;
+%     kept_score_idx = anchor_num*(0:length(tmp2)-1)+tmp2;
+%     kept_score_idx = kept_score_idx';
+%     pred_boxes = pred_boxes(kept_score_idx, :);
+%     scores = scores(kept_score_idx, :);
     %====== end of 1008
     
     box_deltas_ = box_deltas;
