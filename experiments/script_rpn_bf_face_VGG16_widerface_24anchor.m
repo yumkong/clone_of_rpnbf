@@ -1,31 +1,33 @@
-function script_rpn_bf_face_VGG16_widerface()
+function script_rpn_bf_face_VGG16_widerface_24anchor()
 
 clc;
 clear mex;
 clear is_valid_handle; % to clear init_key
 run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 
-%0929 added: switch from '$root/experiments' to '$root', to run on puck
-%with matlab -nojvm
+%0929 added: switch from '$root/experiments' to '$root', to run on puck with matlab -nojvm
 %cd('..');  %
+%cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
     opts.caffe_version          = 'caffe_faster_rcnn_win';
+    cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn';
+    cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
 
-exp_name = 'ZF_widerface';
+exp_name = 'VGG16_widerface';
 
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.ZF_for_rpn_widerface(exp_name);
+model                       = Model.VGG16_for_rpn_widerface(exp_name);
 % cache base
-cache_base_proposal         = 'rpn_widerface_ZF';
+cache_base_proposal         = 'rpn_widerface_VGG16';
 % set cache folder for each stage
 model                       = Faster_RCNN_Train.set_cache_folder_widerface(cache_base_proposal, model);
 % train/test data
@@ -34,9 +36,13 @@ dataset                     = [];
 cache_data_root = 'output';  %cache_data
 mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
-model_name_base = 'ZF';  % ZF, vgg16_conv5
+model_name_base = 'vgg16_conv5';  % ZF, vgg16_conv5
+% liu@1010 moved from line109 to here
+BF_prototxt_path = fullfile('models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
+%1009 change exp here for output
+exp_name = 'VGG16_widerface_twelve_anchors';
 % the dir holding intermediate data paticular
-cache_data_this_model_dir = fullfile(cache_data_root, model.stage1_rpn.cache_name);
+cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
 event_num                   = 3;
@@ -61,16 +67,19 @@ conf_proposal.exp_name = exp_name;
 % [conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                             = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
-output_map_name = 'output_map_ZF';  % output_map_conv4, output_map_conv5
-output_map_save_name = fullfile(cache_data_root, output_map_name);
+output_map_name = 'output_map_conv5';  % output_map_conv4, output_map_conv5
+output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_map, conf_proposal.output_height_map] = proposal_calc_output_size(conf_proposal, ...
                                                                     model.stage1_rpn.test_net_def_file, output_map_save_name);
-conf_proposal.anchors = proposal_generate_anchors(cache_data_root, 'scales',  2.^[-1:5]);
-
+%conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'scales',  2.^[-1:5]);
+%1009: from 7 to 12 anchors
+%1012: from 12 to 24 anchors
+conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);
+        
 %% read the RPN model
 imdbs_name = cell2mat(cellfun(@(x) x.name, dataset.imdb_train, 'UniformOutput', false));
-%log_dir = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, imdbs_name);
-log_dir = fullfile(pwd, 'output', model.stage1_rpn.cache_name, imdbs_name);
+log_dir = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, imdbs_name);
+%log_dir = fullfile(pwd, 'output', model.stage1_rpn.cache_name, imdbs_name);
 
 final_model_path = fullfile(log_dir, 'final');
 if exist(final_model_path, 'file')
@@ -81,23 +90,24 @@ end
             
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
-model.stage1_rpn.nms.nms_overlap_thres = 1;
-model.stage1_rpn.nms.after_nms_topN = 500;  %40
-roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test);
-model.stage1_rpn.nms.nms_overlap_thres = 0.7;
-model.stage1_rpn.nms.after_nms_topN = 1000;
-roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1});
+model.stage1_rpn.nms.nms_overlap_thres = 1; %1004: 1-->0.5
+model.stage1_rpn.nms.after_nms_topN = 300;  %40
+is_test = true;
+roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
+model.stage1_rpn.nms.nms_overlap_thres = 0.8; %1010: 0.7 --> 0.8
+model.stage1_rpn.nms.after_nms_topN = 600;  % 1010: 1000 --> 600
+roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
 BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir');
 mkdir_if_missing(BF_cachedir);
-dataDir = fullfile('..','datasets','caltech');                % Caltech ==> to be replaced?
+dataDir = fullfile('datasets','caltech');                % Caltech ==> to be replaced?
 posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
-addpath(fullfile('..', 'external', 'code3.2.1'));              % Caltech ==> to be replaced?
-%addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
-addpath(fullfile('..','external', 'toolbox'));
+addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
+addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
+%addpath(fullfile('..','external', 'toolbox'));
 %BF_prototxt_path = fullfile('models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
-BF_prototxt_path = fullfile('..','models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
+%BF_prototxt_path = fullfile('..','models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
 conf.test_max_size = conf_proposal.max_size;
@@ -113,7 +123,12 @@ caffe_log_file_base = fullfile(log_dir, 'caffe_log');
 caffe.init_log(caffe_log_file_base);
 caffe_net = caffe.Net(BF_prototxt_path, 'test');  % error here
 caffe_net.copy_from(final_model_path);
-caffe.set_mode_gpu();
+%1004 changed:
+if conf_proposal.use_gpu
+    caffe.set_mode_gpu();
+else
+    caffe.set_mode_cpu();
+end
 
 % set up opts for training detector (see acfTrain)
 opts = DeepTrain_otf_trans_ratio(); 
@@ -151,8 +166,8 @@ opts.roidb_test = roidb_test_BF;
 opts.imdb_train = dataset.imdb_train{1};
 opts.imdb_test = dataset.imdb_test;
 opts.fg_thres_hi = 1;
-opts.fg_thres_lo = 0.8; %[lo, hi)
-opts.bg_thres_hi = 0.5;
+opts.fg_thres_lo = 0.5; %[lo, hi) 0.8
+opts.bg_thres_hi = 0.2; %0.5
 opts.bg_thres_lo = 0; %[lo hi)
 opts.dataDir = dataDir;
 opts.caffe_net = caffe_net;
@@ -164,7 +179,7 @@ opts.bg_nms_thres = 1;
 opts.max_rois_num_in_gpu = 3000;
 opts.init_detector = '';
 opts.load_gt = false;
-opts.ratio = 1.0;
+opts.ratio = 1.5;  %1--1.5
 opts.nms_thres = 0.5;
 
 % forward an image to check error and get the feature length
@@ -212,7 +227,10 @@ opts.train_gts = train_gts;
 detector = DeepTrain_otf_trans_ratio( opts );
 
 % visual
-if 1 % set to 1 for visual
+%if 1 % set to 1 for visual
+    % ########## save the final result (after BF) here #############
+    cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
+    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e3-RPN+BF-anchor12-ave-300-nms-op3.txt'), 'w+');
   rois = opts.roidb_test.rois;
   %imgNms=bbGt('getFiles',{[dataDir 'test/images']});
   for i = 1:length(rois)
@@ -221,45 +239,73 @@ if 1 % set to 1 for visual
           feat = rois_get_features_ratio(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
           scores = adaBoostApply(feat, detector.clf);
           bbs = [rois(i).boxes scores];
+ 
           % do nms
           % nms_thres  = 0.5
-          sel_idx = nms(bbs, opts.nms_thres);
+          %if i~=29
+          %sel_idx = nms(bbs, opts.nms_thres);
+          %end
+          sel_idx = (1:size(bbs,1))';
           sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+          
+          % ########## save the final result (after BF) here #############
+          %fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN+BF.txt'), 'a');
+            %for i = 1:size(aboxes, 1)
+            bbs = bbs(sel_idx, :);
+                if ~isempty(bbs)
+                    % filesep  '/' in linux and '\' in windows 
+                    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
+                    % [x1 y1 x2 y2] pascal VOC style
+                    for j = 1:size(bbs,1)
+                        %each row: [image_name score x1 y1 x2 y2]
+                        fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, bbs(j, 5), round(bbs(j, 1:4)));
+                    end
+                end
+                %if i == 29
+                disp(i);
+                %end
+            %end
+            %fclose(fid);
+            %fprintf('Done with saving RPN+BF detected boxes.\n');
+    
           % liu@1001: use a higher thresh to get rid of false alarms:  opts.cascThr = -1,  new set 5
           %sel_idx = intersect(sel_idx, find(bbs(:, end) > opts.cascThr));
-          sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
-          bbs = bbs(sel_idx, :);
-          bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
-          bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
-          if ~isempty(bbs)
-              %I=imread(imgNms{i});
-              figure(1); 
-              im(img);  %im(I)
-              bbApply('draw',bbs); pause();
-          end
+%           sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
+%           bbs = bbs(sel_idx, :);
+%           bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
+%           bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
+%           if ~isempty(bbs)
+%               %I=imread(imgNms{i});
+%               figure(1); 
+%               im(img);  %im(I)
+%               bbApply('draw',bbs); pause();
+%           end
       end
   end
-end
+  %1004 added
+  fclose(fid);
+  fprintf('Done with saving RPN+BF+nms detected boxes.\n');
+%end
 
 % test detector and plot roc
-method_name = 'RPN+BF';
-folder1 = fullfile(pwd, 'output', exp_name, 'bf_cachedir', method_name);
-folder2 = fullfile('..', 'external', 'code3.2.1', 'data-USA', 'res', method_name);
-
-%liu@0929: 'show' 2-->0
-if ~exist(folder1, 'dir')
-    [~,~,gt,dt]=DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
-        'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
-        'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
-        'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
-        'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', false, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
-end
-
-copyfile(folder1, folder2);
-tmp_dir = pwd;
-cd(fullfile(pwd, 'external', 'code3.2.1'));
-dbEval_RPNBF;
-cd(tmp_dir);
+% method_name = 'RPN+BF';
+% folder1 = fullfile(pwd, 'output', exp_name, 'bf_cachedir', method_name);
+% folder2 = fullfile('..', 'external', 'code3.2.1', 'data-USA', 'res', method_name);
+% 
+% %liu@0929: 'show' 2-->0
+% if ~exist(folder1, 'dir')
+%     [~,~,gt,dt]=DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
+%         'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
+%         'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
+%         'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
+%         'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', false, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
+% end
+% 
+% copyfile(folder1, folder2);
+% tmp_dir = pwd;
+% cd(fullfile(pwd, 'external', 'code3.2.1'));
+% dbEval_RPNBF;
+% cd(tmp_dir);
 
 caffe.reset_all();
 end
