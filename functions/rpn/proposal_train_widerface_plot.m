@@ -15,10 +15,10 @@ function save_model_path = proposal_train_widerface_plot(conf, imdb_train, roidb
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           2000,                 @isscalar);%100
-    ip.addParamValue('val_interval',        10000,               @isscalar);%2000
+    ip.addParamValue('val_iters',           201,                 @isscalar);%100
+    ip.addParamValue('val_interval',        1000,               @isscalar);%2000
     ip.addParamValue('snapshot_interval',...
-                                            10000,              @isscalar); % 10000
+                                            1000,              @isscalar); % 10000
                                                                        
     % Max pixel size of a scaled input image
     ip.addParamValue('solver_def_file',     fullfile(pwd, 'proposal_models', 'Zeiler_conv5', 'solver.prototxt'), ...
@@ -112,8 +112,10 @@ function save_model_path = proposal_train_widerface_plot(conf, imdb_train, roidb
         fprintf('Done.\n');
 
         % fix validation data
-        shuffled_inds_val   = generate_random_minibatch([], image_roidb_val, conf.ims_per_batch);
-        shuffled_inds_val   = shuffled_inds_val(randperm(length(shuffled_inds_val), opts.val_iters));
+        % 1012 changed to use all validation set
+        %shuffled_inds_val   = generate_random_minibatch([], image_roidb_val, conf.ims_per_batch);
+        %shuffled_inds_val   = shuffled_inds_val(randperm(length(shuffled_inds_val), opts.val_iters));
+        shuffled_inds_val = num2cell(1:size(image_roidb_val,1));
     end
     
     conf.classes        = opts.imdb_train{1}.classes;

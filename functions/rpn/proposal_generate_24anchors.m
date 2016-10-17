@@ -11,7 +11,7 @@ function anchors = proposal_generate_24anchors(cache_name, varargin)
     ip.addRequired('cache_name',                        @isstr);
 
     % the size of the base anchor 
-    ip.addParamValue('base_size',       12,             @isscalar); %1009: 16 -->12
+    ip.addParamValue('base_size',       10,             @isscalar); %1009: 16 -->12
     % ratio list of anchors
     ip.addParamValue('ratios',          [1],    @ismatrix);%0807: [0.5, 1, 2] --> [1]
     % scale list of anchors
@@ -35,9 +35,22 @@ function anchors = proposal_generate_24anchors(cache_name, varargin)
         base_anchor             = [1, 1, opts.base_size, opts.base_size];
         ratio_anchors           = ratio_jitter(base_anchor, opts.ratios);
         anchors                 = cellfun(@(x) scale_jitter(x, opts.scales), num2cell(ratio_anchors, 2), 'UniformOutput', false);
-        % extend the length-10 anchor to 9 anchors
         
+        % extend anchors
+        tmp_anchors = anchors{1};
+        % extend the length-10 anchor to 9 anchors
+        extent_anchor10_delta = [-5 -5 -5 -5; 0 -5 0 -5; 5 -5 5 -5; ...
+                                 -5  0 -5  0; 0 0  0  0; 5 0  5  0; ...
+                                 -5  5 -5  5; 0  5 0  5; 5 5  5  5];
+        anchor10_ext = bsxfun(@plus, tmp_anchors(1,:), extent_anchor10_delta);
         % extend the length-16 anchor to 4 anchors
+        extent_anchor16_delta = [0 0 0 0; 0 8 0 8; ...
+                                 8 0 8 0; 8 8 8 8];
+        anchor16_ext = bsxfun(@plus, tmp_anchors(2,:), extent_anchor16_delta);
+        % extend anchors
+        tmp_anchors(1:2,:) = [];
+        tmp_anchors = cat(1, anchor10_ext, anchor16_ext, tmp_anchors);
+        anchors{1} = tmp_anchors;
         
         anchors                 = cat(1, anchors{:});
         if ~opts.ignore_cache

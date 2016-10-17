@@ -223,7 +223,7 @@ detector = DeepTrain_otf_trans_ratio( opts );
 %if 1 % set to 1 for visual
     % ########## save the final result (after BF) here #############
     cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
-    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e3-RPN+BF-keep-ave-300-nms-op3.txt'), 'a');
+    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e3-RPN+BF-ave-300-nms-op3-newscore2.txt'), 'a');
   rois = opts.roidb_test.rois;
   %imgNms=bbGt('getFiles',{[dataDir 'test/images']});
   for i = 1:length(rois)

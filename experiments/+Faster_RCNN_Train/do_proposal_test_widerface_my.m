@@ -20,7 +20,7 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
         scores = s_scores(1:ave_per_image_topN*length(sample_aboxes));
     end
     score_thresh = scores(end);
-    fprintf('score_threshold:%f\n', score_thresh);
+    fprintf('score_threshold = %f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
     show_image = true;
     % path to save file
@@ -30,6 +30,8 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     %1007 tempararily use another cell to save bbox after nms
     aboxes_nms = cell(length(aboxes), 1);
     nms_option = 3; %1, 2, 3
+    %aboxes_nms2 = cell(length(aboxes), 1);
+    %nms_option2 = 2; %1, 2, 3
     
     for i = 1:length(aboxes)
         
@@ -52,10 +54,6 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
         
         %1006 added to do NPD-style nms
         time = tic;
-        % 1007 do nms
-        %if i == 102
-        %   fprintf('Hoori\n'); 
-        %end
         aboxes_nms{i} = pseudoNMS_v3(aboxes{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
@@ -71,13 +69,34 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
               bbApply('draw',bbs);
             end
         end
+        
+%         time = tic;
+%         % 1007 do nms
+%         %if i == 102
+%         %   fprintf('Hoori\n'); 
+%         %end
+%         aboxes_nms2{i} = pseudoNMS_v3(aboxes{i}, nms_option2);
+%         
+%         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
+%         if show_image
+%             %draw boxes after 'smart' NMS
+%             bbs = aboxes_nms2{i};
+%             if ~isempty(bbs)
+%               bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+%               bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+%               %I=imread(imgNms{i});
+%               figure(3); 
+%               im(img);  %im(I)
+%               bbApply('draw',bbs);
+%             end
+%         end
     end
     
     % save bbox before nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_e1-e3-ave-%d.txt', ave_per_image_topN));
+    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_all-ave-%d.txt', ave_per_image_topN));
     save_bbox_to_txt(aboxes, imdb.image_ids, bbox_save_name);
     % save bbox after nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_e1-e3-ave-%d-nms-op%d.txt', ave_per_image_topN, nms_option));
+    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_all-ave-%d-nms-op%d.txt', ave_per_image_topN, nms_option));
     save_bbox_to_txt(aboxes_nms, imdb.image_ids, bbox_save_name);
 	
     % eval the gt recall
@@ -109,8 +128,6 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
 
     fprintf('Preparing the results for widerface Precision-Recall (VOC-style) evaluation ...');
     % first prepare for gt
-%     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
-%     mkdir_if_missing(cache_dir);
     
     annotation_save_name = fullfile(cache_dir, 'widerface_anno_e1-e3.mat');
     if ~exist(annotation_save_name, 'file')

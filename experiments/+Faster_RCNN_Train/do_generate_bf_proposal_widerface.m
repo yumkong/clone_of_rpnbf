@@ -2,7 +2,9 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
     %cache_dir = fullfile(pwd, 'output', model_stage.cache_name, imdb.name);
-    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF.mat']);
+    %save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF.mat']);
+    %1011 changed
+    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF_newscore.mat']);
     if exist(save_roidb_name, 'file')
         ld = load(save_roidb_name);
         roidb_BF = ld.roidb_BF;
@@ -40,11 +42,22 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
         %aboxes{i} = pseudoNMS(aboxes{i});
         %aboxes{i} = pseudoNMS_v2(aboxes{i}, nms_option);
         aboxes{i} = pseudoNMS_v3(aboxes{i}, nms_option);
+        %set the highest all >=1 scores after nms to 1
+        if ~isempty(aboxes{i})
+            tmp_score = aboxes{i}(:,end);
+            %====newscore1 ==
+            %tmp_score(tmp_score >= 1) = 1;
+            
+            % =====newscore2========
+            tmp_score = sqrt(tmp_score); %square root
+            tmp_score = 0.9 * (tmp_score - min(tmp_score)) / (max(tmp_score) - min(tmp_score)) + 0.1; % shrink to the range [0.1 1]
+            aboxes{i}(:,end) = tmp_score;
+        end
     end
     
     % ########## save the raw result (before BF) here #############
     if is_test
-        fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e3-12anchor-ave-%d-nms-op%d.txt',ave_per_image_topN, nms_option)), 'a');
+        fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e3-12anchor-ave-%d-nms-op%d-newscore2.txt',ave_per_image_topN, nms_option)), 'a');
 
         assert(length(imdb.image_ids) == size(aboxes, 1));
         for i = 1:size(aboxes, 1)

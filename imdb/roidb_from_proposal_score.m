@@ -61,7 +61,7 @@ for i = 1:length(rois)
     
     all_boxes = cat(1, rois(i).boxes, boxes);
     
-    rois(i).scores = ones(size(rois(i).gt, 1), 1);
+    rois(i).scores = ones(size(rois(i).gt, 1), 1); %gt boxes score is set to 1
     
     num_gt_boxes = size(gt_boxes, 1);
     num_boxes = size(boxes, 1);

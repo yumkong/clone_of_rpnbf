@@ -1,14 +1,20 @@
 function rects = pseudoNMS_v3(candi_rects, nms_option)
 
 % overlapping threshold for grouping nearby detections
-overlappingThreshold = 0.7; %0.7:0.5233, 0.8:0.5218, 0.6:0.5233 
-overlappingThreshold2 = 0.6; %0.5: 0.5233, 0.6: 0.5420 
+overlappingThreshold = 0.75; %0.7:0.5233, 0.8:0.5218, 0.6:0.5233 %1012 0.7-->0.75
+overlappingThreshold2 = 0.8; %0.5: 0.5233, 0.6: 0.5420   %1012: 0.6 --> 0.7
 overlappingThreshold3 = 0.2;
 embeddingThreshold = 0.55; %0.5: 0.5279  0.55: 0.5337 
 large_small_ratio = 0.2; %0.1: 0.5271  %0.2: 0.5279
 % candi_rects: N x 5 matrix, each row: [x1 y1 x2 y2 score]
 if isempty(candi_rects)
     rects = [];
+    return;
+end
+
+%1016 added: when option 0, do nothing
+if nms_option == 0
+    rects = candi_rects;
     return;
 end
 
@@ -81,8 +87,8 @@ if nms_option >=2
             s = max(h,0) * max(w,0);
             % 1006 changed to make it more strict
             %if s / (area_all(i) + area_all(j) - s) >= overlappingThreshold2
-            if (s / area_all(i) >= overlappingThreshold2 || s / area_all(j) >= overlappingThreshold2) && ...
-                    (area_all(i)/ area_all(j) >= overlappingThreshold3 && area_all(j)/ area_all(i) >= overlappingThreshold3)
+            if ((s / area_all(i) >= overlappingThreshold2 && s / area_all(i) < 1) || (s / area_all(j) >= overlappingThreshold2 && s / area_all(j) <1)) ...
+                    &&(area_all(i)/ area_all(j) >= overlappingThreshold3 && area_all(j)/ area_all(i) >= overlappingThreshold3)
                 predicate(i,j) = 1;
                 predicate(j,i) = 1;
             end
@@ -127,7 +133,7 @@ if nms_option >=2
                             % absolute value
                             center_dist_x = abs(0.5*(rects_one(3) + rects_one(1) - rects_two(3) - rects_two(1)));
                             center_dist_y = abs(0.5*(rects_one(4) + rects_one(2) - rects_two(4) - rects_two(2)));
-                            if center_dist_x <= 0.5*max(w_one, w_two) && center_dist_y <= 0.5*max(h_one, h_two)
+                            if center_dist_x <= 0.3*max(w_one, w_two) && center_dist_y <= 0.3*max(h_one, h_two) %0.5-->0.3
                                 combined_flag(jj) = true;
                                 % combine two rects
                                 weight = [rects_one(5) rects_two(5)] / sum([rects_one(5) rects_two(5)]);
