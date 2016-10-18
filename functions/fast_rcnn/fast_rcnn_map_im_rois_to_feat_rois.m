@@ -24,7 +24,7 @@ function [feat_rois] = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scal
     boxes_top_change = (boxes(:,4)-boxes(:,2) + 1) * top_ratio;
     boxes(:,2) = round(boxes(:,2) - boxes_top_change);
     
-    bottom_ratio = 3;
+    bottom_ratio = 1.8;
     boxes_bottom_change = (boxes(:,4)-boxes(:,2) + 1) * bottom_ratio;
     boxes(:,4) = round(boxes(:,4) + boxes_bottom_change);
     

@@ -28,7 +28,7 @@ model.stage2_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_na
 % rpn test setting
 model.stage2_rpn.nms.per_nms_topN              	= 20000;%-1
 model.stage2_rpn.nms.nms_overlap_thres       	= 0.7; %0.7
-model.stage2_rpn.nms.after_nms_topN           	= 800; %2000
+model.stage2_rpn.nms.after_nms_topN           	= 1000; %2000
 
 %% stage 2 fast rcnn, only finetune fc layers
 model.stage2_fast_rcnn.solver_def_file          = fullfile(pwd, 'models', exp_name,'fast_rcnn_prototxts', 'vgg_16layers_fc6', 'solver_30k40k_widerface_conv4.prototxt');

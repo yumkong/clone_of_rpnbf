@@ -317,23 +317,25 @@ layer {
 	type: "ReLU"
 }
 
+
+
 layer {
 	bottom: "conv4_3" #conv5_3
 	bottom: "rois"
-	top: "pool5"
-	name: "roi_pool5"
+	top: "pool4_my"
+	name: "roi_pool4"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 7  #7
-		pooled_h: 7  #7
+		pooled_w: 3  #7
+		pooled_h: 3  #7
 		spatial_scale: 0.125  # (1/16)--> (1/8)
 	}
 }
 
 layer {
-	bottom: "pool5"
-	top: "fc6"
-	name: "fc6"
+	bottom: "pool4_my"
+	top: "fc6_my"
+	name: "fc6_my"
 	param {
 		lr_mult: 1.0
 	}
@@ -343,20 +345,28 @@ layer {
 	type: "InnerProduct"
 	inner_product_param {
 		num_output: 4096
+		weight_filler {
+			type: "gaussian"
+			std: 0.001 #0.01
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
 	}
 }
 
 layer {
-	bottom: "fc6"
-	top: "fc6"
-	name: "relu6"
+	bottom: "fc6_my"
+	top: "fc6_my"
+	name: "relu6_my"
 	type: "ReLU"
 }
 
 layer {
-	bottom: "fc6"
-	top: "fc6"
-	name: "drop6"
+	bottom: "fc6_my"
+	top: "fc6_my"
+	name: "drop6_my"
 	type: "Dropout"
 	dropout_param {
 		dropout_ratio: 0.5
@@ -364,9 +374,9 @@ layer {
 }
 
 layer {
-	bottom: "fc6"
-	top: "fc7"
-	name: "fc7"
+	bottom: "fc6_my"
+	top: "fc7_my"
+	name: "fc7_my"
 	param {
 		lr_mult: 1.0
 	}
@@ -376,20 +386,28 @@ layer {
 	type: "InnerProduct"
 	inner_product_param {
 		num_output: 4096
+		weight_filler {
+			type: "gaussian"
+			std: 0.001 #0.01
+		}
+		bias_filler {
+			type: "constant"
+			value: 0
+		}
 	}
 }
 
 layer {
-	bottom: "fc7"
-	top: "fc7"
-	name: "relu7"
+	bottom: "fc7_my"
+	top: "fc7_my"
+	name: "relu7_my"
 	type: "ReLU"
 }
 
 layer {
-	bottom: "fc7"
-	top: "fc7"
-	name: "drop7"
+	bottom: "fc7_my"
+	top: "fc7_my"
+	name: "drop7_my"
 	type: "Dropout"
 	dropout_param {
 		dropout_ratio: 0.5
@@ -397,7 +415,7 @@ layer {
 }
 
 layer {
-	bottom: "fc7"
+	bottom: "fc7_my"
 	top: "cls_score"
 	name: "cls_score"
 	param {
@@ -411,7 +429,7 @@ layer {
 		num_output: 2  #21 --> 2[face bg]
 		weight_filler {
 			type: "gaussian"
-			std: 0.01
+			std: 0.001  #0.01
 		}
 		bias_filler {
 			type: "constant"
@@ -421,7 +439,7 @@ layer {
 }
 
 layer {
-	bottom: "fc7"
+	bottom: "fc7_my"
 	top: "bbox_pred"
 	name: "bbox_pred"
 	type: "InnerProduct"
@@ -468,7 +486,7 @@ layer {
 	bottom: "bbox_targets"
 	bottom: "bbox_loss_weights"
 	top: "loss_bbox"
-	loss_weight: 1
+	loss_weight: 0.1 #1
 }
 
 

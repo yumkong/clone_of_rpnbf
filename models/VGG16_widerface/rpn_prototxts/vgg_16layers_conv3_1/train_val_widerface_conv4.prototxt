@@ -481,5 +481,5 @@ layer {
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 10
+  loss_weight: 5  #1017: 10-->5
 }
