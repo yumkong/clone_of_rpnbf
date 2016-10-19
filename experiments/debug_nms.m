@@ -20,7 +20,21 @@ mkdir_if_missing(cache_data_this_model_dir);
 event_num                   = 11; %3
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 imdb = dataset.imdb_test;
-if isunix
+%1018 added for windows
+%if image path is of unix format but in windows platform, replace it with windows path
+if ispc && ~isempty(strfind(imdb.image_at(1), '/'))  %unix path must have '/'
+    %test set
+    imdb.image_dir = 'D:\\datasets\\WIDERFACE';
+    for k = 1:length(imdb.image_ids)
+        imdb.image_ids{k} = strrep(imdb.image_ids{k}, '/', '\\'); % '/' --> '\'
+    end
+    test_root = fullfile(imdb.image_dir, 'WIDER_val','images');
+    imdb.image_at = @(i) sprintf('%s\\%s.%s', test_root, imdb.image_ids{i}, imdb.extension); 
+end
+
+if ispc
+    cd('D:\\RPN_BF_master');
+elseif isunix
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 
@@ -61,7 +75,7 @@ for i = 1:length(aboxes)
         end
         
         time = tic;
-        nms_aboxes{i} = pseudoNMS_v3(bf_aboxes{i}, nms_option);
+        nms_aboxes{i} = pseudoNMS_v6(bf_aboxes{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         if show_image
