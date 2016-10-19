@@ -91,9 +91,9 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf
 %nms_option_test = 3;
 %dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, x, y, nms_option_train), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
 %dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-%cache_name = 'widerface';
-%method_name = 'RPN-ped';
-%Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
+cache_name = 'widerface';
+method_name = 'RPN-ped';
+Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');

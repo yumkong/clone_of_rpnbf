@@ -107,18 +107,25 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     gt_re_num_nms = 0;
     for i = 1:length(roidb.rois)
         %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
+        %if i == 245
+        %disp(i);
+        %end
         gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
         if ~isempty(gts)
             rois = aboxes{i}(:, 1:4);
             max_ols = max(boxoverlap(rois, gts));
             gt_num = gt_num + size(gts, 1);
-            gt_re_num = gt_re_num + sum(max_ols >= 0.5);
+            if ~isempty(max_ols)
+                gt_re_num = gt_re_num + sum(max_ols >= 0.5);
+            end
             %1007 added
             if ~isempty(aboxes_nms{i})
                 rois_nms = aboxes_nms{i}(:, 1:4);
                 max_ols_nms = max(boxoverlap(rois_nms, gts));
                 gt_num_nms = gt_num_nms + size(gts, 1);
-                gt_re_num_nms = gt_re_num_nms + sum(max_ols_nms >= 0.5);
+                if ~isempty(max_ols_nms)
+                    gt_re_num_nms = gt_re_num_nms + sum(max_ols_nms >= 0.5);
+                end
             end
         end
     end
@@ -126,23 +133,23 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     % 1007 added
     fprintf('gt recall rate after nms-%d = %.4f\n', nms_option, gt_re_num_nms / gt_num_nms);
 
-    fprintf('Preparing the results for widerface Precision-Recall (VOC-style) evaluation ...');
+    %fprintf('Preparing the results for widerface Precision-Recall (VOC-style) evaluation ...');
     % first prepare for gt
     
-    annotation_save_name = fullfile(cache_dir, 'widerface_anno_e1-e3.mat');
-    if ~exist(annotation_save_name, 'file')
-        gt_im_num = length(roidb.rois);
-        objects = cell(gt_im_num, 1);
-        imgname = cell(gt_im_num, 1);
-        for kk = 1:gt_im_num
-            tmp_name = strsplit(imdb.image_ids{kk}, filesep);
-            imgname{kk} = tmp_name{2};
-            tmp_box = roidb.rois(kk).boxes;
-            objects{kk} = [tmp_box zeros(size(tmp_box, 1), 2)];
-        end
-        Annotations = struct('imgname', imgname, 'objects', objects);
-        save(annotation_save_name, 'Annotations');
-    end
+%     annotation_save_name = fullfile(cache_dir, 'widerface_anno_e1-e3.mat');
+%     if ~exist(annotation_save_name, 'file')
+%         gt_im_num = length(roidb.rois);
+%         objects = cell(gt_im_num, 1);
+%         imgname = cell(gt_im_num, 1);
+%         for kk = 1:gt_im_num
+%             tmp_name = strsplit(imdb.image_ids{kk}, filesep);
+%             imgname{kk} = tmp_name{2};
+%             tmp_box = roidb.rois(kk).boxes;
+%             objects{kk} = [tmp_box zeros(size(tmp_box, 1), 2)];
+%         end
+%         Annotations = struct('imgname', imgname, 'objects', objects);
+%         save(annotation_save_name, 'Annotations');
+%     end
     % then prepare for dt
 %     fid = fopen(fullfile(cache_dir, 'VGG16_e1-e3-pseudoNMS05-2.txt'), 'a');
 %     assert(length(imdb.image_ids) == size(aboxes, 1));
@@ -157,7 +164,7 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
 %         end
 %     end
 %     fclose(fid);
-    fprintf('Done.\n');
+    %fprintf('Done.\n');
     
 %     fprintf('Preparing the results for Caltech evaluation ...');
 %     %cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name);

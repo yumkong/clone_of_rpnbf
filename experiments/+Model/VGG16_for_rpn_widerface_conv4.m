@@ -12,9 +12,9 @@ model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_na
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting
-model.stage1_rpn.nms.per_nms_topN               = 20000; %-1
-model.stage1_rpn.nms.nms_overlap_thres       	= 0.7;%1
-model.stage1_rpn.nms.after_nms_topN         	= 1000;  %800
+model.stage1_rpn.nms.per_nms_topN               = -1; %20000
+model.stage1_rpn.nms.nms_overlap_thres       	= 1;%0.7
+model.stage1_rpn.nms.after_nms_topN         	= 300;  %1000
 
 %% stage 1 fast rcnn, inited from pre-trained network
 model.stage1_fast_rcnn.solver_def_file          = fullfile(pwd, 'models', exp_name,'fast_rcnn_prototxts', 'vgg_16layers_conv3_1', 'solver_30k40k_widerface_conv4.prototxt');

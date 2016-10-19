@@ -35,7 +35,7 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     score_thresh = scores(end);
     fprintf('score_threshold:%f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
-    nms_option = 3; %1,2,3
+    nms_option = 0; %0(no_nms),1,2,3
     for i = 1:length(aboxes)
         aboxes{i} = aboxes{i}(aboxes{i}(:, end) > score_thresh, :);
         % do NMS
@@ -57,7 +57,7 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
     
     % ########## save the raw result (before BF) here #############
     if is_test
-        fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e3-12anchor-ave-%d-nms-op%d-newscore2.txt',ave_per_image_topN, nms_option)), 'a');
+        fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e11-12anchor-ave-%d-nms-op%d.txt',ave_per_image_topN, nms_option)), 'a');
 
         assert(length(imdb.image_ids) == size(aboxes, 1));
         for i = 1:size(aboxes, 1)
