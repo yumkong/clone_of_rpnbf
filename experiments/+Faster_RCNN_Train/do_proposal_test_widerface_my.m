@@ -1,4 +1,4 @@
-function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, cache_name, method_name)
+function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, cache_name, method_name, nms_option)
     aboxes                      = proposal_test_widerface(conf, imdb, ...
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
@@ -22,14 +22,14 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     score_thresh = scores(end);
     fprintf('score_threshold = %f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
-    show_image = true;
+    show_image = false;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);
     
     %1007 tempararily use another cell to save bbox after nms
     aboxes_nms = cell(length(aboxes), 1);
-    nms_option = 3; %1, 2, 3
+    %nms_option = 3; %1, 2, 3
     %aboxes_nms2 = cell(length(aboxes), 1);
     %nms_option2 = 2; %1, 2, 3
     

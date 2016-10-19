@@ -1,5 +1,5 @@
 function script_rpn_face_VGG16_widerface_conv4()
-% script_rpn_pedestrian_VGG16_caltech()
+% script_rpn_face_VGG16_widerface_conv4()
 % --------------------------------------------------------
 % RPN_BF
 % Copyright (c) 2016, Liliang Zhang
@@ -93,7 +93,8 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf
 %dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 cache_name = 'widerface';
 method_name = 'RPN-ped';
-Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
+nms_option_test = 0;
+Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');

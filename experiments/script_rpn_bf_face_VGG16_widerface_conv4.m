@@ -222,8 +222,20 @@ opts.train_gts = train_gts;
 % train BF detector
 detector = DeepTrain_otf_trans_ratio( opts );
 
+%1019 added to do bf on rpn result
+load('rpn_aboxes.mat'); %'aboxes'
+bf_aboxes = cell(length(aboxes), 1);
+for i = 1:length(aboxes)
+      if ~isempty(aboxes{i})
+          img = imread(dataset.imdb_test.image_at(i));  
+          feat = rois_get_features_ratio(conf, caffe_net, img, aboxes{i}(:,1:4), opts.max_rois_num_in_gpu, opts.ratio);   
+          scores = adaBoostApply(feat, detector.clf);
+          bf_aboxes{i} = [aboxes{i}(:,1:4) scores];
+      end
+end
+save('bf_aboxes.mat','bf_aboxes');
 % visual
-%if 1 % set to 1 for visual
+if 0 % set to 1 for visual
     % ########## save the final result (after BF) here #############
     cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
     fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e11-RPN+BF-ave-300-nms-op3.txt'), 'a');
@@ -281,7 +293,7 @@ detector = DeepTrain_otf_trans_ratio( opts );
   %1004 added
   fclose(fid);
   fprintf('Done with saving RPN+BF+nms detected boxes.\n');
-%end
+end
 
 % test detector and plot roc
 % method_name = 'RPN+BF';
