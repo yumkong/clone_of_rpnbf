@@ -235,7 +235,7 @@ detector = DeepTrain_otf_trans_ratio( opts );
           %if i~=29
           %sel_idx = nms(bbs, opts.nms_thres);
           %end
-          sel_idx = (1:size(bbs,1))';
+          sel_idx = (1:size(bbs,1))'; %'
           sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
           
           % ########## save the final result (after BF) here #############

@@ -22,8 +22,10 @@ void nms(const mxArray *input_boxes, double overlap, vector<int> &vPick, int &nP
     T *pBoxes = (T*)mxGetData(input_boxes);
 
 	vector<double> vArea(nSample);
+	// compute the area of each bbox
 	for (int i = 0; i < nSample; ++i)
 	{
+		// (right - left) X (bottom - top)
 		vArea[i] = double(pBoxes[2*nSample + i] - pBoxes[0*nSample + i] + 1) 
 		* (pBoxes[3*nSample + i] - pBoxes[1*nSample + i] + 1);
 		if (vArea[i] < 0)
@@ -31,17 +33,19 @@ void nms(const mxArray *input_boxes, double overlap, vector<int> &vPick, int &nP
 	}
 
 	std::multimap<T, int> scores;
+	// <bbox_ptr, box_index> == <first, second>
 	for (int i = 0; i < nSample; ++i)
 		scores.insert(std::pair<T,int>(pBoxes[4*nSample + i], i));
-
+	// nPick is the total number of finally selected bboxes
 	nPick = 0;
-
+	// do until all scores are erased
 	do 
 	{
+		// pick up the last (right-most) item
 		int last = scores.rbegin()->second;
 		vPick[nPick] = last;
 		nPick += 1;
-
+		// iterate from 1st to the second last
 		for (typename std::multimap<T, int>::iterator it = scores.begin(); it != scores.end();)
 		{
 			int it_idx = it->second;
@@ -53,7 +57,7 @@ void nms(const mxArray *input_boxes, double overlap, vector<int> &vPick, int &nP
 			double w = max(T(0.0), xx2-xx1+1), h = max(T(0.0), yy2-yy1+1);
 
 			double ov = w*h / (vArea[last] + vArea[it_idx] - w*h);
-
+			// if larger than nms threshold, delete it
 			if (ov > overlap)
 			{
 				it = scores.erase(it);
@@ -99,6 +103,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	
 	int nPick = 0;
+	// indicator vector: whether to pick up this bbox or not
 	vector<int> vPick(nSample);
 	if(mxGetClassID(input_boxes) == mxDOUBLE_CLASS)
 		nms<double>(input_boxes, overlap, vPick, nPick);
@@ -107,6 +112,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	plhs[0] = mxCreateNumericMatrix(nPick, 1, mxDOUBLE_CLASS, mxREAL);
 	double *pRst = mxGetPr(plhs[0]);
+	// change from 0-index to 1-index
 	for (int i = 0; i < nPick; ++i)
 		pRst[i] = vPick[i] + 1;
 }
