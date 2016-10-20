@@ -311,8 +311,8 @@ layer {
 	name: "roi_pool3"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4 #3
+		pooled_h: 4 #3
 		spatial_scale: 0.25  # (1/4)
 	}
 }
@@ -324,8 +324,8 @@ layer {
 	name: "roi_pool4_3"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4 #3
+		pooled_h: 4 #3
 		spatial_scale: 0.25  # (1/4)
 	}
 }

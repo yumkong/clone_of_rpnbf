@@ -24,6 +24,7 @@ end
 opts.gpu_id                 = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
 
+% 1009 use more anchors
 exp_name = 'VGG16_widerface';
 
 % do validation, or not 
@@ -41,11 +42,13 @@ cache_data_root = 'output';  %cache_data
 mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_conv5';  % ZF, vgg16_conv5
+%1009 change exp here for output
+exp_name = 'VGG16_widerface_twelve_anchors_all'; %VGG16_widerface_twelve_anchors
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
-event_num                   = 3;
+event_num                   = -1; %3
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 
@@ -71,7 +74,9 @@ output_map_name = 'output_map_conv5';  % output_map_conv4, output_map_conv5
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_map, conf_proposal.output_height_map] = proposal_calc_output_size(conf_proposal, ...
                                                                     model.stage1_rpn.test_net_def_file, output_map_save_name);
-conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'scales',  2.^[-1:5]);
+%conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'scales',  2.^[-1:5]);
+%1009: from 7 to 12 anchors
+conf_proposal.anchors = proposal_generate_anchors_widerface(cache_data_this_model_dir, 'scales', [12 16 24 32 48 64 90 128 180 256 360 512]);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
@@ -80,7 +85,7 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf
 %% test
 cache_name = 'widerface';
 method_name = 'RPN-ped';
-Faster_RCNN_Train.do_proposal_test_widerface(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
+Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name);
 
 end
 

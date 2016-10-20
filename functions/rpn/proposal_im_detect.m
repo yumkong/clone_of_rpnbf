@@ -46,6 +46,29 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     scores = permute(scores, [3, 2, 1]);
     scores = scores(:);
     
+    %====== 1008 do nms around each anchors first (assume only one out of 7 is the best)
+    %1009 found that only keeping one box out of 12 boxes doesnt have a
+    %good result, keep all 12 boxes and select the first 300 boxes is
+    %better
+%     anchor_num = size(conf.anchors, 1);
+%     tmp = reshape(scores, anchor_num, []);
+%     [~, sel_idx] = sort(tmp,1,'descend');
+%     %[~,tmp2] = max(tmp,[], 1);
+%     % select 1 out of 9
+%     [~, size10_sel1_idx] = max(tmp(1:9, :),[], 1);
+%     % select 1 out of 4
+%     [~, size16_sel1_idx] = max(tmp(10:13, :),[], 1);
+% 
+%     %kept_score_idx = anchor_num*(0:length(tmp2)-1)+tmp2;
+%     kept_score_idx = bsxfun(@plus, anchor_num * (0:length(size10_sel1_idx)-1), cat(1, size10_sel1_idx, size16_sel1_idx+9, repmat((14:24)',1, length(size10_sel1_idx))));
+    %1013: only keep top-5 score anchors for each position
+%     kept_score_idx = bsxfun(@plus, anchor_num * (0:size(sel_idx,2)-1), sel_idx(1:5,:));
+%     %kept_score_idx = kept_score_idx';
+%     kept_score_idx = kept_score_idx(:);
+%     pred_boxes = pred_boxes(kept_score_idx, :);
+%     scores = scores(kept_score_idx, :);
+    %====== end of 1008
+    
     box_deltas_ = box_deltas;
     anchors_ = anchors;
     scores_ = scores;
@@ -57,6 +80,8 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     end
     
     % drop too small boxes
+    %1006 changed to get rid of too small boxes
+    %[pred_boxes, scores] = filter_boxes(conf.test_min_box_size-3, pred_boxes, scores);
     [pred_boxes, scores] = filter_boxes(conf.test_min_box_size-3, pred_boxes, scores);
     
     % sort

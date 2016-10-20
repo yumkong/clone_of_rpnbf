@@ -8,27 +8,27 @@ input_dim: 224
 
 input: "labels"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 7        # 9(anchors)        
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
+input_dim: 7        # 7(anchors)        
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 7        # 9(anchors)        
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
+input_dim: 7        # 7(anchors)        
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 28  		# 4 * 9(anchors) 
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
+input_dim: 28  		# 4 (coords) * 7(anchors) 
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 28  		# 4 * 9(anchors) 
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim
+input_dim: 28  		# 4 (coords) * 7(anchors) 
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 
 layer {

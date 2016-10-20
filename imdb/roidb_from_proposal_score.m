@@ -35,8 +35,15 @@ for i = 1:length(rois)
     [~, image_name2] = fileparts(opts.regions.images{i});
     assert(strcmp(image_name1, image_name2));
     
-    boxes = opts.regions.boxes{i}(:, 1:4);
-    scores = opts.regions.boxes{i}(:, end);
+    %1007 added, to judge whether detected boxes is zero
+    if ~isempty(opts.regions.boxes{i})
+        boxes = opts.regions.boxes{i}(:, 1:4);
+        scores = opts.regions.boxes{i}(:, end);
+    else
+       boxes = [];
+       scores = [];
+    end
+    
     is_gt = rois(i).gt;
     
     if isfield(rois(i), 'ignores')
@@ -54,7 +61,7 @@ for i = 1:length(rois)
     
     all_boxes = cat(1, rois(i).boxes, boxes);
     
-    rois(i).scores = ones(size(rois(i).gt, 1), 1);
+    rois(i).scores = ones(size(rois(i).gt, 1), 1); %gt boxes score is set to 1
     
     num_gt_boxes = size(gt_boxes, 1);
     num_boxes = size(boxes, 1);

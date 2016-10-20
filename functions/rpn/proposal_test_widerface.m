@@ -22,7 +22,9 @@ function aboxes = proposal_test_widerface(conf, imdb, varargin)
     ip.parse(conf, imdb, varargin{:});
     opts = ip.Results;
     
-
+    %##### note@1013:every time you want to regenerate bboxes, need to
+    %delete the proposal_boxes_*.mat file in
+    %output/VGG16_wider*/rpn_cachedir/rpn_widerface_VGG16_stage1_rpn
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', opts.cache_name, imdb.name);
 	%cache_dir = fullfile(pwd, 'output', opts.cache_name, imdb.name);
     try

@@ -15,14 +15,25 @@ function [feats] = rois_get_features_ratio(conf, caffe_net, im, boxes, max_rois_
     boxes(:,1) = boxes(:,1) - boxes_width_change;
     boxes(:,3) = boxes(:,3) + boxes_width_change;
     % boxes_height_change = (boxes(:,4)-boxes(:,2))*(outer_box_ratio-1)/2;
-    boxes_height_change = (boxes(:,4)-boxes(:,2) + 1)*(outer_box_ratio-1)/2;
-    boxes(:,2) = boxes(:,2) - boxes_height_change;
-    boxes(:,4) = boxes(:,4) + boxes_height_change;
+    %boxes_height_change = (boxes(:,4)-boxes(:,2) + 1)*(outer_box_ratio-1)/2;
+    %boxes(:,2) = boxes(:,2) - boxes_height_change;
+    %boxes(:,4) = boxes(:,4) + boxes_height_change;
+    top_ratio = 0.2; %0.25
+    bottom_ratio = 0.8; %1.75
+    boxes_top_change = (boxes(:,4)-boxes(:,2) + 1) * top_ratio;
+    boxes_bottom_change = (boxes(:,4)-boxes(:,2) + 1) * bottom_ratio;
+    boxes(:,2) = boxes(:,2) - boxes_top_change;
+    boxes(:,4) = boxes(:,4) + boxes_bottom_change;
     [height, width, ~] = size(im);
-    boxes(:,1) = max(1, boxes(:,1));
-    boxes(:,3) = max(1, boxes(:,3));
-    boxes(:,2) = min(width, boxes(:,2));
-    boxes(:,4) = min(height, boxes(:,4));
+    %1018 changed: the previous was wrong
+    %boxes(:,1) = max(1, boxes(:,1));
+    %boxes(:,3) = max(1, boxes(:,3));
+    %boxes(:,2) = min(width, boxes(:,2));
+    %boxes(:,4) = min(height, boxes(:,4));
+    boxes(:,1) = max(1, boxes(:,1)); %left
+    boxes(:,2) = max(1, boxes(:,2)); %top
+    boxes(:,3) = min(width, boxes(:,3)); %right
+    boxes(:,4) = min(height, boxes(:,4)); % bottom
 
     [im_blob, rois_blob, ~] = get_blobs(conf, im, boxes);
     
