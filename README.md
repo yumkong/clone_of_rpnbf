@@ -80,3 +80,6 @@ in root_dir,  run "./startup", then "script_rpn_bf_pedestrian_VGG16_caltech_demo
 
 # liu@0925
 only require 1.5G gpu memory
+
+#liu#1019
+run(fullfile('experiments','script_rpn_bf_face_VGG16_widerface_conv4_submit'))

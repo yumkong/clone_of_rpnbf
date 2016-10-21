@@ -1,3 +1,8 @@
+liu@0929
+This repo is cloned from the following published research work for study and practice, all rights belong to the original authors.
+
+
+==========================================
 # Is Faster R-CNN Doing Well for Pedestrian Detection?
 
 By Liliang Zhang, Liang Lin, Xiaodan Liang, Kaiming He
@@ -75,3 +80,6 @@ in root_dir,  run "./startup", then "script_rpn_bf_pedestrian_VGG16_caltech_demo
 
 # liu@0925
 only require 1.5G gpu memory
+
+#liu#1019
+run(fullfile('experiments','script_rpn_bf_face_VGG16_widerface_conv4_submit'))
