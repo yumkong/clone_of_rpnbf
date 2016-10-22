@@ -34,7 +34,7 @@ function roidb_BF = do_generate_bf_proposal_submit(conf, model_stage, imdb, roid
     score_thresh = scores(end);
     fprintf('score_threshold:%f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
-    nms_option = 3; %1,2,3
+    nms_option = 0; %0(no_nms),1,2,3
     for i = 1:length(aboxes)
         aboxes{i} = aboxes{i}(aboxes{i}(:, end) > score_thresh, :);
         % do NMS
