@@ -45,16 +45,17 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_conv4';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_conv4_hwRatio'; %VGG16_widerface_twelve_anchors
+exp_name = 'VGG16_widerface_conv4_hwRatio_flip'; %VGG16_widerface_twelve_anchors
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = true;  %true --> false
-event_num                   = 3; %3
+event_num                   = 11; %3
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 
 % 1021 debug dataset augmentation by flipping
+if 1
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 for ii = 1:12
     img = imread(dataset.imdb_train.image_at(ii)); 
@@ -66,6 +67,8 @@ for ii = 1:12
     im(img);  %im(I)
     bbApply('draw',bbs); pause();
 end
+end
+
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
     dataset.imdb_train = {dataset.imdb_train};
