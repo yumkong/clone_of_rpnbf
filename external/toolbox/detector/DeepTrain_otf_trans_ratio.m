@@ -145,7 +145,13 @@ if(exist(nm,'file')), diary(nm); diary('off'); delete(nm); end; diary(nm);
 RandStream.setGlobalStream(RandStream('mrg32k3a','Seed',opts.seed));
 
 % sample positives 
-[X1, X1_score, ~] = sampleWins( detector, 0, 1 );  % detector  stage  positive
+% 1023 added store pos samples to save time when use it later
+try
+    load([opts.name '_initPos.mat']);
+catch
+    [X1, X1_score, ~] = sampleWins( detector, 0, 1 );  % detector  stage  positive
+    save([opts.name '_initPos.mat'], 'X1', 'X1_score');
+end
 X1 = single(X1);
 
 % iterate bootstraping and training
@@ -154,7 +160,16 @@ for stage = 0:numel(opts.nWeak)-1
   fprintf('Training stage %i\n',stage); startStage=clock;
   
   % sample negatives and compute features
-  [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 );
+  if stage ~= 0
+    [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 );
+  else
+    try
+        load([opts.name '_initNeg.mat']);
+    catch
+        [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 ); %neg
+        save([opts.name '_initNeg.mat'], 'X0', 'X0_score');
+    end  
+  end
   X0 = single(X0);
   
 %   if stage == 0 && ~isempty(opts.init_detector)
