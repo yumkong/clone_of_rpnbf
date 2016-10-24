@@ -38,8 +38,9 @@ elseif isunix
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 
-load('rpn_aboxes.mat'); %'aboxes'
-load('bf_aboxes.mat'); %'bf_aboxes'
+test_folder = 'e1_e11_conv4';
+load(fullfile('output','bbox_mat',test_folder,'rpn_aboxes.mat')); %'aboxes'
+load(fullfile('output','bbox_mat',test_folder,'bf_aboxes.mat')); %'bf_aboxes'
 nms_aboxes = cell(length(aboxes), 1);
 nms_option = 3;
 show_image = true;
