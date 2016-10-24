@@ -150,7 +150,7 @@ try
     load([opts.name '_initPos.mat']);
 catch
     [X1, X1_score, ~] = sampleWins( detector, 0, 1 );  % detector  stage  positive
-    save([opts.name '_initPos.mat'], 'X1', 'X1_score');
+    save([opts.name '_initPos.mat'], 'X1', 'X1_score', '-v7.3');
 end
 X1 = single(X1);
 
@@ -167,7 +167,7 @@ for stage = 0:numel(opts.nWeak)-1
         load([opts.name '_initNeg.mat']);
     catch
         [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 ); %neg
-        save([opts.name '_initNeg.mat'], 'X0', 'X0_score');
+        save([opts.name '_initNeg.mat'], 'X0', 'X0_score', '-v7.3');
     end  
   end
   X0 = single(X0);
