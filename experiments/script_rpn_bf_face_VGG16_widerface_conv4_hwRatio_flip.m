@@ -181,7 +181,7 @@ opts.ratio = 2.0;  %1018: 1.0 --> 2.0: left-0.5*width, right+0.5*width, top-0.2*
 opts.nms_thres = 0.5;
 %1020 added
 opts.cascThr = -1; %1020: -1 --> 0
-opts.cascCal = .01; %1026 changed .005-->.01
+opts.cascCal = .05; %1026 changed .005-->.01
 opts.nPerNeg = 15; %1022: 10 --> 20
 
 % forward an image to check error and get the feature length

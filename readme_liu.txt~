@@ -124,7 +124,10 @@ res2: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_fgthresh05
       -- opts.fg_thres_lo = 0.5;
          all other are set the same with res1 
       => final 2048 tree training loss: 2.06e-06
-res3: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_fgthresh05
+res3: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_casCal001
       -- opts.cascCal = .01; %1026 changed .005-->.01
          all other are set the same with res2 
+      => final 2048 tree training loss: 8.31e-07
+res4: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_doublefeat
+      -- feat of res3 + cxt feat(l:-width, r:width, t:0.2*hei, b:+3*hei)
       => final 2048 tree training loss: 8.31e-07
