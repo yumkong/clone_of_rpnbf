@@ -132,13 +132,13 @@ end
 opts = DeepTrain_otf_trans_ratio(); 
 opts.cache_dir = BF_cachedir;
 opts.name=fullfile(opts.cache_dir, 'DeepCaltech_otf');
-opts.nWeak = [64 256 1024 2048]; %[64 128 256 512 1024 1536 2048]
+opts.nWeak = [64 128 256 512 1024 1536 2048];
 opts.bg_hard_min_ratio = [1 1 1 1 1 1 1];
 opts.pBoost.pTree.maxDepth = 5; % 1022: 5 --> 6 
-opts.pBoost.discrete=0;  %1: adaboost  0: realboost
+opts.pBoost.discrete = 0;  %1: adaboost  0: realboost
 opts.pBoost.pTree.fracFtrs = 1/4;  %fraction of features to split a node 1022:1/4 --> 1/8, since feature diversity is large and also speed up training 
-opts.first_nNeg = 90000;  %#neg of the 1st stage 30000 --> 40000
-opts.nNeg = 20000;  % #neg needed by every stage  1020: 5000 --> 8000
+opts.first_nNeg = 80000;  %#neg of the 1st stage 30000 --> 40000
+opts.nNeg = 5000;  % #neg needed by every stage  1020: 5000 --> 8000
 opts.nAccNeg = 100000;  % #accumulated neg from stage2 -- 7 % 50000-->60000 --> 90000
 pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
 opts.pLoad = [pLoad 'hRng',[50 inf], 'vRng',[1 1] ];   % delete?
@@ -164,7 +164,7 @@ opts.roidb_test = roidb_test_BF;
 opts.imdb_train = dataset.imdb_train{1};
 opts.imdb_test = dataset.imdb_test;
 opts.fg_thres_hi = 1;
-opts.fg_thres_lo = 0.6; %[lo, hi) 1018: 0.8 --> 0.5 --> 0.6 (1022)
+opts.fg_thres_lo = 0.5; %[lo, hi) 1018: 0.8 --> 0.5 --> 0.6 (1022)
 opts.bg_thres_hi = 0.3; %1018: 0.5 --> 0.3
 opts.bg_thres_lo = 0; %[lo hi)
 opts.dataDir = dataDir;
@@ -174,13 +174,14 @@ opts.exp_name = exp_name;
 opts.fg_nms_thres = 1;
 opts.fg_use_gt = true;
 opts.bg_nms_thres = 1;
-opts.max_rois_num_in_gpu = 6000;  %1022: 3000 --> 6000
+opts.max_rois_num_in_gpu = 3000;
 opts.init_detector = '';
 opts.load_gt = false;
 opts.ratio = 2.0;  %1018: 1.0 --> 2.0: left-0.5*width, right+0.5*width, top-0.2*height, bottom + 0.8height
 opts.nms_thres = 0.5;
 %1020 added
 opts.cascThr = -1; %1020: -1 --> 0
+opts.cascCal = .01; %1026 changed .005-->.01
 opts.nPerNeg = 15; %1022: 10 --> 20
 
 % forward an image to check error and get the feature length
@@ -202,7 +203,8 @@ end
 tmp_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
 % liu@1001: extract deep features from tmp_box
 % opts.max_rois_num_in_gpu = 3000, opts.ratio = 1
-feat = rois_get_features_ratio(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
+%feat = rois_get_features_ratio(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
+feat = rois_get_features_ratio2(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
 toc;
 opts.feat_len = length(feat);
 

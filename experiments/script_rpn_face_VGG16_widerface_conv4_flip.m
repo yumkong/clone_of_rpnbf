@@ -55,7 +55,7 @@ dataset                     = Dataset.widerface_all(dataset, 'train', use_flippe
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 
 % 1021 debug dataset augmentation by flipping
-if 1
+if 0
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 for ii = 1:12
     img = imread(dataset.imdb_train.image_at(ii)); 

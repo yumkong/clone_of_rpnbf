@@ -78,3 +78,53 @@ kept_score_idx = bsxfun(@plus, anchor_num * (0:size(sel_idx,2)-1), sel_idx(1:5,:
 kept_score_idx = kept_score_idx(:);
 pred_boxes = pred_boxes(kept_score_idx, :);
 scores = scores(kept_score_idx, :);
+
+======1025==================
+% plot boxes of each anchor position and find that hwRatio could be decimated to one half
+inside proper position of 'im_detect':
+figure, imshow(im/256);
+bbs = [pred_boxes,scores]; 
+bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+bbApply('draw',bbs(11775:11781,:), 'g');
+
+%plot position of anchors:
+anchor_pos = [0.5*(anchors(:,1)+anchors(:,3)) 0.5*(anchors(:,2)+anchors(:,4))];
+anchor_pos = anchor_pos(1:14:end,:);
+re_im = imresize(im, im_scales);
+figure, imshow(re_im/256);
+hold on
+plot(anchor_pos(:,1), anchor_pos(:,2),'g.','MarkerSize',5)
+hold off
+
+% decimate anchors by one half (only keep one boxes out of each anchor scale position)
+anchor_num = size(conf.anchors, 1);  %14
+half_anchor_num = size(conf.anchors, 1)/2; %7
+tmp_scores = reshape(scores, anchor_num, []); 
+hw1_score = tmp_scores(1:half_anchor_num, :);
+hw2_score = tmp_scores(1+half_anchor_num:end, :);
+hw1_greater_mask = (hw1_score >= hw2_score);
+greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
+scores = scores(greater_mask(:),:);
+pred_boxes = pred_boxes(greater_mask(:),:);
+
+=====1026/1027===================
+when using only halp of all anchors from rpn to do the bf training and set bf param the same as in conv4:
+res1: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_1025_conv4_setting: 
+      --recover to conv4 setting:
+         opts.cascThr = -1;
+	 opts.nPerNeg = 15;
+ 	 opts.max_rois_num_in_gpu = 3000;
+	 opts.fg_thres_lo = 0.6;
+	 opts.bg_thres_hi = 0.3;
+	 atros features use top 0.2 and bottom 0.8
+	 roi-pooling size 4x4
+      => final 2048 tree training loss: 2.10e-06 (previous 1023 setting: 2.85e-06)
+res2: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_fgthresh05
+      -- opts.fg_thres_lo = 0.5;
+         all other are set the same with res1 
+      => final 2048 tree training loss: 2.06e-06
+res3: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_casCal001
+      -- opts.cascCal = .01; %1026 changed .005-->.01
+         all other are set the same with res2 
+      => final 2048 tree training loss: 8.31e-07

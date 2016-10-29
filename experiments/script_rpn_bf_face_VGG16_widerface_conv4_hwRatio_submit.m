@@ -90,7 +90,7 @@ end
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
 model.stage1_rpn.nms.nms_overlap_thres = 1; %1004: 1-->0.5
-model.stage1_rpn.nms.after_nms_topN = 300;  %40
+model.stage1_rpn.nms.after_nms_topN = 600;  %300--600
 is_test = true;
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_submit(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
 model.stage1_rpn.nms.nms_overlap_thres = 0.7;
