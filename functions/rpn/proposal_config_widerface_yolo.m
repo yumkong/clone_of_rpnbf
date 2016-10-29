@@ -1,4 +1,4 @@
-function conf = proposal_config_widerface(varargin)
+function conf = proposal_config_widerface_yolo(varargin)
 % conf = proposal_config_caltech(varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -14,7 +14,7 @@ function conf = proposal_config_widerface(varargin)
                                     
 %     % whether drop the anchors that has edges outside of the image boundary
     ip.addParamValue('drop_boxes_runoff_image', ...
-                                        true,           @islogical);
+                                        false,           @islogical); % 1028: true --> false
                                     
 %    ip.addParamValue('drop_fg_boxes_runoff_image', ...
 %                                         true,           @islogical);
@@ -26,12 +26,12 @@ function conf = proposal_config_widerface(varargin)
     % Images per batch, only supports ims_per_batch = 1 currently
     ip.addParamValue('ims_per_batch',   1,              @isscalar);
     % Minibatch size
-    ip.addParamValue('batch_size',      256,            @isscalar); %120
+    ip.addParamValue('batch_size',      512,            @isscalar); %120
     % Fraction of minibatch that is foreground labeled (class > 0)
-    ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
+    ip.addParamValue('fg_fraction',     0.25,           @isscalar); %128 fg 384 bg
     % weight of background samples, when weight of foreground samples is
     % 1.0
-    ip.addParamValue('bg_weight',       1,            @isscalar);
+    ip.addParamValue('bg_weight',       1,            @isscalar); %1028:1-->0.1
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)
     ip.addParamValue('fg_thresh',       0.5,            @isscalar);
     % Overlap threshold for a ROI to be considered background (class = 0 if

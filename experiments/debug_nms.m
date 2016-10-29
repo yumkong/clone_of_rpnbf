@@ -1,7 +1,6 @@
 function debug_nms()
 clear
 clc
-
 % add all necessary path
 run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
@@ -37,6 +36,11 @@ if ispc
 elseif isunix
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
+
+% 1024: add these 3 lines for drawing
+addpath(fullfile('external','export_fig'));
+res_dir = fullfile('output','res_pic');
+mkdir_if_missing(res_dir);
 
 test_folder = 'e1_e11_conv4';
 load(fullfile('output','bbox_mat',test_folder,'rpn_aboxes.mat')); %'aboxes'
@@ -87,8 +91,12 @@ for i = 1:length(aboxes)
               bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
               %I=imread(imgNms{i});
               figure(3); 
-              im(img);  %im(I)
+              %im(img);  %im(I)
+              imshow(img);
               bbApply('draw',bbs);
+              saveName = sprintf('%s\\img_%d',res_dir, i);
+              export_fig(saveName, '-png', '-a1', '-native');
+              fprintf('image %d saved.\n', i);
             end
         end
 end
