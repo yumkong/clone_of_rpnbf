@@ -1,4 +1,4 @@
-function save_model_path = proposal_train_widerface_plot(conf, imdb_train, roidb_train, varargin)
+function save_model_path = proposal_train_widerface_yolo(conf, imdb_train, roidb_train, varargin)
 % save_model_path = proposal_train_caltech(conf, imdb_train, roidb_train, varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -269,9 +269,9 @@ end
 
 function rst = check_error(rst, caffe_solver)
 
-    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape').get_data();
-    labels = caffe_solver.net.blobs('labels_reshape').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_reshape').get_data();
+    cls_score = caffe_solver.net.blobs('proposal_cls_score').get_data();
+    labels = caffe_solver.net.blobs('labels').get_data();
+    labels_weights = caffe_solver.net.blobs('labels_weights').get_data();
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
