@@ -49,7 +49,7 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     % also should change the name of 
     %D:\RPN_BF_master\output\VGG16_widerface_conv4\rpn_cachedir\yolo_widerface_VGG16_stage1_rpn\WIDERFACE_test\proposal_boxes_WIDERFACE_test.mat
     % so that algo will re-process each test image one by one
-    show_mask = false;
+    show_mask = true;
     if show_mask
         scores_max = max(scores, [], 1);
         score_plot = squeeze(scores_max);
@@ -59,15 +59,15 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     scores = scores(:);
 
     % 1025: decimate anchors by one half (only keep one boxes out of each anchor scale position)
-%     anchor_num = size(conf.anchors, 1);  %14
-%     half_anchor_num = size(conf.anchors, 1)/2; %7
-%     tmp_scores = reshape(scores, anchor_num, []); 
-%     hw1_score = tmp_scores(1:half_anchor_num, :);
-%     hw2_score = tmp_scores(1+half_anchor_num:end, :);
-%     hw1_greater_mask = (hw1_score >= hw2_score);
-%     greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
-%     scores = scores(greater_mask(:),:);  %new scores
-%     pred_boxes = pred_boxes(greater_mask(:),:);  % new pred_boxes
+    anchor_num = size(conf.anchors, 1);  %14
+    half_anchor_num = size(conf.anchors, 1)/2; %7
+    tmp_scores = reshape(scores, anchor_num, []); 
+    hw1_score = tmp_scores(1:half_anchor_num, :);
+    hw2_score = tmp_scores(1+half_anchor_num:end, :);
+    hw1_greater_mask = (hw1_score >= hw2_score);
+    greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
+    scores = scores(greater_mask(:),:);  %new scores
+    pred_boxes = pred_boxes(greater_mask(:),:);  % new pred_boxes
     %====== end of 1025
     
     box_deltas_ = box_deltas;
@@ -89,12 +89,6 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     [scores, scores_ind] = sort(scores, 'descend');
     pred_boxes = pred_boxes(scores_ind, :);
     
-    if show_mask
-        figure(1), imshow(im/255);
-        %figure(2), imshow(score_plot_resize);
-        figure(2), h = imshow(im/255);
-        set(h,'AlphaData',score_plot_resize);
-    end
 %     image(im/255); 
 %     axis image;
 %     axis off;

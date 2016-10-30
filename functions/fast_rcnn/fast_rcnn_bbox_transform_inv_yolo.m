@@ -23,8 +23,10 @@ function [pred_boxes] = fast_rcnn_bbox_transform_inv_yolo(boxes, box_deltas)
 
     pred_ctr_x = bsxfun(@plus, bsxfun(@times, dst_ctr_x, src_w), src_ctr_x);
     pred_ctr_y = bsxfun(@plus, bsxfun(@times, dst_ctr_y, src_h), src_ctr_y);
-    pred_w = bsxfun(@times, exp(dst_scl_x), src_w);
-    pred_h = bsxfun(@times, exp(dst_scl_y), src_h);
+    %pred_w = bsxfun(@times, exp(dst_scl_x), src_w);
+    %pred_h = bsxfun(@times, exp(dst_scl_y), src_h);
+    pred_w = bsxfun(@times, dst_scl_x, src_w);
+    pred_h = bsxfun(@times, dst_scl_y, src_h);
     pred_boxes = zeros(size(box_deltas), 'single');
     pred_boxes(:, 1:4:end) = pred_ctr_x - 0.5*(pred_w-1);
     pred_boxes(:, 2:4:end) = pred_ctr_y - 0.5*(pred_h-1);

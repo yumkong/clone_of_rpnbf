@@ -1,5 +1,5 @@
 function aboxes = do_proposal_test_widerface_yolo(conf, model_stage, imdb, roidb, cache_name, method_name, nms_option)
-    aboxes                      = proposal_test_widerface(conf, imdb, ...
+    aboxes                      = proposal_test_widerface_yolo(conf, imdb, ...
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
                                         'cache_name',       model_stage.cache_name); 
@@ -22,7 +22,7 @@ function aboxes = do_proposal_test_widerface_yolo(conf, model_stage, imdb, roidb
     score_thresh = scores(end);
     fprintf('score_threshold = %f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
-    show_image = true;
+    show_image = false;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);
@@ -54,7 +54,7 @@ function aboxes = do_proposal_test_widerface_yolo(conf, model_stage, imdb, roidb
         
         %1006 added to do NPD-style nms
         time = tic;
-        aboxes_nms{i} = pseudoNMS_v3(aboxes{i}, nms_option);
+        aboxes_nms{i} = pseudoNMS_v6(aboxes{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         if show_image
