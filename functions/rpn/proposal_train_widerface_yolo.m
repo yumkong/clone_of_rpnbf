@@ -62,8 +62,8 @@ function save_model_path = proposal_train_widerface_yolo(conf, imdb_train, roidb
     caffe_log_file_base = fullfile(cache_dir, 'caffe_log');
     caffe.init_log(caffe_log_file_base);
     caffe_solver = caffe.Solver(opts.solver_def_file);
-    caffe_solver.net.copy_from(opts.net_file);
-    %caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_conv4', 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_7000'));
+    %caffe_solver.net.copy_from(opts.net_file);
+    caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_conv4_yolo_inception_lrn_3by3', 'rpn_cachedir', 'yolo_inception_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_19000'));
     % init log
     timestamp = datestr(datevec(now()), 'yyyymmdd_HHMMSS');
     mkdir_if_missing(fullfile(cache_dir, 'log'));

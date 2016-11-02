@@ -636,8 +636,8 @@ layer {
 	}
    convolution_param{
 	   num_output: 4	# 4 * 9(anchors) 
-	   kernel_size: 3 #1
-	   pad: 1 #0
+	   kernel_size: 1
+	   pad: 0
 	   stride: 1
 	   weight_filler {
 		 type: "gaussian"
