@@ -130,4 +130,4 @@ res3: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_casCal001
       => final 2048 tree training loss: 8.31e-07
 res4: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_doublefeat
       -- feat of res3 + cxt feat(l:-width, r:width, t:0.2*hei, b:+3*hei)
-      => final 2048 tree training loss: 8.31e-07
+      => final 2048 tree training loss: 9.83e-08
