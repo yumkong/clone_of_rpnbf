@@ -80,11 +80,12 @@ function aboxes = proposal_test_widerface_iou(conf, imdb, varargin)
             th = tic;
             im = imread(imdb.image_at(i));
 
-            [boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_iou(conf, caffe_net, im);
+            %[boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_iou(conf, caffe_net, im);
+            [boxes, scores] = proposal_im_detect_iou_smoothl1(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th));  
 
-            aboxes{i} = [boxes, scores];
+            aboxes{i} = []; %[boxes, scores];
             
             if 0
                 % debugging visualizations
