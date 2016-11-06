@@ -28,9 +28,10 @@ opts.do_val                 = true;
 model                       = Model.VGG16_for_rpn_widerface_conv4(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
-cache_base_fast_rcnn        = '';
+%cache_base_fast_rcnn        = '';
 % set cache folder for each stage
-model                       = Faster_RCNN_Train.set_cache_folder_widerface(cache_base_proposal,cache_base_fast_rcnn, model);
+%model                       = Faster_RCNN_Train.set_cache_folder_widerface(cache_base_proposal,cache_base_fast_rcnn, model);
+model                       = Faster_RCNN_Train.set_cache_folder_widerface(cache_base_proposal, model);
 % train/test data
 dataset                     = [];
 % the root directory to hold any useful intermediate data during training process

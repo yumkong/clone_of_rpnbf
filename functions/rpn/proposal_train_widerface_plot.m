@@ -95,7 +95,7 @@ function save_model_path = proposal_train_widerface_plot(conf, imdb_train, roidb
         load(train_roi_name);
     catch
         [image_roidb_train, bbox_means, bbox_stds]...
-                            = proposal_prepare_image_roidb_yolo(conf, opts.imdb_train, opts.roidb_train);
+                            = proposal_prepare_image_roidb_widerface(conf, opts.imdb_train, opts.roidb_train);
         save(train_roi_name, 'image_roidb_train','bbox_means', 'bbox_stds','-v7.3');
     end
     fprintf('Done.\n');
@@ -106,7 +106,7 @@ function save_model_path = proposal_train_widerface_plot(conf, imdb_train, roidb
             load(test_roi_name);
         catch
             [image_roidb_val]...
-                                = proposal_prepare_image_roidb_yolo(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
+                                = proposal_prepare_image_roidb_widerface(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
             save(test_roi_name, 'image_roidb_val','-v7.3');
         end
         fprintf('Done.\n');
