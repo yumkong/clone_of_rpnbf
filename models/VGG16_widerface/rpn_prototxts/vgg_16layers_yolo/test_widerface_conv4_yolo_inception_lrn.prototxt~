@@ -6,31 +6,6 @@ input_dim: 3
 input_dim: 224
 input_dim: 224
 
-input: "labels"
-input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 1        # 1 (face/nonface)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
-input: "labels_weights"
-input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 1        # 1 (face/nonface)      
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
-input: "bbox_targets"
-input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 4  		# 4 (coords)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
-input: "bbox_loss_weights"
-input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 4  		# 4 (coords)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
-
 layer {
 	bottom: "data"
 	top: "conv1_1"
@@ -636,8 +611,8 @@ layer {
 	}
    convolution_param{
 	   num_output: 4	# 4 * 9(anchors) 
-	   kernel_size: 3 #1
-	   pad: 1 #0
+	   kernel_size: 1
+	   pad: 0
 	   stride: 1
 	   weight_filler {
 		 type: "gaussian"
@@ -652,30 +627,10 @@ layer {
 
 #-----------------------output------------------------
 
-layer {
-   name: "loss"
-   type: "SoftmaxWithLoss"
-   bottom: "proposal_cls_score"
-   bottom: "labels"
-   bottom: "labels_weights"
-   top: "loss_cls"
-   loss_weight: 1
-}
 
 layer {
-   name: "accuarcy"
-   type: "Accuracy"
+   name: "proposal_cls_prob"
+   type: "Softmax"
    bottom: "proposal_cls_score"
-   bottom: "labels"
-   top: "accuarcy"
-}
-
-layer {
-  name: "loss_bbox"
-  type: "SmoothL1Loss"
-  bottom: "proposal_bbox_pred"
-  bottom: "bbox_targets"
-  bottom: "bbox_loss_weights"
-  top: "loss_bbox"
-  loss_weight: 5  #1028: 5-->1
+   top: "proposal_cls_prob"
 }

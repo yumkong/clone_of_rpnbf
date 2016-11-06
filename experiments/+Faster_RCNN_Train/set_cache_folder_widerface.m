@@ -1,6 +1,5 @@
 function model = set_cache_folder_widerface(cache_base_proposal, model)
 %function model = set_cache_folder_widerface(cache_base_proposal, cache_base_fast_rcnn, model)
-% model = set_cache_folder_caltech(cache_base_proposal, model)
 % --------------------------------------------------------
 % RPN_BF
 % Copyright (c) 2016, Liliang Zhang

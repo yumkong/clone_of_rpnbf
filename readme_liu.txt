@@ -131,3 +131,30 @@ res3: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_casCal001
 res4: output/VGG16_widerface_conv4_hwRatio_flip/bf_cachedir_doublefeat
       -- feat of res3 + cxt feat(l:-width, r:width, t:0.2*hei, b:+3*hei)
       => final 2048 tree training loss: 9.83e-08
+
+=============================
+:/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/caffe-RPN_BF/build/tools$ ./caffe.bin device_query -gpu 0
+I1102 18:40:11.543684 31440 caffe.cpp:75] Querying device ID = 0
+I1102 18:40:11.552920 31440 common.cpp:166] Device id:                     0
+I1102 18:40:11.552939 31440 common.cpp:167] Major revision number:         5
+I1102 18:40:11.552945 31440 common.cpp:168] Minor revision number:         2
+I1102 18:40:11.552950 31440 common.cpp:169] Name:                          GeForce GTX TITAN X
+I1102 18:40:11.552955 31440 common.cpp:170] Total global memory:           12884180992
+I1102 18:40:11.552961 31440 common.cpp:171] Total shared memory per block: 49152
+I1102 18:40:11.552966 31440 common.cpp:172] Total registers per block:     65536
+I1102 18:40:11.552970 31440 common.cpp:173] Warp size:                     32
+I1102 18:40:11.552975 31440 common.cpp:174] Maximum memory pitch:          2147483647
+I1102 18:40:11.552980 31440 common.cpp:175] Maximum threads per block:     1024
+I1102 18:40:11.552984 31440 common.cpp:176] Maximum dimension of block:    1024, 1024, 64
+I1102 18:40:11.552987 31440 common.cpp:179] Maximum dimension of grid:     2147483647, 65535, 65535
+I1102 18:40:11.552994 31440 common.cpp:182] Clock rate:                    1076000
+I1102 18:40:11.552999 31440 common.cpp:183] Total constant memory:         65536
+I1102 18:40:11.553005 31440 common.cpp:184] Texture alignment:             512
+I1102 18:40:11.553010 31440 common.cpp:185] Concurrent copy and execution: Yes
+I1102 18:40:11.553016 31440 common.cpp:187] Number of multiprocessors:     24
+I1102 18:40:11.553021 31440 common.cpp:188] Kernel execution timeout:      Yes
+
+
+1103 res50 conv4==================
+gt recall rate = 0.7381
+gt recall rate after nms-3 = 0.5875
