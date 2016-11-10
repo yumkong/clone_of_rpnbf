@@ -657,6 +657,16 @@ layer {
   top: "proposal_bbox_pred"
 }
 
+layer {
+    bottom: "proposal_bbox_pred"
+    top: "proposal_bbox_pred"
+    name: "scale_bbox_pred"
+    type: "Scale"
+    scale_param {
+        bias_term: true
+    }
+}
+
 #-----------------------output------------------------
 
 layer {
