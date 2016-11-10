@@ -42,8 +42,8 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_iou(conf
         label_weights_blob = reshape(label_weights, size(conf.anchors, 1), output_size(1), output_size(2));
         bbox_targets_blob = reshape(bbox_targets', size(conf.anchors, 1)*4, output_size(1), output_size(2));
         %1031 changed
-        bbox_loss_blob = reshape(bbox_loss', size(conf.anchors, 1)*4, output_size(1), output_size(2));
-        %bbox_loss_blob = reshape(bbox_loss', size(conf.anchors, 1), output_size(1), output_size(2));
+        %bbox_loss_blob = reshape(bbox_loss', size(conf.anchors, 1)*4, output_size(1), output_size(2));
+        bbox_loss_blob = reshape(bbox_loss', size(conf.anchors, 1), output_size(1), output_size(2));
         
         % permute from [channel, height, width], where channel is the
         % fastest dimension to [width, height, channel]
@@ -131,8 +131,8 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
     bbox_targets = single(full(bbox_targets(:, 2:end)));
     
     % 1031 changed from 4channels to 1channel
-    bbox_loss_weights = bbox_targets * 0;
-    %bbox_loss_weights = bbox_targets(:,2) * 0;
+    %bbox_loss_weights = bbox_targets * 0;
+    bbox_loss_weights = bbox_targets(:,2) * 0;
     bbox_loss_weights(fg_inds, :) = 1;
 end
 

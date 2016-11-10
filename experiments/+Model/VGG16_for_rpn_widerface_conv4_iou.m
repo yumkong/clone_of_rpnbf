@@ -1,4 +1,4 @@
-function model = VGG16_for_rpn_widerface_conv4_iou_inception(exp_name, cache_base_proposal, model)
+function model = VGG16_for_rpn_widerface_conv4_iou(exp_name, cache_base_proposal, model)
 
 
 model.mean_image                                = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'mean_image');
@@ -7,8 +7,8 @@ model.pre_trained_net_file                      = fullfile(pwd, 'models', exp_na
 model.feat_stride                               = 8; %16
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_iou', 'solver_60k80k_widerface_conv45_iou.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_iou', 'test_widerface_conv45_iou.prototxt');
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_iou', 'solver_60k80k_widerface_conv4_iou.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_iou', 'test_widerface_conv4_iou.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 model.stage1_rpn.cache_name = [cache_base_proposal, '_stage1_rpn'];
 % rpn test setting

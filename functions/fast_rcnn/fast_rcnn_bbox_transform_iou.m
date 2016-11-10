@@ -18,10 +18,10 @@ function [regression_label] = fast_rcnn_bbox_transform_iou(ex_boxes, gt_boxes)
     targets_dr = max(gt_boxes(:, 3) - ex_ctr_x, 0);  % right-mid distance
     
     % 1101 normalize them tp [0 1]
-    targets_dt_norm = targets_dt ./ (targets_dt + targets_db);
-    targets_db_norm = targets_db ./ (targets_dt + targets_db);
-    targets_dl_norm = targets_dl ./ (targets_dl + targets_dr);
-    targets_dr_norm = targets_dr ./ (targets_dl + targets_dr);
+    targets_dt_norm = targets_dt; % ./ (targets_dt + targets_db);
+    targets_db_norm = targets_db; % ./ (targets_dt + targets_db);
+    targets_dl_norm = targets_dl; % ./ (targets_dl + targets_dr);
+    targets_dr_norm = targets_dr; % ./ (targets_dl + targets_dr);
     
     regression_label = [targets_dt_norm, targets_db_norm, targets_dl_norm, targets_dr_norm];
 end

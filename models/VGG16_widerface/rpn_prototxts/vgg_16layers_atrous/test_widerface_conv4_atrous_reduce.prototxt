@@ -295,6 +295,7 @@ layer {
 
 
 #-----------------------layer +-------------------------
+# normal conv layer
 layer {
    name: "conv_proposal1"
    type: "Convolution"
@@ -322,17 +323,85 @@ layer {
    }
 }
 
+# atrous with hole_size = 2
 layer {
-   name: "relu_proposal1"
+   name: "conv_proposal2"
+   type: "Convolution"
+   bottom: "conv4_3"
+   top: "conv_proposal2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 2 #1
+	   filter_stride: 2 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+# atrous with hole_size = 4
+layer {
+   name: "conv_proposal3"
+   type: "Convolution"
+   bottom: "conv4_3"
+   top: "conv_proposal3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 4 #1
+	   filter_stride: 4 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+  name: "eltwise_sum_proposal"
+  bottom: "conv_proposal1"
+  bottom: "conv_proposal2"
+  bottom: "conv_proposal3"
+  top: "eltwise_sum_proposal"
+  type: "Eltwise"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+   name: "relu_proposal"
    type: "ReLU"
-   bottom: "conv_proposal1"
-   top: "conv_proposal1"
+   bottom: "eltwise_sum_proposal"
+   top: "eltwise_sum_proposal"
 }
 
 layer {
    name: "proposal_cls_score"
    type: "Convolution"
-   bottom: "conv_proposal1"
+   bottom: "concat_proposal"
    top: "proposal_cls_score"
 	param {
 		lr_mult: 1.0
@@ -341,7 +410,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 2   # 2(bg/fg) * 9(anchors) 
+	   num_output: 14   # 2(bg/fg) * 9(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -359,7 +428,7 @@ layer {
 layer {
    name: "proposal_bbox_pred"
    type: "Convolution"
-   bottom: "conv_proposal1"
+   bottom: "eltwise_sum_proposal"
    top: "proposal_bbox_pred"
 	param {
 		lr_mult: 1.0
@@ -368,7 +437,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 4	# 4 * 9(anchors) 
+	   num_output: 28	# 4 * 9(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -383,14 +452,27 @@ layer {
    }
 }
 
-
-
 #-----------------------output------------------------
 
+# to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
+layer {
+   bottom: "proposal_cls_score"
+   top: "proposal_cls_score_reshape"
+   name: "proposal_cls_score_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 2
+			dim: -1 
+			dim: 0
+		}
+	}
+}
 
 layer {
    name: "proposal_cls_prob"
    type: "Softmax"
-   bottom: "proposal_cls_score"
+   bottom: "proposal_cls_score_reshape"
    top: "proposal_cls_prob"
 }
