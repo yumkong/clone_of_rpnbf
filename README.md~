@@ -83,3 +83,20 @@ only require 1.5G gpu memory
 
 #liu#1019
 run(fullfile('experiments','script_rpn_bf_face_VGG16_widerface_conv4_submit'))
+
+#1108
+1. conv4_atros_reduce three atros:
+1) normal 3x3; 2)3x3 with hole 2; 3) 3x3 with hole 4
+and elemltwise SUM them, but the result diverge
+
+2. conv4_atros_reduce2
+same three atros as 1., but concatenate them and them use a 1x1 conv to reduce dimension
+test res:
+gt recall rate = 0.7063
+gt recall rate after nms-3 = 0.6029
+
+3. conv4_atros_reduce3 ===> add a max_pooling before the atros conv layer
+gt recall rate = 0.6366
+gt recall rate after nms-3 = 0.5407
+But it seems from the train net plot that the val loss is even smaller than reduce2, why recall rate is so low? check it out.
+

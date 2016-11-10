@@ -94,11 +94,12 @@ function save_model_path = proposal_train_widerface_iou(conf, imdb_train, roidb_
         %load('output\train_roidb_event123.mat');
         load(train_roi_name);
     catch
-        [image_roidb_train, bbox_means, bbox_stds]...
-                            = proposal_prepare_image_roidb_iou_smoothl1(conf, opts.imdb_train, opts.roidb_train);
-        %[image_roidb_train]...
-        %                    = proposal_prepare_image_roidb_iou(conf, opts.imdb_train, opts.roidb_train);
-        save(train_roi_name, 'image_roidb_train','bbox_means', 'bbox_stds','-v7.3');
+        %[image_roidb_train, bbox_means, bbox_stds]...
+        %                    = proposal_prepare_image_roidb_iou_smoothl1(conf, opts.imdb_train, opts.roidb_train);
+        [image_roidb_train]...
+                            = proposal_prepare_image_roidb_iou(conf, opts.imdb_train, opts.roidb_train);
+        %save(train_roi_name, 'image_roidb_train','bbox_means', 'bbox_stds','-v7.3');
+        save(train_roi_name, 'image_roidb_train','-v7.3');
     end
     fprintf('Done.\n');
     
@@ -107,8 +108,10 @@ function save_model_path = proposal_train_widerface_iou(conf, imdb_train, roidb_
         try
             load(test_roi_name);
         catch
+            %[image_roidb_val]...
+            %                    = proposal_prepare_image_roidb_iou_smoothl1(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
             [image_roidb_val]...
-                                = proposal_prepare_image_roidb_iou_smoothl1(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
+                            = proposal_prepare_image_roidb_iou(conf, opts.imdb_val, opts.roidb_val);
             save(test_roi_name, 'image_roidb_val','-v7.3');
         end
         fprintf('Done.\n');
@@ -148,7 +151,9 @@ function save_model_path = proposal_train_widerface_iou(conf, imdb_train, roidb_
         caffe_solver.net.set_phase('train');
 
         % generate minibatch training data
-        [shuffled_inds, sub_db_inds] = generate_random_minibatch(shuffled_inds, image_roidb_train, conf.ims_per_batch);        
+        %random number
+        [shuffled_inds, sub_db_inds] = generate_random_minibatch(shuffled_inds, image_roidb_train, conf.ims_per_batch);  
+        % training input pair: X and y
         [net_inputs, scale_inds] = proposal_generate_minibatch_fun(conf, image_roidb_train(sub_db_inds));
         
         caffe_solver.net.reshape_as_input(net_inputs);
@@ -305,8 +310,8 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     labels_weights = labels_blob;
     bbox_targets_blob = single(zeros(output_width, output_height, anchor_num*4, conf.ims_per_batch));
     % 1031 changed from 4channels to 1channel
-    bbox_loss_weights_blob = bbox_targets_blob;
-    %bbox_loss_weights_blob = single(zeros(output_width, output_height, anchor_num, conf.ims_per_batch));
+    %bbox_loss_weights_blob = bbox_targets_blob;
+    bbox_loss_weights_blob = single(zeros(output_width, output_height, anchor_num, conf.ims_per_batch));
 
     net_inputs = {im_blob, labels_blob, labels_weights, bbox_targets_blob, bbox_loss_weights_blob};
     

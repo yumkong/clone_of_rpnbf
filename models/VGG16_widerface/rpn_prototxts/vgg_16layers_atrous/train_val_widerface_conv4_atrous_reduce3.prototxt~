@@ -8,25 +8,25 @@ input_dim: 224
 
 input: "labels"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 1        # 1 (face/nonface)
+input_dim: 7        # 7(anchors)        
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 1        # 1 (face/nonface)      
+input_dim: 7        # 7(anchors)        
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 4  		# 4 (coords)
+input_dim: 28  		# 4 (coords) * 7(anchors) 
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 4  		# 4 (coords) --> 1 (flag indicating whether bbox iou loss is calculated at this point)
+input_dim: 28  		# 4 (coords) * 7(anchors) 
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
@@ -317,11 +317,26 @@ layer {
 	type: "ReLU"
 }
 
+#1108 added for reduce3
+layer {
+  name: "pool4_new"
+  type: "Pooling"
+  bottom: "conv4_3"
+  top: "pool4_new"
+  pooling_param {
+    pool: MAX
+    kernel_size: 3
+    stride: 2
+    pad: 1
+  }
+}
+
 #-----------------------layer +-------------------------
+# normal conv layer
 layer {
    name: "conv_proposal1"
    type: "Convolution"
-   bottom: "conv4_3"
+   bottom: "pool4_new"
    top: "conv_proposal1"
 	param {
 		lr_mult: 1.0
@@ -345,18 +360,119 @@ layer {
    }
 }
 
+# atrous with hole_size = 2
+layer {
+   name: "conv_proposal2"
+   type: "Convolution"
+   bottom: "pool4_new"
+   top: "conv_proposal2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 2 #1
+	   filter_stride: 2 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+# atrous with hole_size = 4
+layer {
+   name: "conv_proposal3"
+   type: "Convolution"
+   bottom: "pool4_new"
+   top: "conv_proposal3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 4 #1
+	   filter_stride: 4 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+  name: "concat_proposal"
+  bottom: "conv_proposal1"
+  bottom: "conv_proposal2"
+  bottom: "conv_proposal3"
+  top: "concat_proposal"
+  type: "Concat"
+  concat_param {
+    axis: 1 # concat channels: 512+512+512 = 1536
+  }
+}
+
 layer {
    name: "relu_proposal1"
    type: "ReLU"
-   bottom: "conv_proposal1"
-   top: "conv_proposal1"
+   bottom: "concat_proposal"
+   top: "concat_proposal"
 }
 
-#-----------------------for cls -------------------------
+layer {
+   name: "reduce_proposal"
+   type: "Convolution"
+   bottom: "concat_proposal"
+   top: "reduce_proposal"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "relu_proposal2"
+   type: "ReLU"
+   bottom: "reduce_proposal"
+   top: "reduce_proposal"
+}
+
 layer {
    name: "proposal_cls_score"
    type: "Convolution"
-   bottom: "conv_proposal1"
+   bottom: "reduce_proposal"
    top: "proposal_cls_score"
 	param {
 		lr_mult: 1.0
@@ -365,7 +481,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 2   # 2(bg/fg) * 9(anchors) 
+	   num_output: 14   # 2(bg/fg) * 9(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -380,86 +496,10 @@ layer {
    }
 }
 
-#-----------------------for bbox reg -------------------------
-layer {
-	bottom: "conv_proposal1"
-	top: "conv5_1_new"
-	name: "conv5_1_new"
-	param {
-		lr_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 512
-		pad: 1
-		kernel_size: 3
-	}
-}
-
-layer {
-	bottom: "conv5_1_new"
-	top: "conv5_1_new"
-	name: "relu5_1_new"
-	type: "ReLU"
-}
-
-layer {
-	bottom: "conv5_1_new"
-	top: "conv5_2_new"
-	name: "conv5_2_new"
-	param {
-		lr_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 512
-		pad: 1
-		kernel_size: 3
-	}
-}
-
-layer {
-	bottom: "conv5_2_new"
-	top: "conv5_2_new"
-	name: "relu5_2_new"
-	type: "ReLU"
-}
-
-layer {
-	bottom: "conv5_2_new"
-	top: "conv5_3_new"
-	name: "conv5_3_new"
-	param {
-		lr_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 512
-		pad: 1
-		kernel_size: 3
-	}
-}
-
-layer {
-	bottom: "conv5_3_new"
-	top: "conv5_3_new"
-	name: "relu5_3_new"
-	type: "ReLU"
-}
-
 layer {
    name: "proposal_bbox_pred"
    type: "Convolution"
-   bottom: "conv5_3_new" #"conv_proposal1"
+   bottom: "reduce_proposal"
    top: "proposal_bbox_pred"
 	param {
 		lr_mult: 1.0
@@ -468,7 +508,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 4	# 4 * 9(anchors) 
+	   num_output: 28	# 4 * 9(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -483,21 +523,60 @@ layer {
    }
 }
 
-#layer {
-#  name: "relu_bbox_pred"
-#  type: "ReLU"
-#  bottom: "proposal_bbox_pred"
-#  top: "proposal_bbox_pred"
-#}
-
 #-----------------------output------------------------
+
+# to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
+layer {
+   bottom: "proposal_cls_score"
+   top: "proposal_cls_score_reshape"
+   name: "proposal_cls_score_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 2
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels"
+   top: "labels_reshape"
+   name: "labels_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights"
+   top: "labels_weights_reshape"
+   name: "labels_weights_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
 
 layer {
    name: "loss"
    type: "SoftmaxWithLoss"
-   bottom: "proposal_cls_score"
-   bottom: "labels"
-   bottom: "labels_weights"
+   bottom: "proposal_cls_score_reshape"
+   bottom: "labels_reshape"
+   bottom: "labels_weights_reshape"
    top: "loss_cls"
    loss_weight: 1
 }
@@ -505,17 +584,17 @@ layer {
 layer {
    name: "accuarcy"
    type: "Accuracy"
-   bottom: "proposal_cls_score"
-   bottom: "labels"
+   bottom: "proposal_cls_score_reshape"
+   bottom: "labels_reshape"
    top: "accuarcy"
 }
 
 layer {
   name: "loss_bbox"
-  type: "SmoothL1Loss" #"IouLoss"
+  type: "SmoothL1Loss"
   bottom: "proposal_bbox_pred"
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 10  #1028: 5-->1
+  loss_weight: 5  #1017: 10-->5
 }

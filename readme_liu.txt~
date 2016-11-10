@@ -153,3 +153,8 @@ I1102 18:40:11.553005 31440 common.cpp:184] Texture alignment:             512
 I1102 18:40:11.553010 31440 common.cpp:185] Concurrent copy and execution: Yes
 I1102 18:40:11.553016 31440 common.cpp:187] Number of multiprocessors:     24
 I1102 18:40:11.553021 31440 common.cpp:188] Kernel execution timeout:      Yes
+
+
+1103 res50 conv4==================
+gt recall rate = 0.7381
+gt recall rate after nms-3 = 0.5875

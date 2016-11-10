@@ -18,7 +18,7 @@ if ispc
     opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_iou';
     cd('D:\\RPN_BF_master');
 elseif isunix
-    opts.caffe_version          = 'caffe_faster_rcnn';
+    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_iou';
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -33,7 +33,11 @@ opts.do_val                 = true;
 % cache base
 cache_base_proposal         = 'iou_inception_widerface_VGG16';
 % model
+<<<<<<< HEAD
 model                       = Model.VGG16_for_rpn_widerface_conv4_iou_inception(exp_name, cache_base_proposal); %VGG16_for_rpn_widerface_conv4_iou_inception
+=======
+model                       = Model.VGG16_for_rpn_widerface_conv4_iou(exp_name, cache_base_proposal); %VGG16_for_rpn_widerface_conv4_iou_inception
+>>>>>>> c038ae078c19178fcae616cd5cd623fd4075da32
 
 %cache_base_fast_rcnn        = '';
 % set cache folder for each stage
@@ -46,7 +50,11 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_conv4';  % ZF, vgg16_conv5
 %1009 change exp here for output
+<<<<<<< HEAD
 exp_name = 'VGG16_widerface_conv4_iou_inception'; %VGG16_widerface_conv4_iou_inception
+=======
+exp_name = 'VGG16_widerface_conv4_iou'; %VGG16_widerface_conv4_iou_inception
+>>>>>>> c038ae078c19178fcae616cd5cd623fd4075da32
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
