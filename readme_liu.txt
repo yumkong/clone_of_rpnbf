@@ -92,7 +92,7 @@ bbApply('draw',bbs(11775:11781,:), 'g');
 anchor_pos = [0.5*(anchors(:,1)+anchors(:,3)) 0.5*(anchors(:,2)+anchors(:,4))];
 anchor_pos = anchor_pos(1:14:end,:);
 re_im = imresize(im, im_scales);
-figure, imshow(re_im/256);
+figure, imshow(re_im/255);
 hold on
 plot(anchor_pos(:,1), anchor_pos(:,2),'g.','MarkerSize',5)
 hold off

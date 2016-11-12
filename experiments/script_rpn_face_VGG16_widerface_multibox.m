@@ -1,4 +1,4 @@
-function script_rpn_face_VGG16_widerface_conv4()
+function script_rpn_face_VGG16_widerface_multibox()
 % script_rpn_face_VGG16_widerface_conv4()
 % --------------------------------------------------------
 % RPN_BF
@@ -30,7 +30,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface_conv4(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -43,9 +43,9 @@ dataset                     = [];
 cache_data_root = 'output';  %cache_data
 mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
-model_name_base = 'vgg16_conv4';  % ZF, vgg16_conv5
+model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_conv4';
+exp_name = 'VGG16_widerface_multibox';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -65,19 +65,20 @@ end
 % %% -------------------- TRAIN --------------------
 % conf
 conf_proposal               = proposal_config_widerface('image_means', model.mean_image, 'feat_stride', model.feat_stride);
-conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
+%conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
 conf_proposal.exp_name = exp_name;
-conf_fast_rcnn.exp_name = exp_name;
+%conf_fast_rcnn.exp_name = exp_name;
 %[conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                            = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
-output_map_name = 'output_map_conv4';  % output_map_conv4, output_map_conv5
+output_map_name = 'output_map_multibox';  % output_map_conv4, output_map_conv5
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
-[conf_proposal.output_width_map, conf_proposal.output_height_map] = proposal_calc_output_size(conf_proposal, ...
-                                                                    model.stage1_rpn.test_net_def_file, output_map_save_name);
-conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'ratios', [1], 'scales',  2.^[-1:5]);  %[8 16 32 64 128 256 512]
+[conf_proposal.output_width_conv4, conf_proposal.output_height_conv4, conf_proposal.output_width_conv5, conf_proposal.output_height_conv5]...
+                             = proposal_calc_output_size_multibox(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
+[conf_proposal.anchors_conv4,conf_proposal.anchors_conv5] = proposal_generate_anchors_multibox(cache_data_this_model_dir, ...
+                                                            'ratios', [1], 'scales',  2.^[-1:5], 'add_size', [900]);  %[8 16 32 64 128 256 512]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
 %conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);

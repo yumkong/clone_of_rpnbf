@@ -50,6 +50,10 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     %D:\RPN_BF_master\output\VGG16_widerface_conv4\rpn_cachedir\yolo_widerface_VGG16_stage1_rpn\WIDERFACE_test\proposal_boxes_WIDERFACE_test.mat
     % so that algo will re-process each test image one by one
     show_mask = false;
+    %1110 added to display the anchor center position as well as plot the
+    %512-d vector of each anchor position
+    show_mask2 = false;
+    debug_position_sensitive = false;
     if show_mask
         scores_max = max(scores, [], 1);
         score_plot = squeeze(scores_max);
@@ -94,6 +98,38 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
         %figure(2), imshow(score_plot_resize);
         figure(2), h = imshow(im/255);
         set(h,'AlphaData',score_plot_resize);
+    end
+    
+    if show_mask2
+        %plot position of anchors:
+        anchor_pos = [0.5*(anchors(:,1)+anchors(:,3)) 0.5*(anchors(:,2)+anchors(:,4))];
+        anchor_pos = anchor_pos(1:7:end,:);
+        re_im = imresize(im, im_scales);
+        figure(1), imshow(re_im/255);
+        
+        [x_pos, y_pos] = meshgrid(1:featuremap_size(2),1:featuremap_size(1));
+        rectangle_anchor_pos = reshape(anchor_pos, featuremap_size(1), featuremap_size(2), 2);
+        rectangle_anchor_pos = cat(3, rectangle_anchor_pos, y_pos, x_pos);
+        sample_rectangle_anchor_pos = rectangle_anchor_pos(1:10:end, 1:10:end, :);
+        sample_rectangle_anchor_pos = reshape(sample_rectangle_anchor_pos, [], 4);
+        pos_info_cell = num2cell(sample_rectangle_anchor_pos(:,3:4), 2);
+        pos_info_txt = cellfun(@(x) sprintf('(%d,%d)',x(1), x(2)), pos_info_cell, 'UniformOutput',false);
+        
+        hold on
+        text(sample_rectangle_anchor_pos(:,1),sample_rectangle_anchor_pos(:,2),pos_info_txt, 'Color', 'c','HorizontalAlignment','center');
+        plot(anchor_pos(:,1), anchor_pos(:,2),'g.','MarkerSize',5);
+        hold off
+    end
+    if debug_position_sensitive
+        layer_name = 'conv4_3';%conv_proposal1
+        layer_mat = caffe_net.blobs(layer_name).get_data();
+        % from [w x h x feat_dim] to [h x w x feat_dim]
+        layer_mat = permute(layer_mat, [2, 1, 3]);
+        posY1 = 36; posX1 = 76; %77
+        posY2 = 56; posX2 = 18; 
+        figure(2);
+        subplot(2,1,1),plot(squeeze(layer_mat(posY1, posX1, :)));
+        subplot(2,1,2),plot(squeeze(layer_mat(posY2, posX2, :)));
     end
 %     image(im/255); 
 %     axis image;
