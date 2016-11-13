@@ -64,7 +64,8 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal               = proposal_config_widerface('image_means', model.mean_image, 'feat_stride', model.feat_stride);
+conf_proposal               = proposal_config_widerface_multibox('image_means', model.mean_image, ...
+                                                    'feat_stride_conv4', model.feat_stride_conv4, 'feat_stride_conv5', model.feat_stride_conv5);
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 

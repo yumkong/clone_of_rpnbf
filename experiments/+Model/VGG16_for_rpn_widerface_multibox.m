@@ -4,7 +4,8 @@ function model = VGG16_for_rpn_widerface_multibox(exp_name, model)
 model.mean_image                                = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'mean_image');
 model.pre_trained_net_file                      = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'vgg16.caffemodel');
 % Stride in input image pixels at the last conv layer
-model.feat_stride                               = 8; %16
+model.feat_stride_conv4                              = 8; %16
+model.feat_stride_conv5                              = 16;
 
 %% stage 1 rpn, inited from pre-trained network
 model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_multibox', 'solver_60k80k_widerface_multibox.prototxt'); 
