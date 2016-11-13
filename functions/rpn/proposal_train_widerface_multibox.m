@@ -96,7 +96,7 @@ function save_model_path = proposal_train_widerface_multibox(conf, imdb_train, r
     catch
         [image_roidb_train, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5]...
                             = proposal_prepare_image_roidb_multibox(conf, opts.imdb_train, opts.roidb_train);
-        save(train_roi_name, 'image_roidb_train','bbox_means', 'bbox_stds','-v7.3');
+        save(train_roi_name, 'image_roidb_train','bbox_means_conv4', 'bbox_stds_conv4', 'bbox_means_conv5', 'bbox_stds_conv5','-v7.3');
     end
     fprintf('Done.\n');
     
@@ -297,7 +297,7 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     labels_blob_conv4 = single(zeros(output_width_conv4, output_height_conv4, anchor_num_conv4, conf.ims_per_batch));
     labels_weights_conv4 = labels_blob_conv4;
     bbox_targets_blob_conv4 = single(zeros(output_width_conv4, output_height_conv4, anchor_num_conv4*4, conf.ims_per_batch));
-    bbox_loss_weights_blob_conv4 = bbox_targets_blob_Conv4;
+    bbox_loss_weights_blob_conv4 = bbox_targets_blob_conv4;
     
     anchor_num_conv5 = size(conf.anchors_conv5, 1);
     output_width_conv5 = conf.output_width_conv5.values({size(im_blob, 1)});
@@ -307,7 +307,7 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     labels_blob_conv5 = single(zeros(output_width_conv5, output_height_conv5, anchor_num_conv5, conf.ims_per_batch));
     labels_weights_conv5 = labels_blob_conv5;
     bbox_targets_blob_conv5 = single(zeros(output_width_conv5, output_height_conv5, anchor_num_conv5*4, conf.ims_per_batch));
-    bbox_loss_weights_blob_conv5 = bbox_targets_blob_Conv5;
+    bbox_loss_weights_blob_conv5 = bbox_targets_blob_conv5;
 
     net_inputs = {im_blob, labels_blob_conv4, labels_weights_conv4, bbox_targets_blob_conv4, bbox_loss_weights_blob_conv4, ...
                            labels_blob_conv5, labels_weights_conv5, bbox_targets_blob_conv5, bbox_loss_weights_blob_conv5 };

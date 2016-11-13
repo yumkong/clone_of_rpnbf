@@ -7,7 +7,7 @@ function [image_roidb, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------   
 
-    if ~exist('bbox_means', 'var')
+    if ~exist('bbox_means_conv4', 'var')
         bbox_means_conv4 = [];
         bbox_stds_conv4 = [];
         bbox_means_conv5 = [];
@@ -149,9 +149,9 @@ function [image_roidb, means_conv4, stds_conv4, means_conv5, stds_conv5] = appen
             gt_inds = find(targets(:, 1) > 0);
             if ~isempty(gt_inds)
                 image_roidb(i).bbox_targets_conv5{j}(gt_inds, 2:end) = ...
-                    bsxfun(@minus, image_roidb(i).bbox_targets_conv5{j}(gt_inds, 2:end), means_conv4);
+                    bsxfun(@minus, image_roidb(i).bbox_targets_conv5{j}(gt_inds, 2:end), means_conv5);
                 image_roidb(i).bbox_targets_conv5{j}(gt_inds, 2:end) = ...
-                    bsxfun(@rdivide, image_roidb(i).bbox_targets_conv5{j}(gt_inds, 2:end), stds_conv4);
+                    bsxfun(@rdivide, image_roidb(i).bbox_targets_conv5{j}(gt_inds, 2:end), stds_conv5);
             end
         end
     end
@@ -225,7 +225,9 @@ function bbox_targets = compute_targets(conf, gt_rois, gt_labels, ex_rois, image
     % Indices of examples for which we try to make predictions
     % both (ex_max_overlaps >= conf.fg_thresh) and gt_best_matches are
     % assigned as positive examples
-    fg_inds = unique([find(ex_max_overlaps >= conf.fg_thresh); gt_best_matches]);
+    %1112 changed, it may happens that all gt_best_matches < conf.fg_thresh
+    %fg_inds = unique([find(ex_max_overlaps >= conf.fg_thresh); gt_best_matches]);
+    fg_inds = unique([find(ex_max_overlaps >= conf.fg_thresh)]);
         
     % Indices of examples for which we try to used as negtive samples
     % the logic for assigning labels to anchors can be satisfied by both the positive label and the negative label
