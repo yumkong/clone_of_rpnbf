@@ -784,7 +784,7 @@ layer {
   bottom: "proposal_bbox_pred_conv4"
   bottom: "bbox_targets_conv4"
   bottom: "bbox_loss_weights_conv4"
-  top: "loss_bbox"
+  top: "loss_bbox_conv4"
   loss_weight: 5  #1017: 10-->5
 }
 
@@ -860,6 +860,6 @@ layer {
   bottom: "proposal_bbox_pred_conv5"
   bottom: "bbox_targets_conv5"
   bottom: "bbox_loss_weights_conv5"
-  top: "loss_bbox"
+  top: "loss_bbox_conv5"
   loss_weight: 5  #1017: 10-->5
 }

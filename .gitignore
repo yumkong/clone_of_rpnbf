@@ -6,6 +6,7 @@ external/caffe/matlab/caffe_faster_rcnn_win
 external/caffe/matlab/caffe_faster_rcnn_win_cudnn
 external/caffe/matlab/caffe_faster_rcnn_win_cudnn_iou
 external/caffe/matlab/caffe_faster_rcnn_win_cudnn_iou_Copy
+external/caffe/matlab/caffe*
 external/export_fig/
 sourceinsight/
 !external/code3.2.1/*.m

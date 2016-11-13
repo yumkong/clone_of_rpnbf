@@ -136,7 +136,9 @@ function save_model_path = proposal_train_widerface_multibox(conf, imdb_train, r
 
     % 0927 added to record plot info
     modelFigPath = fullfile(cache_dir, 'net-train.pdf');  % plot save path
-    tmp_struct = struct('err_fg', [], 'err_bg', [], 'loss_cls', [], 'loss_bbox', []);
+    %tmp_struct = struct('err_fg', [], 'err_bg', [], 'loss_cls', [], 'loss_bbox', []);
+    tmp_struct = struct('err_fg_conv4', [], 'err_bg_conv4', [], 'loss_cls_conv4', [], 'loss_bbox_conv4', [], ...
+                        'err_fg_conv5', [], 'err_bg_conv5', [], 'loss_cls_conv5', [], 'loss_bbox_conv5', [] );
     history_rec = struct('train',tmp_struct,'val',tmp_struct, 'num', 0);
     %1009 changed so that validation can be done within while loop
     while (iter_ <= max_iter)
@@ -167,7 +169,11 @@ function save_model_path = proposal_train_widerface_multibox(conf, imdb_train, r
         
         %format long
         fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds, 1/cost_time);
-        for kkk = 1:length(rst)
+        for kkk = 1:floor(length(rst)/2)
+            fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
+        end
+        fprintf('\n\t');
+        for kkk = floor(length(rst)/2)+1:length(rst)
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n');
@@ -269,18 +275,32 @@ end
 
 function rst = check_error(rst, caffe_solver)
 
-    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape').get_data();
-    labels = caffe_solver.net.blobs('labels_reshape').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_reshape').get_data();
+    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_conv4').get_data();
+    labels = caffe_solver.net.blobs('labels_reshape_conv4').get_data();
+    labels_weights = caffe_solver.net.blobs('labels_weights_reshape_conv4').get_data();
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
-    accurate = accurate_fg | accurate_bg;
-    accuracy_fg = sum(accurate_fg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 1)) + eps);
-    accuracy_bg = sum(accurate_bg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 0)) + eps);
+    %accurate = accurate_fg | accurate_bg;
+    accuracy_fg_conv4 = sum(accurate_fg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 1)) + eps);
+    accuracy_bg_conv4 = sum(accurate_bg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 0)) + eps);
     
-    rst(end+1) = struct('blob_name', 'accuracy_fg', 'data', accuracy_fg);
-    rst(end+1) = struct('blob_name', 'accuracy_bg', 'data', accuracy_bg);
+    % for conv5 ===============================
+    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_conv5').get_data();
+    labels = caffe_solver.net.blobs('labels_reshape_conv5').get_data();
+    labels_weights = caffe_solver.net.blobs('labels_weights_reshape_conv5').get_data();
+    
+    accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
+    accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
+    %accurate = accurate_fg | accurate_bg;
+    accuracy_fg_conv5 = sum(accurate_fg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 1)) + eps);
+    accuracy_bg_conv5 = sum(accurate_bg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 0)) + eps);
+    
+    rst(end+1) = struct('blob_name', 'accuracy_fg_conv4', 'data', accuracy_fg_conv4);
+    rst(end+1) = struct('blob_name', 'accuracy_bg_conv4', 'data', accuracy_bg_conv4);
+    
+    rst(end+1) = struct('blob_name', 'accuracy_fg_conv5', 'data', accuracy_fg_conv5);
+    rst(end+1) = struct('blob_name', 'accuracy_bg_conv5', 'data', accuracy_bg_conv5);
 end
 
 function check_gpu_memory(conf, caffe_solver, do_val)
@@ -385,30 +405,53 @@ end
 function history_rec = show_state_and_plot(iter, train_results, val_results, history_rec, modelFigPath)
     % --------- begin previously show_state part ------------
     fprintf('\n------------------------- Iteration %d -------------------------\n', iter);
-    fprintf('Training : err_fg %.3g, err_bg %.3g, loss (cls %.3g + reg %.3g)\n', ...
-        1 - mean(train_results.accuracy_fg.data), 1 - mean(train_results.accuracy_bg.data), ...
-        mean(train_results.loss_cls.data), ...
-        mean(train_results.loss_bbox.data));
+    fprintf('Training : err_fg_conv4 %.3g, err_bg_conv4 %.3g, loss_conv4 (cls %.3g + reg %.3g)\n', ...
+        1 - mean(train_results.accuracy_fg_conv4.data), 1 - mean(train_results.accuracy_bg_conv4.data), ...
+        mean(train_results.loss_cls_conv4.data), ...
+        mean(train_results.loss_bbox_conv4.data));
+    fprintf('\t err_fg_conv5 %.3g, err_bg_conv5 %.3g, loss_conv5 (cls %.3g + reg %.3g)\n', ...
+        1 - mean(train_results.accuracy_fg_conv5.data), 1 - mean(train_results.accuracy_bg_conv5.data), ...
+        mean(train_results.loss_cls_conv5.data), ...
+        mean(train_results.loss_bbox_conv5.data));
+    
     if exist('val_results', 'var') && ~isempty(val_results)
-        fprintf('Testing  : err_fg %.3g, err_bg %.3g, loss (cls %.3g + reg %.3g)\n', ...
-            1 - mean(val_results.accuracy_fg.data), 1 - mean(val_results.accuracy_bg.data), ...
-            mean(val_results.loss_cls.data), ...
-            mean(val_results.loss_bbox.data));
+        fprintf('Testing  : err_fg_conv4 %.3g, err_bg_conv4 %.3g, loss_conv4 (cls %.3g + reg %.3g)\n', ...
+            1 - mean(val_results.accuracy_fg_conv4.data), 1 - mean(val_results.accuracy_bg_conv4.data), ...
+            mean(val_results.loss_cls_conv4.data), ...
+            mean(val_results.loss_bbox_conv4.data));
+        fprintf('\t err_fg_conv5 %.3g, err_bg_conv5 %.3g, loss_conv5 (cls %.3g + reg %.3g)\n', ...
+            1 - mean(val_results.accuracy_fg_conv5.data), 1 - mean(val_results.accuracy_bg_conv5.data), ...
+            mean(val_results.loss_cls_conv5.data), ...
+            mean(val_results.loss_bbox_conv5.data));
     end
     % --------- end previously show_state part ------------
     % ========= newly added plot part =====================
-    history_rec.train.err_fg = [history_rec.train.err_fg; 1 - mean(train_results.accuracy_fg.data)];
-    history_rec.train.err_bg = [history_rec.train.err_bg; 1 - mean(train_results.accuracy_bg.data)];
-    history_rec.train.loss_cls = [history_rec.train.loss_cls; mean(train_results.loss_cls.data)];
-    history_rec.train.loss_bbox = [history_rec.train.loss_bbox; mean(train_results.loss_bbox.data)];
-    history_rec.val.err_fg = [history_rec.val.err_fg; 1 - mean(val_results.accuracy_fg.data)];
-    history_rec.val.err_bg = [history_rec.val.err_bg; 1 - mean(val_results.accuracy_bg.data)];
-    history_rec.val.loss_cls = [history_rec.val.loss_cls; mean(val_results.loss_cls.data)];
-    history_rec.val.loss_bbox = [history_rec.val.loss_bbox; mean(val_results.loss_bbox.data)];
+    %conv4
+    history_rec.train.err_fg_conv4 = [history_rec.train.err_fg_conv4; 1 - mean(train_results.accuracy_fg_conv4.data)];
+    history_rec.train.err_bg_conv4 = [history_rec.train.err_bg_conv4; 1 - mean(train_results.accuracy_bg_conv4.data)];
+    history_rec.train.loss_cls_conv4 = [history_rec.train.loss_cls_conv4; mean(train_results.loss_cls_conv4.data)];
+    history_rec.train.loss_bbox_conv4 = [history_rec.train.loss_bbox_conv4; mean(train_results.loss_bbox_conv4.data)];
+    history_rec.val.err_fg_conv4 = [history_rec.val.err_fg_conv4; 1 - mean(val_results.accuracy_fg_conv4.data)];
+    history_rec.val.err_bg_conv4 = [history_rec.val.err_bg_conv4; 1 - mean(val_results.accuracy_bg_conv4.data)];
+    history_rec.val.loss_cls_conv4 = [history_rec.val.loss_cls_conv4; mean(val_results.loss_cls_conv4.data)];
+    history_rec.val.loss_bbox_conv4 = [history_rec.val.loss_bbox_conv4; mean(val_results.loss_bbox_conv4.data)];
+    %conv5
+    history_rec.train.err_fg_conv5 = [history_rec.train.err_fg_conv5; 1 - mean(train_results.accuracy_fg_conv5.data)];
+    history_rec.train.err_bg_conv5 = [history_rec.train.err_bg_conv5; 1 - mean(train_results.accuracy_bg_conv5.data)];
+    history_rec.train.loss_cls_conv5 = [history_rec.train.loss_cls_conv5; mean(train_results.loss_cls_conv5.data)];
+    history_rec.train.loss_bbox_conv5 = [history_rec.train.loss_bbox_conv5; mean(train_results.loss_bbox_conv5.data)];
+    history_rec.val.err_fg_conv5 = [history_rec.val.err_fg_conv5; 1 - mean(val_results.accuracy_fg_conv5.data)];
+    history_rec.val.err_bg_conv5 = [history_rec.val.err_bg_conv5; 1 - mean(val_results.accuracy_bg_conv5.data)];
+    history_rec.val.loss_cls_conv5 = [history_rec.val.loss_cls_conv5; mean(val_results.loss_cls_conv5.data)];
+    history_rec.val.loss_bbox_conv5 = [history_rec.val.loss_bbox_conv5; mean(val_results.loss_bbox_conv5.data)];
+    
     history_rec.num = history_rec.num + 1;
     % draw it
     figure(1) ; clf ;
-    plots = {'err_fg', 'err_bg', 'loss_cls', 'loss_bbox'};
+    plots = {'err_fg_conv4', 'err_bg_conv4', 'loss_cls_conv4', 'loss_bbox_conv4', ...
+             'err_fg_conv5', 'err_bg_conv5', 'loss_cls_conv5', 'loss_bbox_conv5'};
+
+    half_plot_num = ceil(numel(plots)/2);
     for p = plots
       c_p = char(p) ;
       values = zeros(0, history_rec.num) ;
@@ -422,7 +465,8 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
           leg{end+1} = c_f;
         end
       end
-      subplot(1,numel(plots),find(strcmp(c_p, plots))) ;
+      subplot(2, half_plot_num,find(strcmp(c_p, plots)));
+      %subplot(1,numel(plots),find(strcmp(c_p, plots))) ;
       plot(1:history_rec.num, values','o-') ;
       xlabel('epoch') ;
       title(c_p) ;
