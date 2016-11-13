@@ -837,7 +837,7 @@ layer {
 }
 
 layer {
-   name: "loss_clf_conv5"
+   name: "loss_cls_conv5"
    type: "SoftmaxWithLoss"
    bottom: "proposal_cls_score_reshape_conv5"
    bottom: "labels_reshape_conv5"
