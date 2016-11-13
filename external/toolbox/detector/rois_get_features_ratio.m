@@ -35,7 +35,7 @@ function [feats] = rois_get_features_ratio(conf, caffe_net, im, boxes, max_rois_
     boxes(:,3) = min(width, boxes(:,3)); %right
     boxes(:,4) = min(height, boxes(:,4)); % bottom
 
-    [im_blob, rois_blob, ~] = get_blobs(conf, im, boxes);
+    [im_blob, rois_blob, ~] = get_blobs(conf, im, boxes); % rescaled image and rescaled bbox
     
     % When mapping from image ROIs to feature map ROIs, there's some aliasing
     % (some distinct image ROIs get mapped to the same feature ROI).
