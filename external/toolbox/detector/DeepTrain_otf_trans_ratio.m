@@ -145,7 +145,13 @@ if(exist(nm,'file')), diary(nm); diary('off'); delete(nm); end; diary(nm);
 RandStream.setGlobalStream(RandStream('mrg32k3a','Seed',opts.seed));
 
 % sample positives 
-[X1, X1_score, ~] = sampleWins( detector, 0, 1 );  % detector  stage  positive
+% 1023 added store pos samples to save time when use it later
+try
+    load([opts.name '_initPos.mat']);
+catch
+    [X1, X1_score, ~] = sampleWins( detector, 0, 1 );  % detector  stage  positive
+    save([opts.name '_initPos.mat'], 'X1', 'X1_score', '-v7.3');
+end
 X1 = single(X1);
 
 % iterate bootstraping and training
@@ -154,7 +160,18 @@ for stage = 0:numel(opts.nWeak)-1
   fprintf('Training stage %i\n',stage); startStage=clock;
   
   % sample negatives and compute features
-  [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 );  % neg sample of current stage
+
+  if stage ~= 0
+    [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 );
+  else
+    try
+        load([opts.name '_initNeg.mat']);
+    catch
+        [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 ); %neg
+        save([opts.name '_initNeg.mat'], 'X0', 'X0_score', '-v7.3');
+    end  
+  end
+
   X0 = single(X0);
   
 %   if stage == 0 && ~isempty(opts.init_detector)
@@ -385,7 +402,8 @@ if positive
                 % liu@1001: get the deep feature vector of all selected fg boxes
                 % liu@1001: max_rois_num_in_gpu -- how many roi features can be extract at one pass,
                 % if the total features are larger than this, will divide it into several parts to extract gradually
-                fg_feat_cell{idx} = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_boxes, opts.max_rois_num_in_gpu, opts.ratio);
+                %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
+                fg_feat_cell{idx} = rois_get_features_ratio2(opts.conf, opts.caffe_net, im, sel_boxes, opts.max_rois_num_in_gpu, opts.ratio);
 %                 assert(size(fg_feat_cell{idx}, 2)==opts.feat_len, sprintf('assert fail: feat_len should set to %d', size(fg_feat_cell{idx}, 2)));
                 fg_score_cell{idx} =  rois(idx).scores(sel_idx);
             end
@@ -461,7 +479,8 @@ else
                sel_scores = rois(idx).scores(sel_idx, :);
            end 
            im = imread(opts.imdb_train.image_at(idx)); 
-           sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
+           %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
+           sel_feat = rois_get_features_ratio2(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
            
            if ~isempty(sel_idx)               
                scores = DeepDetect_otf_trans(sel_feat, sel_scores, detector);
@@ -474,7 +493,8 @@ else
            retain_idx = randperm(length(sel_idx), min(opts.nPerNeg, length(sel_idx)));
            sel_idx = sel_idx(retain_idx);
            sel_box = rois(idx).boxes(sel_idx, :);
-           sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
+           %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
+           sel_feat = rois_get_features_ratio2(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
        end
        
        

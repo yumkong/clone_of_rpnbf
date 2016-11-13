@@ -22,7 +22,7 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     score_thresh = scores(end);
     fprintf('score_threshold = %f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
-    show_image = false;
+    show_image = true;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);
@@ -54,7 +54,7 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
         
         %1006 added to do NPD-style nms
         time = tic;
-        aboxes_nms{i} = pseudoNMS_v3(aboxes{i}, nms_option);
+        aboxes_nms{i} = pseudoNMS_v6(aboxes{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         if show_image

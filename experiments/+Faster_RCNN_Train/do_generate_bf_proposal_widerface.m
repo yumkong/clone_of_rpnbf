@@ -43,36 +43,39 @@ function roidb_BF = do_generate_bf_proposal_widerface(conf, model_stage, imdb, r
         %aboxes{i} = pseudoNMS_v2(aboxes{i}, nms_option);
         aboxes{i} = pseudoNMS_v3(aboxes{i}, nms_option);
         %set the highest all >=1 scores after nms to 1
-        if ~isempty(aboxes{i})
-            tmp_score = aboxes{i}(:,end);
-            %====newscore1 ==
-            %tmp_score(tmp_score >= 1) = 1;
-            
-            % =====newscore2========
-            tmp_score = sqrt(tmp_score); %square root
-            tmp_score = 0.9 * (tmp_score - min(tmp_score)) / (max(tmp_score) - min(tmp_score)) + 0.1; % shrink to the range [0.1 1]
-            aboxes{i}(:,end) = tmp_score;
-        end
+%         if ~isempty(aboxes{i})
+%             tmp_score = aboxes{i}(:,end);
+%             %====newscore1 ==
+%             %tmp_score(tmp_score >= 1) = 1;
+%             
+%             % =====newscore2========
+%             tmp_score = sqrt(tmp_score); %square root
+%             tmp_score = 0.9 * (tmp_score - min(tmp_score)) / (max(tmp_score) - min(tmp_score)) + 0.1; % shrink to the range [0.1 1]
+%             aboxes{i}(:,end) = tmp_score;
+%         end
     end
-    
-    % ########## save the raw result (before BF) here #############
+    %1020 added
     if is_test
-        fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e11-12anchor-ave-%d-nms-op%d.txt',ave_per_image_topN, nms_option)), 'a');
-
-        assert(length(imdb.image_ids) == size(aboxes, 1));
-        for i = 1:size(aboxes, 1)
-            if ~isempty(aboxes{i})
-                sstr = strsplit(imdb.image_ids{i}, filesep);
-                % [x1 y1 x2 y2] pascal VOC style
-                for j = 1:size(aboxes{i}, 1)
-                    %each row: [image_name score x1 y1 x2 y2]
-                    fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, aboxes{i}(j, 5), round(aboxes{i}(j, 1:4)));
-                end
-            end
-        end
-        fclose(fid);
-        fprintf('Done with saving RPN detected boxes.\n');
+        save('rpn_aboxes.mat','aboxes');
     end
+    % ########## save the raw result (before BF) here #############
+%     if is_test
+%         fid = fopen(fullfile(cache_dir, sprintf('VGG16_e1-e11-12anchor-ave-%d-nms-op%d.txt',ave_per_image_topN, nms_option)), 'a');
+% 
+%         assert(length(imdb.image_ids) == size(aboxes, 1));
+%         for i = 1:size(aboxes, 1)
+%             if ~isempty(aboxes{i})
+%                 sstr = strsplit(imdb.image_ids{i}, filesep);
+%                 % [x1 y1 x2 y2] pascal VOC style
+%                 for j = 1:size(aboxes{i}, 1)
+%                     %each row: [image_name score x1 y1 x2 y2]
+%                     fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, aboxes{i}(j, 5), round(aboxes{i}(j, 1:4)));
+%                 end
+%             end
+%         end
+%         fclose(fid);
+%         fprintf('Done with saving RPN detected boxes.\n');
+%     end
     
     % eval the gt recall
     gt_num = 0;

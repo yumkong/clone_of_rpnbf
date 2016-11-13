@@ -10,14 +10,13 @@ function [feats] = rois_get_features_ratio(conf, caffe_net, im, boxes, max_rois_
     % liu@1001: ratio = 1, so no bbox width and height changes
     outer_box_ratio = ratio;
     %1004 changed
-    %boxes_width_change = (boxes(:,3)-boxes(:,1))*(outer_box_ratio-1)/2;
     boxes_width_change = (boxes(:,3)-boxes(:,1) + 1)*(outer_box_ratio-1)/2;
     boxes(:,1) = boxes(:,1) - boxes_width_change;
     boxes(:,3) = boxes(:,3) + boxes_width_change;
-    % boxes_height_change = (boxes(:,4)-boxes(:,2))*(outer_box_ratio-1)/2;
-    %boxes_height_change = (boxes(:,4)-boxes(:,2) + 1)*(outer_box_ratio-1)/2;
-    %boxes(:,2) = boxes(:,2) - boxes_height_change;
-    %boxes(:,4) = boxes(:,4) + boxes_height_change;
+
+%     boxes_height_change = (boxes(:,4)-boxes(:,2) + 1)*(outer_box_ratio-1)/2;
+%     boxes(:,2) = boxes(:,2) - boxes_height_change;
+%     boxes(:,4) = boxes(:,4) + boxes_height_change;
     top_ratio = 0.2; %0.25
     bottom_ratio = 0.8; %1.75
     boxes_top_change = (boxes(:,4)-boxes(:,2) + 1) * top_ratio;

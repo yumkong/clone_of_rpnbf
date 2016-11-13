@@ -7,14 +7,14 @@ model.pre_trained_net_file                      = fullfile(pwd, 'models', exp_na
 model.feat_stride                               = 8; %16
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_conv3_1', 'solver_60k80k_widerface_conv4.prototxt'); %solver_60k80k_widerface_12anchor
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_conv3_1', 'solver_60k80k_widerface_conv4.prototxt'); 
 model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_conv3_1', 'test_widerface_conv4.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting
 model.stage1_rpn.nms.per_nms_topN               = -1; %20000
 model.stage1_rpn.nms.nms_overlap_thres       	= 1;%0.7
-model.stage1_rpn.nms.after_nms_topN         	= 300;  %1000
+model.stage1_rpn.nms.after_nms_topN         	= 800;  %1000
 
 %% stage 1 fast rcnn, inited from pre-trained network
 model.stage1_fast_rcnn.solver_def_file          = fullfile(pwd, 'models', exp_name,'fast_rcnn_prototxts', 'vgg_16layers_conv3_1', 'solver_30k40k_widerface_conv4.prototxt');

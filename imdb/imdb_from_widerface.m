@@ -3,16 +3,6 @@ function [imdb, roidb] = imdb_from_widerface(root_dir, image_set, flip, cache_di
 
 switch image_set
     case {'trainval'}
-        %cache_imdb = fullfile(cache_dir, 'train_imdb_e1-e3_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'train_roidb_e1-e3_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'train_imdb_all_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'train_roidb_all_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'train_imdb_ZF_e1-e3_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'train_roidb_ZF_e1-e3_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'train_imdb_vgg_conv4_e1-e3_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'train_roidb_vgg_conv4_e1-e3_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'train_imdb_vgg_conv4_all_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'train_roidb_vgg_conv4_all_raw.mat');  %roidb
         if event_num == -1
             data_num_str = 'all';
         elseif event_num > 0
@@ -24,16 +14,6 @@ switch image_set
         doc_dir = fullfile('wider_face_split','wider_face_train');
         name = 'WIDERFACE_train';
     case {'test'}
-        %cache_imdb = fullfile(cache_dir, 'test_imdb_e1-e3_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'test_roidb_e1-e3_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'test_imdb_all_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'test_roidb_all_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'test_imdb_ZF_e1-e3_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'test_roidb_ZF_e1-e3_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'test_imdb_vgg_conv4_e1-e3_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'test_roidb_vgg_conv4_e1-e3_raw.mat');  %roidb
-        %cache_imdb = fullfile(cache_dir, 'test_imdb_vgg_conv4_all_raw.mat');  %imdb
-        %cache_roidb = fullfile(cache_dir, 'test_roidb_vgg_conv4_all_raw.mat');  %roidb
         if event_num == -1
             data_num_str = 'all';
         elseif event_num > 0

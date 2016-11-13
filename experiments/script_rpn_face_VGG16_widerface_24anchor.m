@@ -1,5 +1,5 @@
 function script_rpn_face_VGG16_widerface_24anchor()
-% script_rpn_pedestrian_VGG16_caltech()
+% script_rpn_face_VGG16_widerface_24anchor()
 % --------------------------------------------------------
 % RPN_BF
 % Copyright (c) 2016, Liliang Zhang

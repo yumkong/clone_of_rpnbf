@@ -44,30 +44,35 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     % permute from [width, height, channel] to [channel, height, width], where channel is the
         % fastest dimension
     scores = permute(scores, [3, 2, 1]);
-    scores = scores(:);
     
-    %====== 1008 do nms around each anchors first (assume only one out of 7 is the best)
-    %1009 found that only keeping one box out of 12 boxes doesnt have a
-    %good result, keep all 12 boxes and select the first 300 boxes is
-    %better
-%     anchor_num = size(conf.anchors, 1);
-%     tmp = reshape(scores, anchor_num, []);
-%     [~, sel_idx] = sort(tmp,1,'descend');
-%     %[~,tmp2] = max(tmp,[], 1);
-%     % select 1 out of 9
-%     [~, size10_sel1_idx] = max(tmp(1:9, :),[], 1);
-%     % select 1 out of 4
-%     [~, size16_sel1_idx] = max(tmp(10:13, :),[], 1);
-% 
-%     %kept_score_idx = anchor_num*(0:length(tmp2)-1)+tmp2;
-%     kept_score_idx = bsxfun(@plus, anchor_num * (0:length(size10_sel1_idx)-1), cat(1, size10_sel1_idx, size16_sel1_idx+9, repmat((14:24)',1, length(size10_sel1_idx))));
-    %1013: only keep top-5 score anchors for each position
-%     kept_score_idx = bsxfun(@plus, anchor_num * (0:size(sel_idx,2)-1), sel_idx(1:5,:));
-%     %kept_score_idx = kept_score_idx';
-%     kept_score_idx = kept_score_idx(:);
-%     pred_boxes = pred_boxes(kept_score_idx, :);
-%     scores = scores(kept_score_idx, :);
-    %====== end of 1008
+    % 1029 added
+    % also should change the name of 
+    %D:\RPN_BF_master\output\VGG16_widerface_conv4\rpn_cachedir\yolo_widerface_VGG16_stage1_rpn\WIDERFACE_test\proposal_boxes_WIDERFACE_test.mat
+    % so that algo will re-process each test image one by one
+    show_mask = false;
+    %1110 added to display the anchor center position as well as plot the
+    %512-d vector of each anchor position
+    show_mask2 = false;
+    debug_position_sensitive = false;
+    if show_mask
+        scores_max = max(scores, [], 1);
+        score_plot = squeeze(scores_max);
+        score_plot_resize = imresize(score_plot, [size(im,1) size(im,2)]);
+    end
+    
+    scores = scores(:);
+
+    % 1025: decimate anchors by one half (only keep one boxes out of each anchor scale position)
+%     anchor_num = size(conf.anchors, 1);  %14
+%     half_anchor_num = size(conf.anchors, 1)/2; %7
+%     tmp_scores = reshape(scores, anchor_num, []); 
+%     hw1_score = tmp_scores(1:half_anchor_num, :);
+%     hw2_score = tmp_scores(1+half_anchor_num:end, :);
+%     hw1_greater_mask = (hw1_score >= hw2_score);
+%     greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
+%     scores = scores(greater_mask(:),:);  %new scores
+%     pred_boxes = pred_boxes(greater_mask(:),:);  % new pred_boxes
+    %====== end of 1025
     
     box_deltas_ = box_deltas;
     anchors_ = anchors;
@@ -88,6 +93,44 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     [scores, scores_ind] = sort(scores, 'descend');
     pred_boxes = pred_boxes(scores_ind, :);
     
+    if show_mask
+        figure(1), imshow(im/255);
+        %figure(2), imshow(score_plot_resize);
+        figure(2), h = imshow(im/255);
+        set(h,'AlphaData',score_plot_resize);
+    end
+    
+    if show_mask2
+        %plot position of anchors:
+        anchor_pos = [0.5*(anchors(:,1)+anchors(:,3)) 0.5*(anchors(:,2)+anchors(:,4))];
+        anchor_pos = anchor_pos(1:7:end,:);
+        re_im = imresize(im, im_scales);
+        figure(1), imshow(re_im/255);
+        
+        [x_pos, y_pos] = meshgrid(1:featuremap_size(2),1:featuremap_size(1));
+        rectangle_anchor_pos = reshape(anchor_pos, featuremap_size(1), featuremap_size(2), 2);
+        rectangle_anchor_pos = cat(3, rectangle_anchor_pos, y_pos, x_pos);
+        sample_rectangle_anchor_pos = rectangle_anchor_pos(1:10:end, 1:10:end, :);
+        sample_rectangle_anchor_pos = reshape(sample_rectangle_anchor_pos, [], 4);
+        pos_info_cell = num2cell(sample_rectangle_anchor_pos(:,3:4), 2);
+        pos_info_txt = cellfun(@(x) sprintf('(%d,%d)',x(1), x(2)), pos_info_cell, 'UniformOutput',false);
+        
+        hold on
+        text(sample_rectangle_anchor_pos(:,1),sample_rectangle_anchor_pos(:,2),pos_info_txt, 'Color', 'c','HorizontalAlignment','center');
+        plot(anchor_pos(:,1), anchor_pos(:,2),'g.','MarkerSize',5);
+        hold off
+    end
+    if debug_position_sensitive
+        layer_name = 'conv4_3';%conv_proposal1
+        layer_mat = caffe_net.blobs(layer_name).get_data();
+        % from [w x h x feat_dim] to [h x w x feat_dim]
+        layer_mat = permute(layer_mat, [2, 1, 3]);
+        posY1 = 36; posX1 = 76; %77
+        posY2 = 56; posX2 = 18; 
+        figure(2);
+        subplot(2,1,1),plot(squeeze(layer_mat(posY1, posX1, :)));
+        subplot(2,1,2),plot(squeeze(layer_mat(posY2, posX2, :)));
+    end
 %     image(im/255); 
 %     axis image;
 %     axis off;

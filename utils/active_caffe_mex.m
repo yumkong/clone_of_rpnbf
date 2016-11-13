@@ -26,6 +26,6 @@ function active_caffe_mex(gpu_id, caffe_version)
     
     addpath(genpath(caffe_dir));
     cd(caffe_dir);
-    caffe.set_device(gpu_id-1);
+    caffe.set_device(gpu_id-1);  %gpu_id-1
     cd(cur_dir);
 end

@@ -1,7 +1,7 @@
 function rects = pseudoNMS_v6(candi_rects, nms_option)
 
 % overlapping threshold for grouping nearby detections
-overlappingThreshold = 0.75; %0.7:0.5233, 0.8:0.5218, 0.6:0.5233 %1012 0.7-->0.75
+overlappingThreshold = 0.9; %0.7:0.5233, 0.8:0.5218, 0.6:0.5233 %1012 0.7-->0.75
 overlappingThreshold2 = 0.8; %0.5: 0.5233, 0.6: 0.5420   %1012: 0.6 --> 0.7
 overlappingThreshold3 = 0.2;
 embeddingThreshold = 0.55; %0.5: 0.5279  0.55: 0.5337 
@@ -57,8 +57,9 @@ for i = 1 : numCandidates
     % now a row vector
     %weight = candi_rects(index, 5)';
     weight = candi_rects(index, 5);
-    rects(i,5) = sum( weight );  %1006: sum --> max
-    weight = weight .^ 3; %make big score bigger and small score smaller
+    rects(i,5) = max( weight );  %1006: sum --> max
+    % 1024 masked
+    %weight = weight.^ 3; %make big score bigger and small score smaller
     
 	%normalize weight
     weight = weight / sum(weight);
@@ -109,8 +110,13 @@ if nms_option >=2
     for i = 1 : numCandidates
         % index of the i-th cluster
         index = find(label == i);
-        
-        if numel(index) > 1
+        % 1024 find a bug: '>' should change to '>='
+        if numel(index) == 1
+            % direct assign for singleton rect
+            %rects(i, :) = candi_rects(index, :);
+            rects = cat(1, rects, candi_rects(index, :));
+        else
+            
             weight = candi_rects(index, 5);           
             mean_weight = mean(weight);
             % get rid of low scoring rects
@@ -140,7 +146,7 @@ if nms_option >=2
                             % absolute value
                             center_dist_x = abs(0.5*(rects_one(3) + rects_one(1) - rects_two(3) - rects_two(1)));
                             center_dist_y = abs(0.5*(rects_one(4) + rects_one(2) - rects_two(4) - rects_two(2)));
-                            if center_dist_x <= 0.3*max(w_one, w_two) && center_dist_y <= 0.3*max(h_one, h_two) %0.5-->0.3
+                            if center_dist_x <= 0.2*max(w_one, w_two) && center_dist_y <= 0.2*max(h_one, h_two) %0.5-->0.3 --> 0.2(1024)
                                 combined_flag(jj) = true;
                                 % combine two rects
                                 weight = [rects_one(5) rects_two(5)] / sum([rects_one(5) rects_two(5)]);
@@ -149,8 +155,8 @@ if nms_option >=2
                                 ave_w = weight * [rects_one(3)-rects_one(1)+1; rects_two(3)-rects_two(1)+1];
                                 ave_h = weight * [rects_one(4)-rects_one(2)+1; rects_two(4)-rects_two(2)+1];
                                 %1007 no rounding, single value is ok
-                                new_rects(ii, :) = [ave_center_x-(ave_w-1)/2  ave_center_y-(ave_h-1)/2  ave_center_x+(ave_w-1)/2  ave_center_y+(ave_h-1)/2  rects_one(5)+rects_two(5)];
-                                %new_rects(ii, :) = [ave_center_x-(ave_w-1)/2  ave_center_y-(ave_h-1)/2  ave_center_x+(ave_w-1)/2  ave_center_y+(ave_h-1)/2  max([rects_one(5) rects_two(5)])];
+                                %new_rects(ii, :) = [ave_center_x-(ave_w-1)/2  ave_center_y-(ave_h-1)/2  ave_center_x+(ave_w-1)/2  ave_center_y+(ave_h-1)/2  rects_one(5)+rects_two(5)];
+                                new_rects(ii, :) = [ave_center_x-(ave_w-1)/2  ave_center_y-(ave_h-1)/2  ave_center_x+(ave_w-1)/2  ave_center_y+(ave_h-1)/2  max([rects_one(5) rects_two(5)])];
                             end
                         end
                     end
@@ -198,10 +204,7 @@ if nms_option >=2
 %                 % append the 2nd high scoring boxes at the end of output rects
 %                 rects = cat(1, rects, rects_two);
 %             end
-        else
-            % direct assign for singleton rect
-            %rects(i, :) = candi_rects(index, :);
-            rects = cat(1, rects, candi_rects(index, :));
+        
         end
     end
 
@@ -213,6 +216,8 @@ end
 if nms_option >=3
     
     candi_rects = rects;
+    % 1024 solve a bug by adding this line:
+    numCandidates = size(candi_rects, 1);
     predicate = eye(numCandidates);
     area_rect = (candi_rects(:,3) - candi_rects(:,1) + 1) .* (candi_rects(:,4) - candi_rects(:,2) + 1);
     for i = 1 : numCandidates
