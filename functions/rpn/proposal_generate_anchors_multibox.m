@@ -35,7 +35,7 @@ function [anchors_conv4, anchors_conv5] = proposal_generate_anchors_multibox(cac
     catch
         base_anchor             = [1, 1, opts.base_size, opts.base_size];
         ratio_anchors           = ratio_jitter(base_anchor, opts.ratios);
-        anchors                 = cellfun(@(x) scale_jitter(x, opts.scales), num2cell(ratio_anchors, 2), 'UniformOutput', false);
+        anchors                 = cellfun(@(x) scale_jitter(x, opts.scales, opts.add_size), num2cell(ratio_anchors, 2), 'UniformOutput', false);
         anchors                 = cat(1, anchors{:});
         % 1112 added
         anchors_conv4 = anchors(1:2, :);  %[8 16]
@@ -63,7 +63,7 @@ function anchors = ratio_jitter(anchor, ratios)
     anchors = [x_ctr - (ws - 1) / 2, y_ctr - (hs - 1) / 2, x_ctr + (ws - 1) / 2, y_ctr + (hs - 1) / 2];
 end
 
-function anchors = scale_jitter(anchor, scales)
+function anchors = scale_jitter(anchor, scales, add_size)
     scales = scales(:);
 
     w = anchor(3) - anchor(1) + 1;
@@ -73,8 +73,8 @@ function anchors = scale_jitter(anchor, scales)
 
     %ws = w * scales;
     %hs = h * scales;
-    ws = [w * scales opts.add_size];
-    hs = [h * scales opts.add_size];
+    ws = [w * scales; add_size];
+    hs = [h * scales; add_size];
     
     anchors = [x_ctr - (ws - 1) / 2, y_ctr - (hs - 1) / 2, x_ctr + (ws - 1) / 2, y_ctr + (hs - 1) / 2];
 end
