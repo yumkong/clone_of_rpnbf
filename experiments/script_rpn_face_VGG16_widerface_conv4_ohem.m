@@ -21,7 +21,7 @@ elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_normlayer'; %caffe_faster_rcnn
+    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_ohem'; %caffe_faster_rcnn
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -95,10 +95,10 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ohem
 %nms_option_test = 3;
 %dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, x, y, nms_option_train), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
 %dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-cache_name = 'widerface';
-method_name = 'RPN-ped';
-nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_multibox(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+%cache_name = 'widerface';
+%method_name = 'RPN-ped';
+%nms_option_test = 3;
+%Faster_RCNN_Train.do_proposal_test_widerface_multibox(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');

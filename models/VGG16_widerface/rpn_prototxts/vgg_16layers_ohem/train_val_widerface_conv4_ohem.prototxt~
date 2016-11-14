@@ -517,8 +517,8 @@ layer {
    }
    propagate_down: false
    propagate_down: false
-   #propagate_down: false
-   #propagate_down: false
+   propagate_down: false
+   propagate_down: false
 }
 
 layer {

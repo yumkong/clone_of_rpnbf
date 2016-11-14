@@ -270,14 +270,20 @@ end
 function rst = check_error(rst, caffe_solver)
 
     cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape').get_data();
-    labels = caffe_solver.net.blobs('labels_reshape').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_reshape').get_data();
+    %labels = caffe_solver.net.blobs('labels_reshape').get_data();
+    %labels_weights = caffe_solver.net.blobs('labels_weights_reshape').get_data();
+    labels_weights_ohem = caffe_solver.net.blobs('labels_ohem').get_data();
     
-    accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
-    accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
-    accurate = accurate_fg | accurate_bg;
-    accuracy_fg = sum(accurate_fg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 1)) + eps);
-    accuracy_bg = sum(accurate_bg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 0)) + eps);
+    %accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
+    %accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
+    %accurate = accurate_fg | accurate_bg;
+    %accuracy_fg = sum(accurate_fg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 1)) + eps);
+    %accuracy_bg = sum(accurate_bg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 0)) + eps);
+    
+    accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels_weights_ohem == 1);
+    accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels_weights_ohem == 0);
+    accuracy_fg = sum(accurate_fg(:)) / (sum((labels_weights_ohem(:) == 1)) + eps);
+    accuracy_bg = sum(accurate_bg(:)) / (sum((labels_weights_ohem(:) == 0)) + eps);
     
     rst(end+1) = struct('blob_name', 'accuracy_fg', 'data', accuracy_fg);
     rst(end+1) = struct('blob_name', 'accuracy_bg', 'data', accuracy_bg);
@@ -295,11 +301,12 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     output_height = conf.output_width_map.values({size(im_blob, 2)});
     output_height = output_height{1};
     labels_blob = single(zeros(output_width, output_height, anchor_num, conf.ims_per_batch));
-    labels_weights = labels_blob;
+    %labels_weights = labels_blob;
     bbox_targets_blob = single(zeros(output_width, output_height, anchor_num*4, conf.ims_per_batch));
     bbox_loss_weights_blob = bbox_targets_blob;
 
-    net_inputs = {im_blob, labels_blob, labels_weights, bbox_targets_blob, bbox_loss_weights_blob};
+    %net_inputs = {im_blob, labels_blob, labels_weights, bbox_targets_blob, bbox_loss_weights_blob};
+    net_inputs = {im_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
     
      % Reshape net's input blobs
     caffe_solver.net.reshape_as_input(net_inputs);
