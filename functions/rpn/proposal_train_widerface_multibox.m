@@ -135,7 +135,8 @@ function save_model_path = proposal_train_widerface_multibox(conf, imdb_train, r
     max_iter = caffe_solver.max_iter();
 
     % 0927 added to record plot info
-    modelFigPath = fullfile(cache_dir, 'net-train.pdf');  % plot save path
+    modelFigPath1 = fullfile(cache_dir, 'net-train_conv4.pdf');  % plot save path
+    modelFigPath2 = fullfile(cache_dir, 'net-train_conv5.pdf');  % plot save path
     %tmp_struct = struct('err_fg', [], 'err_bg', [], 'loss_cls', [], 'loss_bbox', []);
     tmp_struct = struct('err_fg_conv4', [], 'err_bg_conv4', [], 'loss_cls_conv4', [], 'loss_bbox_conv4', [], ...
                         'err_fg_conv5', [], 'err_bg_conv5', [], 'loss_cls_conv5', [], 'loss_bbox_conv5', [] );
@@ -188,7 +189,7 @@ function save_model_path = proposal_train_widerface_multibox(conf, imdb_train, r
             end
             % 0927 changed: showstate + plot
             %show_state(iter_, train_results, val_results);
-            history_rec = show_state_and_plot(iter_, train_results, val_results, history_rec, modelFigPath);
+            history_rec = show_state_and_plot(iter_, train_results, val_results, history_rec, modelFigPath1, modelFigPath2);
             
             train_results = [];
             diary; diary; % flush diary
@@ -210,7 +211,7 @@ function save_model_path = proposal_train_widerface_multibox(conf, imdb_train, r
     % final snapshot
     % liu@0927 commented, because now all snapshot can be done during while loop
     %snapshot(conf, caffe_solver, bbox_means, bbox_stds, cache_dir, sprintf('iter_%d', iter_));
-    save_model_path = snapshot(conf, caffe_solver, bbox_means, bbox_stds, cache_dir, 'final');
+    save_model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5, cache_dir, 'final');
 
     diary off;
     caffe.reset_all(); 
@@ -402,7 +403,7 @@ function model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_c
 end
 
 %function show_state(iter, train_results, val_results)
-function history_rec = show_state_and_plot(iter, train_results, val_results, history_rec, modelFigPath)
+function history_rec = show_state_and_plot(iter, train_results, val_results, history_rec, modelFigPath1, modelFigPath2)
     % --------- begin previously show_state part ------------
     fprintf('\n------------------------- Iteration %d -------------------------\n', iter);
     fprintf('Training : err_fg_conv4 %.3g, err_bg_conv4 %.3g, loss_conv4 (cls %.3g + reg %.3g)\n', ...
@@ -448,11 +449,12 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     history_rec.num = history_rec.num + 1;
     % draw it
     figure(1) ; clf ;
-    plots = {'err_fg_conv4', 'err_bg_conv4', 'loss_cls_conv4', 'loss_bbox_conv4', ...
-             'err_fg_conv5', 'err_bg_conv5', 'loss_cls_conv5', 'loss_bbox_conv5'};
+    titles1 = {'err\_fg\_conv4', 'err\_bg\_conv4', 'loss\_cls\_conv4', 'loss\_bbox\_conv4'};
+    plots1 = {'err_fg_conv4', 'err_bg_conv4', 'loss_cls_conv4', 'loss_bbox_conv4'};
 
-    half_plot_num = ceil(numel(plots)/2);
-    for p = plots
+    %half_plot_num = ceil(numel(plots)/2);
+    cnt = 0;
+    for p = plots1
       c_p = char(p) ;
       values = zeros(0, history_rec.num) ;
       leg = {} ;
@@ -465,16 +467,51 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
           leg{end+1} = c_f;
         end
       end
-      subplot(2, half_plot_num,find(strcmp(c_p, plots)));
-      %subplot(1,numel(plots),find(strcmp(c_p, plots))) ;
+      %subplot(2, half_plot_num,find(strcmp(c_p, plots)));
+      subplot(1,numel(plots1),find(strcmp(c_p, plots1))) ;
       plot(1:history_rec.num, values','o-') ;
       xlabel('epoch') ;
-      title(c_p) ;
+      cnt = cnt + 1;
+      %title(c_p) ;
+      title(titles1(cnt)) ;
       legend(leg{:}) ;
       grid on ;
     end
     drawnow ;
-    print(1, modelFigPath, '-dpdf') ;
+    print(1, modelFigPath1, '-dpdf') ;
+    
+    % for conv5
+    figure(2) ; clf ;
+    titles2 = {'err\_fg\_conv5', 'err\_bg\_conv5', 'loss\_cls\_conv5', 'loss\_bbox\_conv5'};
+    plots2 = {'err_fg_conv5', 'err_bg_conv5', 'loss_cls_conv5', 'loss_bbox_conv5'};
+
+    %half_plot_num = ceil(numel(plots)/2);
+    cnt = 0;
+    for p = plots2
+      c_p = char(p) ;
+      values = zeros(0, history_rec.num) ;
+      leg = {} ;
+      for f = {'train', 'val'}
+        c_f = char(f) ;
+        if isfield(history_rec.(c_f), c_p)
+          %tmp = [history_rec.(c_f).(c_p)] ;
+          %values(end+1,:) = tmp(1,:)' ;
+          values(end+1,:) = [history_rec.(c_f).(c_p)]';
+          leg{end+1} = c_f;
+        end
+      end
+      %subplot(2, half_plot_num,find(strcmp(c_p, plots)));
+      subplot(1,numel(plots2),find(strcmp(c_p, plots2))) ;
+      plot(1:history_rec.num, values','o-') ;
+      xlabel('epoch') ;
+      cnt = cnt + 1;
+      %title(c_p) ;
+      title(titles2(cnt)) ;
+      legend(leg{:}) ;
+      grid on ;
+    end
+    drawnow ;
+    print(2, modelFigPath2, '-dpdf') ;
 end
 
 function check_loss(rst, caffe_solver, input_blobs)
