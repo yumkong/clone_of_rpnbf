@@ -160,6 +160,7 @@ for stage = 0:numel(opts.nWeak)-1
   fprintf('Training stage %i\n',stage); startStage=clock;
   
   % sample negatives and compute features
+
   if stage ~= 0
     [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 );
   else
@@ -170,6 +171,7 @@ for stage = 0:numel(opts.nWeak)-1
         save([opts.name '_initNeg.mat'], 'X0', 'X0_score', '-v7.3');
     end  
   end
+
   X0 = single(X0);
   
 %   if stage == 0 && ~isempty(opts.init_detector)
@@ -190,9 +192,10 @@ for stage = 0:numel(opts.nWeak)-1
   
   % accumulate negatives from previous stages
   if( stage>0 )
-    n0 = size(X0p,1); 
-    n1 = max(opts.nNeg,opts.nAccNeg)-size(X0,1);
-    if(n0 > n1 && n1 > 0), 
+    n0 = size(X0p,1); % previous number of scores
+    % n1 == how many neg samples of all previous stages should be kept 
+    n1 = max(opts.nNeg,opts.nAccNeg)-size(X0,1);  % 50000 - neg samples of current stage
+    if(n0 > n1 && n1 > 0), % meaning part of the previous neg samples should be deleted
         sel_idx = randSample(n0,n1);
         X0p=X0p(sel_idx,:); 
         X0_score_p=X0_score_p(sel_idx,:); 
@@ -202,8 +205,8 @@ for stage = 0:numel(opts.nWeak)-1
         X0_score=[X0_score_p; X0_score]; 
     end %#ok<AGROW>
   end; 
-  X0p = X0;
-  X0_score_p = X0_score;
+  X0p = X0;  % tempararily store all neg samples till current stage to X0p
+  X0_score_p = X0_score; % tempararily store all neg samples' score
   
   % train boosted clf
   detector.opts.pBoost.nWeak = opts.nWeak(stage+1);
@@ -300,12 +303,12 @@ function [feats, scores, sel_idxes] = sampleWins( detector, stage, positive )
 opts = detector.opts; 
 start=clock;
 if( positive ), 
-    n = opts.nPos; 
+    n = opts.nPos; %inf
 else
     if stage == 0
-        n = opts.first_nNeg;
+        n = opts.first_nNeg; %30000
     else
-        n=opts.nNeg;
+        n=opts.nNeg;  %5000
     end
 end
 
@@ -385,7 +388,7 @@ if positive
             end
 %             showboxes2(im, rois(idx).boxes(sel_idx(nms_sel_idxes), :))
 
-            %liu@1001:  fg_use_gt = true, so use gt
+            %liu@1001:  fg_use_gt = true, so add back gt
             if opts.fg_use_gt
                 sel_idx = union(sel_idx, gt_idx);
             end
@@ -424,10 +427,12 @@ else
    bg_score = zeros(n, 1);
    bg_feat_idx = 1;
    sel_idxes = cell(length(rois), 1);
-   rand_idx = randperm(length(rois));
+   rand_idx = randperm(length(rois));  %randomly shuffle the order of neg images, to extract bbox with large variance
    for i = 1:length(rand_idx)
        idx = rand_idx(i);
        if mod(i, 100) == 0
+       		% n = max samples that can be extracted this time
+       		% bg_feat_idx = till now have many neg boxes have been samples
            fprintf('Neg: %d / %d (from %d images)\n', bg_feat_idx, n, i);
        end
        
@@ -508,7 +513,7 @@ else
            sel_idxes{idx} = sel_idx;
        end
        if bg_feat_idx > n
-           break;
+           break;  %1020: stop criterion
        end
        
    end

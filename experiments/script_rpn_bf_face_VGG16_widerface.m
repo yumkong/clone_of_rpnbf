@@ -143,7 +143,7 @@ opts.pLoad = [pLoad 'hRng',[50 inf], 'vRng',[1 1] ];   % delete?
 for kk = 1:length(roidb_train_BF.rois)
     tm_gt = roidb_train_BF.rois(kk).gt;
     tm_gt = tm_gt(tm_gt > 0);
-    %all gts are not ignored in widerface
+    %all gts are not ignored in widerface (set as 0)
     roidb_train_BF.rois(kk).ignores = zeros(size(tm_gt));
 end
 opts.roidb_train = roidb_train_BF;
@@ -238,7 +238,7 @@ detector = DeepTrain_otf_trans_ratio( opts );
           %if i~=29
           %sel_idx = nms(bbs, opts.nms_thres);
           %end
-          sel_idx = (1:size(bbs,1))';
+          sel_idx = (1:size(bbs,1))'; %'
           sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
           
           % ########## save the final result (after BF) here #############
