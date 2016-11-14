@@ -294,10 +294,26 @@ layer {
 
 # -------------------- for conv4's -----------------------------
 #----------------------- + a conv layer : can it function as a l2 norm layer? -------------------------
+#1113 added norm layer
+layer {
+  name: "conv4_3_norm"
+  type: "Normalize"
+  bottom: "conv4_3"
+  top: "conv4_3_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 20
+    }
+    channel_shared: false
+  }
+}
+
 layer {
    name: "conv_proposal_conv4"
    type: "Convolution"
-   bottom: "conv4_3"
+   bottom: "conv4_3_norm"
    top: "conv_proposal_conv4"
 	param {
 		lr_mult: 1.0

@@ -783,7 +783,7 @@ layer {
    bottom: "labels_reshape_conv4"
    bottom: "labels_weights_reshape_conv4"
    top: "loss_cls_conv4"
-   loss_weight: 1
+   loss_weight: 4  #1-->4
 }
 
 layer {
@@ -801,7 +801,7 @@ layer {
   bottom: "bbox_targets_conv4"
   bottom: "bbox_loss_weights_conv4"
   top: "loss_bbox_conv4"
-  loss_weight: 5  #1017: 10-->5
+  loss_weight: 20  #1113: 5-->20
 }
 
 #-----------------------output2 (for conv5)------------------------
