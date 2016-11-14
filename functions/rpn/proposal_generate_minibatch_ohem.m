@@ -66,7 +66,8 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ohem(con
     assert(~isempty(bbox_targets_blob));
     assert(~isempty(bbox_loss_blob));
     
-    input_blobs = {im_blob, labels_blob, label_weights_blob, bbox_targets_blob, bbox_loss_blob};
+    %input_blobs = {im_blob, labels_blob, label_weights_blob, bbox_targets_blob, bbox_loss_blob};
+    input_blobs = {im_blob, labels_blob, bbox_targets_blob, bbox_loss_blob};  %need not use label_weights again
     
     % ======= recover random seed=======
 %     if debug_flag
