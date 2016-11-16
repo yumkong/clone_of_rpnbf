@@ -111,20 +111,35 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
     
     % ==========1114 masked: do not randomly select fg, keep all of them
     % so that they do not confuse ohem selector
-    %fg_num = min(fg_rois_per_image, length(fg_inds));
-    %fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
+    debug_ohem = true;
+    if debug_ohem  % for debug
+        fg_num = min(fg_rois_per_image, length(fg_inds));
+        fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
     
-    % ==========1114 masked: do not randomly select bg, but use ohem to
-    % mine hard ones
-    %bg_num = min(rois_per_image - fg_num, length(bg_inds));
-    %bg_inds = bg_inds(randperm(length(bg_inds), bg_num));
-
-    labels = zeros(size(bbox_targets, 1), 1);
-    % set foreground labels
-    labels(fg_inds) = ex_asign_labels(fg_inds); % only fg = 1
-    assert(all(ex_asign_labels(fg_inds) > 0));
+    % ==========1114 masked: do not randomly select bg, but use ohem
+    % to make it the same with ohem's input
+        bg_num = min(rois_per_image - fg_rois_per_image, length(bg_inds));
+        bg_inds = bg_inds(randperm(length(bg_inds), bg_num));
+    end
     
-    label_weights = zeros(size(bbox_targets, 1), 1);
+    if debug_ohem
+        labels = -1*ones(size(bbox_targets, 1), 1);  % init all to ignore
+        labels(fg_inds) = ex_asign_labels(fg_inds); % fg = 1
+        assert(all(ex_asign_labels(fg_inds) > 0));
+        labels(bg_inds) = 0; % bg = 0
+    else
+        labels = zeros(size(bbox_targets, 1), 1);
+        % set foreground labels
+        labels(fg_inds) = ex_asign_labels(fg_inds); % only fg = 1
+        assert(all(ex_asign_labels(fg_inds) > 0));
+    end
+    
+    if debug_ohem
+        % initilize to -1 as ohem did
+        label_weights = -1*ones(size(bbox_targets, 1), 1);
+    else
+        label_weights = zeros(size(bbox_targets, 1), 1);
+    end
     % set foreground labels weights
     label_weights(fg_inds) = 1;
     % set background labels weights

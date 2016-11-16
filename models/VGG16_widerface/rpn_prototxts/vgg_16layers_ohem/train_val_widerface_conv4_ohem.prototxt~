@@ -464,17 +464,7 @@ layer {
    top: "accuarcy"
 }
 
-<<<<<<< HEAD
-layer {
-  name: "loss_bbox"
-  type: "SmoothL1Loss"
-  bottom: "proposal_bbox_pred" #[1 28 28 28]
-  bottom: "bbox_targets"       #[1 28 28 28]
-  bottom: "bbox_loss_weights"  #[1 28 28 28]
-  top: "loss_bbox"
-  loss_weight: 5  #1114: 5 --> 10
-}
-=======
+
 # previous bbox regress func
 #layer {
 #  name: "loss_bbox"
@@ -485,7 +475,6 @@ layer {
 #  top: "loss_bbox"
 #  loss_weight: 5  #1017: 10-->5
 #}
->>>>>>> 3fb118f1c4c158351e3b5f362bd83f36b0c4a65f
 
 # previous loss function
 #layer {
@@ -518,8 +507,8 @@ layer {
 layer {
    # bottom: "rois"
    bottom: "per_anchor_cls_loss"  #[1, 1, 7*28, 28] == [num ch hei wid]
-   bottom: "labels_reshape"		  #[1, 1, 7*28, 28]
-   bottom: "bbox_loss_weights"
+   bottom: "labels_reshape"	  #[1, 1, 7*28, 28]
+   bottom: "bbox_loss_weights"    #[1, 4*7, 28, 28]
    top: "labels_ohem"
    top: "bbox_loss_weights_ohem"
    name: "cls_ohem"
@@ -530,7 +519,7 @@ layer {
    }
    propagate_down: false
    propagate_down: false
-   #propagate_down: false
+   propagate_down: false
    #propagate_down: false
 }
 
@@ -564,5 +553,5 @@ layer {
   bottom: "bbox_targets"       #[1 28 28 28]
   bottom: "bbox_loss_weights_ohem"  #[1 28 28 28]
   top: "loss_bbox"
-  loss_weight: 5  #1017: 10-->5
+  loss_weight: 50  #1017: 10-->5
 }
