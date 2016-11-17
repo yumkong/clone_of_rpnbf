@@ -66,8 +66,9 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ohem(con
     assert(~isempty(bbox_targets_blob));
     assert(~isempty(bbox_loss_blob));
     
-    %input_blobs = {im_blob, labels_blob, label_weights_blob, bbox_targets_blob, bbox_loss_blob};
-    input_blobs = {im_blob, labels_blob, bbox_targets_blob, bbox_loss_blob};  %need not use label_weights again
+    % 1116 reuse label_weights_blob to balance the training of pos and neg
+    input_blobs = {im_blob, labels_blob, label_weights_blob, bbox_targets_blob, bbox_loss_blob};
+    %input_blobs = {im_blob, labels_blob, bbox_targets_blob, bbox_loss_blob};  %need not use label_weights again
     
     % ======= recover random seed=======
 %     if debug_flag
@@ -116,8 +117,8 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
         fg_num = min(fg_rois_per_image, length(fg_inds));
         fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
     
-    % ==========1114 masked: do not randomly select bg, but use ohem
-    % to make it the same with ohem's input
+        % ==========1114 masked: do not randomly select bg, but use ohem
+        % to make it the same with ohem's input
         bg_num = min(rois_per_image - fg_rois_per_image, length(bg_inds));
         bg_inds = bg_inds(randperm(length(bg_inds), bg_num));
     end
@@ -128,22 +129,26 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
         assert(all(ex_asign_labels(fg_inds) > 0));
         labels(bg_inds) = 0; % bg = 0
     else
-        labels = zeros(size(bbox_targets, 1), 1);
-        % set foreground labels
-        labels(fg_inds) = ex_asign_labels(fg_inds); % only fg = 1
-        assert(all(ex_asign_labels(fg_inds) > 0));
+        if 1
+            %1116 added, set the border anchors to ignore label (-1)
+            labels = -1*ones(size(bbox_targets, 1), 1);  % init all to ignore
+            labels(fg_inds) = ex_asign_labels(fg_inds); % fg = 1
+            assert(all(ex_asign_labels(fg_inds) > 0));
+            labels(bg_inds) = 0; % bg = 0
+        else
+            labels = zeros(size(bbox_targets, 1), 1);
+            % set foreground labels
+            labels(fg_inds) = ex_asign_labels(fg_inds); % only fg = 1
+            assert(all(ex_asign_labels(fg_inds) > 0));
+        end
     end
     
-    if debug_ohem
-        % initilize to -1 as ohem did
-        label_weights = -1*ones(size(bbox_targets, 1), 1);
-    else
-        label_weights = zeros(size(bbox_targets, 1), 1);
-    end
+
+    label_weights = zeros(size(bbox_targets, 1), 1);
     % set foreground labels weights
     label_weights(fg_inds) = 1;
     % set background labels weights
-    label_weights(bg_inds) = conf.bg_weight;  %1114: 1-->0.9
+    label_weights(bg_inds) = conf.bg_weight;  %1114: 1-->0.25
     
     bbox_targets = single(full(bbox_targets(:, 2:end)));
     

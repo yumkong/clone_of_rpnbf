@@ -28,10 +28,10 @@ function conf = proposal_config_widerface_ohem(varargin)
     % Minibatch size
     ip.addParamValue('batch_size',      256,            @isscalar); %120
     % Fraction of minibatch that is foreground labeled (class > 0)
-    ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
+    ip.addParamValue('fg_fraction',     0.6,           @isscalar); %1/6
     % weight of background samples, when weight of foreground samples is
     % 1.0
-    ip.addParamValue('bg_weight',       0.9,            @isscalar);  %1114:1--> 0.9
+    ip.addParamValue('bg_weight',       0.9,            @isscalar);  %1116:1--> 0.25
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)
     ip.addParamValue('fg_thresh',       0.5,            @isscalar);
     % Overlap threshold for a ROI to be considered background (class = 0 if

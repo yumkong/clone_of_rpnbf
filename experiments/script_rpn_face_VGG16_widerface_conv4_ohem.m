@@ -12,10 +12,12 @@ clc;
 clear mex;
 clear is_valid_handle; % to clear init_key
 run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
+
+addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn'; %caffe_faster_rcnn_win
+    opts.caffe_version          = 'caffe_rfcn_win_ohem_label_weight'; %caffe_rfcn_win_ohem
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
