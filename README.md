@@ -104,3 +104,12 @@ gt recall rate = 0.6366
 gt recall rate after nms-3 = 0.5407
 But it seems from the train net plot that the val loss is even smaller than reduce2, why recall rate is so low? check it out.
 
+#1116
+%=========show ohem selected labels
+aa = labels_weights_ohem;
+aa = aa';
+aa = reshape(aa, 7, [], 150);
+aa(aa == 0) = 255;
+aa(aa~=0) == 0;
+aa = uint8(aa);
+figure, imshow(squeeze(aa(1,:,:)));

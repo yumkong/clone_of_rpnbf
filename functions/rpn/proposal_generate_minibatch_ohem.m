@@ -111,7 +111,7 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
     
     % ==========1114 masked: do not randomly select fg, keep all of them
     % so that they do not confuse ohem selector
-    debug_ohem = true;
+    debug_ohem = false;
     if debug_ohem  % for debug
         fg_num = min(fg_rois_per_image, length(fg_inds));
         fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
