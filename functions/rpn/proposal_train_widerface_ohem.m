@@ -62,8 +62,8 @@ function save_model_path = proposal_train_widerface_ohem(conf, imdb_train, roidb
     caffe_log_file_base = fullfile(cache_dir, 'caffe_log');
     caffe.init_log(caffe_log_file_base);
     caffe_solver = caffe.Solver(opts.solver_def_file);
-    %caffe_solver.net.copy_from(opts.net_file);
-    caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_conv4_ohem', 'rpn_cachedir', 'ohem_random_shuffle_iter_1000'));
+    caffe_solver.net.copy_from(opts.net_file);
+    %caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_conv4_ohem', 'rpn_cachedir', 'ohem_random_shuffle_iter_1000'));
     % init log
     timestamp = datestr(datevec(now()), 'yyyymmdd_HHMMSS');
     mkdir_if_missing(fullfile(cache_dir, 'log'));
