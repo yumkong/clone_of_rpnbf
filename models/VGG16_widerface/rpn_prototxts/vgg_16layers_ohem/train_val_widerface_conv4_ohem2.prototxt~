@@ -519,7 +519,7 @@ layer {
    type: "RpnClsOHEM"
    rpn_cls_ohem_param {
         bg_per_img: 256  #256
-	random_shuffle_percent: 1.0
+	random_shuffle_percent: 0.95
         ignore_label: -1
    }
    propagate_down: false

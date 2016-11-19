@@ -23,7 +23,7 @@ elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_ohem'; %caffe_faster_rcnn
+    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_ohem_final'; %caffe_faster_rcnn
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -50,7 +50,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_conv4_ohem';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_conv4_ohem';
+exp_name = 'VGG16_widerface_conv4_ohem_final';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -92,46 +92,10 @@ fprintf('\n***************\nstage one RPN \n***************\n');
 model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ohem(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 %% test
-% get predicted rois (bboxes) to be used in later stages
-%nms_option_train = 0;
-%nms_option_test = 3;
-%dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, x, y, nms_option_train), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
-%dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-%cache_name = 'widerface';
-%method_name = 'RPN-ped';
-%nms_option_test = 3;
-%Faster_RCNN_Train.do_proposal_test_widerface_multibox(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
-
-% %%  stage one fast rcnn
-% fprintf('\n***************\nstage one fast rcnn\n***************\n');
-% % train
-% model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
-% % test
-% opts.mAP                    = Faster_RCNN_Train.do_fast_rcnn_test_widerface(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
-%  
-% %%  stage two proposal
-% % net proposal
-% fprintf('\n***************\nstage two proposal\n***************\n');
-% % train
-% model.stage2_rpn.init_net_file = model.stage1_fast_rcnn.output_model_file;
-% model.stage2_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf_proposal, dataset, model.stage2_rpn, opts.do_val);
-% % test
-% dataset.roidb_train        	= cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, x, y, nms_option_train), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
-% dataset.roidb_test         	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-% 
-% %%  stage two fast rcnn
-% fprintf('\n***************\nstage two fast rcnn\n***************\n');
-% % train
-% model.stage2_fast_rcnn.init_net_file = model.stage1_fast_rcnn.output_model_file;
-% model.stage2_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface(conf_fast_rcnn, dataset, model.stage2_fast_rcnn, opts.do_val);
-% 
-% %% final test
-% fprintf('\n***************\nfinal test\n***************\n');
-%      
-% model.stage2_rpn.nms        = model.final_test.nms;
-% dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-% opts.final_mAP              = Faster_RCNN_Train.do_fast_rcnn_test_widerface(conf_fast_rcnn, model.stage2_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
-
+cache_name = 'widerface';
+method_name = 'RPN-ped';
+nms_option_test = 3;
+Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 end
 

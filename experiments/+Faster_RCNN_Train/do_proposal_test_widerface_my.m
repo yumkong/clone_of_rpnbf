@@ -69,27 +69,6 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
               bbApply('draw',bbs);
             end
         end
-        
-%         time = tic;
-%         % 1007 do nms
-%         %if i == 102
-%         %   fprintf('Hoori\n'); 
-%         %end
-%         aboxes_nms2{i} = pseudoNMS_v3(aboxes{i}, nms_option2);
-%         
-%         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
-%         if show_image
-%             %draw boxes after 'smart' NMS
-%             bbs = aboxes_nms2{i};
-%             if ~isempty(bbs)
-%               bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-%               bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-%               %I=imread(imgNms{i});
-%               figure(3); 
-%               im(img);  %im(I)
-%               bbApply('draw',bbs);
-%             end
-%         end
     end
     
     % save bbox before nms
