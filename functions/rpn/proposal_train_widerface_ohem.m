@@ -121,7 +121,7 @@ function save_model_path = proposal_train_widerface_ohem(conf, imdb_train, roidb
     conf.classes        = opts.imdb_train{1}.classes;
     
     % 1117 added: recover the weight scale used in the training process
-    if 0
+    if 1
         anchor_size = size(conf.anchors, 1);
         bbox_stds_flatten = repmat(reshape(bbox_stds', [], 1), anchor_size, 1);
         bbox_means_flatten = repmat(reshape(bbox_means', [], 1), anchor_size, 1);
