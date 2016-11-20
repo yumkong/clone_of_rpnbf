@@ -17,7 +17,7 @@ addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_rfcn_win_ohem_label_weight'; %caffe_rfcn_win_ohem
+    opts.caffe_version          = 'caffe_rfcn_win_ohem_final'; %caffe_rfcn_win_ohem,caffe_rfcn_win_ohem_label_weight
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
