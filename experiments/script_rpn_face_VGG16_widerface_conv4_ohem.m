@@ -1,5 +1,5 @@
 function script_rpn_face_VGG16_widerface_conv4_ohem()
-% script_rpn_face_VGG16_widerface_conv4()
+% script_rpn_face_VGG16_widerface_conv4_ohem()
 % --------------------------------------------------------
 % RPN_BF
 % Copyright (c) 2016, Liliang Zhang
