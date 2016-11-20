@@ -136,11 +136,11 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
     bg_inds = find(bbox_targets(:, 1) < 0);
     
     % select foreground
-    fg_num = min(fg_rois_per_image, length(fg_inds)); // 0
+    fg_num = min(fg_rois_per_image, length(fg_inds)); % 0
     fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
     
     bg_num = min(rois_per_image - fg_num, length(bg_inds));
-    bg_inds = bg_inds(randperm(length(bg_inds), bg_num));  //256
+    bg_inds = bg_inds(randperm(length(bg_inds), bg_num));  %256
 
     labels = zeros(size(bbox_targets, 1), 1);
     % set foreground labels

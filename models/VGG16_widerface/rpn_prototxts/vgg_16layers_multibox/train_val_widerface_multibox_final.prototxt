@@ -353,7 +353,7 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 20
+      value: 40  #1120: 20-->40
     }
     channel_shared: false
   }
@@ -405,7 +405,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 4   # 2(bg/fg) * 9(anchors) 
+	   num_output: 4   # 2(bg/fg) * 2(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -432,7 +432,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 8	# 4 * 9(anchors) 
+	   num_output: 8	# 4 * 2(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
