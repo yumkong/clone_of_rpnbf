@@ -33,7 +33,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface_multibox(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox_final(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -81,7 +81,7 @@ output_map_name = 'output_map_multibox';  % output_map_conv4, output_map_conv5
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_conv4, conf_proposal.output_height_conv4, conf_proposal.output_width_conv5, conf_proposal.output_height_conv5]...
                              = proposal_calc_output_size_multibox(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
-[conf_proposal.anchors_conv4,conf_proposal.anchors_conv5] = proposal_generate_anchors_multibox(cache_data_this_model_dir, ...
+[conf_proposal.anchors_conv4,conf_proposal.anchors_conv5] = proposal_generate_anchors_multibox_final(cache_data_this_model_dir, ...
                                                             'ratios', [1], 'scales',  2.^[-1:5], 'add_size', [900]);  %[8 16 32 64 128 256 512]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
@@ -100,7 +100,7 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_mult
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_multibox(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_multibox_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');

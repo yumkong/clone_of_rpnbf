@@ -160,3 +160,14 @@ Iter 21444, Image 1695: 3.8 Hz, accuarcy = 0.7364, loss_bbox = 0.0051, loss_cls 
 Iter 22244, Image 1695: 3.9 Hz, accuarcy = 0.7407, loss_bbox = 0.0051, loss_cls = 0.3018, accuracy_fg = 0.4844, accuracy_bg = 0.9896, 
 Iter 25377, Image 1695: 4.0 Hz, accuarcy = 0.7329, loss_bbox = 0.0049, loss_cls = 0.3008, accuracy_fg = 0.4531, accuracy_bg = 0.9844, 
 Iter 28352, Image 1695: 3.9 Hz, accuarcy = 0.7368, loss_bbox = 0.0050, loss_cls = 0.2924, accuracy_fg = 0.4688, accuracy_bg = 0.9948, 
+
+(3) check the scale param of normalize_layer
+caffe_net.params('conv4_3_norm',1).get_data();
+
+#1121
+(1) when add 32 to conv4 (now it is in charge of [8 16 32]), while conv5 still [32 64 128 256 512 900], normalize_layer scale is 40
+gt recall rate = 0.7958
+gt recall rate after nms-3 = 0.6050
+(2) previously, normalize_layer scale is 20, conv4 [8 16], conv5 [32 64 128 256 512 900]
+gt recall rate = 0.7723
+gt recall rate after nms-3 = 0.6099

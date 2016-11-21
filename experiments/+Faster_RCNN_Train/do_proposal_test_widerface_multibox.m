@@ -23,7 +23,7 @@ function aboxes = do_proposal_test_widerface_multibox(conf, model_stage, imdb, r
     score_thresh = scores(end);
     fprintf('score_threshold = %f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
-    show_image = true;
+    show_image = false;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);
