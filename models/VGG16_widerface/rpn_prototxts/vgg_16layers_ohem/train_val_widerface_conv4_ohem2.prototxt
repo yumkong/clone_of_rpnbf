@@ -456,12 +456,17 @@ layer {
 	}
 }
 
+#1120 add ignore_label
+# this is the overall accuracy of all fgs (thresh >= 0.5) and bgs (0 <= thresh < 0.3)
 layer {
    name: "accuarcy"
    type: "Accuracy"
    bottom: "proposal_cls_score_reshape"
    bottom: "labels_reshape"
    top: "accuarcy"
+   accuracy_param {
+        ignore_label: -1
+   }
 }
 
 
