@@ -8,25 +8,25 @@ input_dim: 224
 
 input: "labels_conv4"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 2        # 2(anchors)        
+input_dim: 3        # 2(anchors) ==> 3  
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights_conv4"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 2        # 2(anchors)        
+input_dim: 3        # 2(anchors) ==> 3    
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets_conv4"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 8  		# 4 (coords) * 2(anchors) 
+input_dim: 12  		# 4 (coords) * 2(anchors) ==> 4*3
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights_conv4"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 8  		# 2 (coords) * 7(anchors) 
+input_dim: 12  		# 4 (coords) * 4(anchors)  ==> 4*3
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
@@ -405,7 +405,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 4   # 2(bg/fg) * 2(anchors) 
+	   num_output: 6   # 2(bg/fg) * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -432,7 +432,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 8	# 4 * 2(anchors) 
+	   num_output: 12	# 4 * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
