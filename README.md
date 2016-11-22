@@ -171,3 +171,8 @@ gt recall rate after nms-3 = 0.6050
 (2) previously, normalize_layer scale is 20, conv4 [8 16], conv5 [32 64 128 256 512 900]
 gt recall rate = 0.7723
 gt recall rate after nms-3 = 0.6099
+
+
+(4) conv4_ohem
+gt recall rate = 0.4997
+gt recall rate after nms-3 = 0.4525

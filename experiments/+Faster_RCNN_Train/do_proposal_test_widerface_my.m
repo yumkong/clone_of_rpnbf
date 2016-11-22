@@ -89,8 +89,8 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
             end
             hold off
             % 1121: save result
-            strs = strsplit(imdb.image_at(i), '/');
-            saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
+            strs = strsplit(imdb.image_at(i), filesep);
+            saveName = fullfile(res_dir, sprintf('res_%s',strs{end}(1:end-4)));
             export_fig(saveName, '-png', '-a1', '-native');
             fprintf('image %d saved.\n', i);
         end
