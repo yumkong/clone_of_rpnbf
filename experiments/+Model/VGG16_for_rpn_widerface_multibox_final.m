@@ -8,8 +8,10 @@ model.feat_stride_conv4                              = 8; %16
 model.feat_stride_conv5                              = 16;
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_multibox', 'solver_60k80k_widerface_multibox_final.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_multibox', 'test_widerface_multibox_final.prototxt');
+% xxx_final and xxx_final2 share this model def file, because they are
+% pretty much the same thing, only difference is add a conv4_atros layer
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_multibox', 'solver_60k80k_widerface_multibox_final2.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_multibox', 'test_widerface_multibox_final2.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting
