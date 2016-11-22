@@ -12,6 +12,8 @@ function [image_roidb, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox
         bbox_stds_conv4 = [];
         bbox_means_conv5 = [];
         bbox_stds_conv5 = [];
+        bbox_means_conv6 = [];
+        bbox_stds_conv6 = [];
     end
     
     if ~iscell(imdbs)

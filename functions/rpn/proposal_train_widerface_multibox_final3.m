@@ -106,7 +106,7 @@ function save_model_path = proposal_train_widerface_multibox_final3(conf, imdb_t
             load(test_roi_name);
         catch
             [image_roidb_val]...
-                                = proposal_prepare_image_roidb_multibox(conf, opts.imdb_val, opts.roidb_val, bbox_means_conv4, bbox_stds_conv4, ...
+                                = proposal_prepare_image_roidb_multibox_final3(conf, opts.imdb_val, opts.roidb_val, bbox_means_conv4, bbox_stds_conv4, ...
                                                                         bbox_means_conv5, bbox_stds_conv5, bbox_means_conv6, bbox_stds_conv6);
             save(test_roi_name, 'image_roidb_val','-v7.3');
         end
@@ -173,15 +173,15 @@ function save_model_path = proposal_train_widerface_multibox_final3(conf, imdb_t
         
         %format long
         fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds, 1/cost_time);
-        for kkk = 1:floor(length(rst)/3)
+        for kkk = [1 4 7 10 11]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
-        fprintf('\n\t');
-        for kkk = floor(length(rst)/3)+1:floor(length(rst)*2/3)
+        fprintf('\n\t\t\t');
+        for kkk = [2 5 8 12 13]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
-        fprintf('\n\t');  %print conv6
-        for kkk = floor(length(rst)*2/3)+1:length(rst)
+        fprintf('\n\t\t\t');  %print conv6
+        for kkk = [3 6 9 14 15]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n');
@@ -204,7 +204,7 @@ function save_model_path = proposal_train_widerface_multibox_final3(conf, imdb_t
         
         % snapshot
         if ~mod(iter_, opts.snapshot_interval)
-            snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5, cache_dir, sprintf('iter_%d', iter_));
+            snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5, bbox_means_conv6, bbox_stds_conv6, cache_dir, sprintf('iter_%d', iter_));
         end
         
         iter_ = caffe_solver.iter();
@@ -218,7 +218,7 @@ function save_model_path = proposal_train_widerface_multibox_final3(conf, imdb_t
     % final snapshot
     % liu@0927 commented, because now all snapshot can be done during while loop
     %snapshot(conf, caffe_solver, bbox_means, bbox_stds, cache_dir, sprintf('iter_%d', iter_));
-    save_model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5, cache_dir, 'final');
+    save_model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5, bbox_means_conv6, bbox_stds_conv6, cache_dir, 'final');
 
     diary off;
     caffe.reset_all(); 
@@ -381,7 +381,7 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     end
 end
 
-function model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5, cache_dir, file_name)
+function model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5,bbox_means_conv6, bbox_stds_conv6, cache_dir, file_name)
     % conv4
     % ================================
     anchor_size_conv4 = size(conf.anchors_conv4, 1);
@@ -431,7 +431,7 @@ function model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_c
     bbox_means_flatten = repmat(reshape(bbox_means_conv6', [], 1), anchor_size_conv6, 1);
     
     % merge bbox_means, bbox_stds into the model
-    bbox_pred_layer_name_conv6 = 'proposal_bbox_pred_conv5';
+    bbox_pred_layer_name_conv6 = 'proposal_bbox_pred_conv6';
     weights = caffe_solver.net.params(bbox_pred_layer_name_conv6, 1).get_data();
     biase = caffe_solver.net.params(bbox_pred_layer_name_conv6, 2).get_data();
     weights_back_conv6 = weights;

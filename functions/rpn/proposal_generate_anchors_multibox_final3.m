@@ -42,7 +42,7 @@ function [anchors_conv4, anchors_conv5, anchors_conv6] = proposal_generate_ancho
         anchors_conv5 = anchors(3:8, :);  % [32 64 128 256 360 512]
         anchors_conv6 = anchors(7:end, :);  % [360 512 720 900]
         if ~opts.ignore_cache
-            save(anchor_cache_file, 'anchors_conv4', 'anchors_conv5');
+            save(anchor_cache_file, 'anchors_conv4', 'anchors_conv5', 'anchors_conv6');
         end
     end
     
@@ -77,8 +77,8 @@ function anchors = scale_jitter(anchor, scales, add_size)
     %ws = [w * scales; add_size];
     %hs = [h * scales; add_size];
     % 1121: in ascending order
-    ws = sort([w * scales; add_size]);
-    hs = sort([h * scales; add_size]);
+    ws = sort([w * scales; add_size']);
+    hs = sort([h * scales; add_size']);
     
     anchors = [x_ctr - (ws - 1) / 2, y_ctr - (hs - 1) / 2, x_ctr + (ws - 1) / 2, y_ctr + (hs - 1) / 2];
 end
