@@ -171,8 +171,14 @@ gt recall rate after nms-3 = 0.6050
 (2) previously, normalize_layer scale is 20, conv4 [8 16], conv5 [32 64 128 256 512 900]
 gt recall rate = 0.7723
 gt recall rate after nms-3 = 0.6099
-
-
+(3) original conv4
+gt recall rate = 0.7728
+gt recall rate after nms-3 = 0.5450
 (4) conv4_ohem
 gt recall rate = 0.4997
 gt recall rate after nms-3 = 0.4525
+
+
+#1121 added multibox_final2: add a conv4_atros (or conv3_atros? or both?) in parallel with conv4
+==> conv3_atros cannot be used because of different size from conv4
+>>>>>>> 1db2bb140b50964530042ab0637d5b3eec0d318c
