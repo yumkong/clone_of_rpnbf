@@ -1,8 +1,8 @@
-function script_rpn_face_VGG16_widerface_multibox_final()
-% script_rpn_face_VGG16_widerface_conv4()
+function script_rpn_face_VGG16_widerface_multibox_final3()
+% script_rpn_face_VGG16_widerface_multibox_final3()
 % --------------------------------------------------------
 % Yuguang Liu
-% Both final and final2 (final+conv4_atrous)
+% 3 layers of loss output
 % --------------------------------------------------------
 
 % ********** liu@1001: run this at root directory !!! *******************************
@@ -32,7 +32,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface_multibox_final(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox_final3(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -47,7 +47,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_final2';  %VGG16_widerface_multibox_final
+exp_name = 'VGG16_widerface_multibox_final3';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -66,8 +66,10 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal               = proposal_config_widerface_multibox('image_means', model.mean_image, ...
-                                                    'feat_stride_conv4', model.feat_stride_conv4, 'feat_stride_conv5', model.feat_stride_conv5);
+conf_proposal               = proposal_config_widerface_multibox_final3('image_means', model.mean_image, ...
+                                                    'feat_stride_conv4', model.feat_stride_conv4, ...
+                                                    'feat_stride_conv5', model.feat_stride_conv5, ...
+                                                    'feat_stride_conv6', model.feat_stride_conv6 );
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
@@ -78,17 +80,19 @@ conf_proposal.exp_name = exp_name;
 % ###4/5### CHANGE EACH TIME*** : name of output map
 output_map_name = 'output_map_multibox';  % output_map_conv4, output_map_conv5
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
-[conf_proposal.output_width_conv4, conf_proposal.output_height_conv4, conf_proposal.output_width_conv5, conf_proposal.output_height_conv5]...
-                             = proposal_calc_output_size_multibox(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
-[conf_proposal.anchors_conv4,conf_proposal.anchors_conv5] = proposal_generate_anchors_multibox_final(cache_data_this_model_dir, ...
-                                                            'ratios', [1], 'scales',  2.^[-1:5], 'add_size', [900]);  %[8 16 32 64 128 256 512]
+[conf_proposal.output_width_conv4, conf_proposal.output_height_conv4, ...
+ conf_proposal.output_width_conv5, conf_proposal.output_height_conv5, ...
+ conf_proposal.output_width_conv6, conf_proposal.output_height_conv6]...
+                             = proposal_calc_output_size_multibox_final3(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
+[conf_proposal.anchors_conv4,conf_proposal.anchors_conv5, conf_proposal.anchors_conv6] = proposal_generate_anchors_multibox_final3(cache_data_this_model_dir, ...
+                                                            'ratios', [1], 'scales',  2.^[-1:5], 'add_size', [360 720 900]);  %[8 16 32 64 128 256 360 512 720 900]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
 %conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_multibox(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_multibox_final3(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 %% test
 % get predicted rois (bboxes) to be used in later stages
@@ -99,7 +103,7 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_mult
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_multibox_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_multibox(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');
