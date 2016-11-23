@@ -122,40 +122,16 @@ function do_proposal_test_widerface_multibox_final(conf, model_stage, imdb, roid
             end
             hold off
             % 1121: save result
-            strs = strsplit(imdb.image_at(i), '/');
-            saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
+            strs = strsplit(imdb.image_at(i), filesep);
+            saveName = fullfile(res_dir, sprintf('res_%s',strs{end}(1:end-4)));
             export_fig(saveName, '-png', '-a1', '-native');
             fprintf('image %d saved.\n', i);
         end
-        
-%         time = tic;
-%         % 1007 do nms
-%         %if i == 102
-%         %   fprintf('Hoori\n'); 
-%         %end
-%         aboxes_nms2{i} = pseudoNMS_v3(aboxes{i}, nms_option2);
-%         
-%         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
-%         if show_image
-%             %draw boxes after 'smart' NMS
-%             bbs = aboxes_nms2{i};
-%             if ~isempty(bbs)
-%               bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-%               bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-%               %I=imread(imgNms{i});
-%               figure(3); 
-%               im(img);  %im(I)
-%               bbApply('draw',bbs);
-%             end
-%         end
     end
     
-    % save bbox before nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_all-ave-%d.txt', ave_per_image_topN));
-    save_bbox_to_txt(aboxes, imdb.image_ids, bbox_save_name);
-    % save bbox after nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_all-ave-%d-nms-op%d.txt', ave_per_image_topN, nms_option));
-    save_bbox_to_txt(aboxes_nms, imdb.image_ids, bbox_save_name);
+    % 1122 added to save combined results of conv4 and conv5
+    aboxes = cell(length(aboxes_conv5), 1);
+    aboxes_nms = cell(length(aboxes_conv5), 1);
 	
     % eval the gt recall
     gt_num = 0;
@@ -164,12 +140,8 @@ function do_proposal_test_widerface_multibox_final(conf, model_stage, imdb, roid
     gt_num_nms = 0;
     gt_re_num_nms = 0;
     for i = 1:length(roidb.rois)
-        %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
-        %if i == 245
-        %disp(i);
-        %end    %fprintf('Preparing the results for widerface Precision-Recall (VOC-style) evaluation ...');
-    % first prepare for gt
-    
+        aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i});
+        aboxes_nms{i} = cat(1, aboxes_nms_conv4{i}, aboxes_nms_conv5{i});
         gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
         if ~isempty(gts)
             rois = aboxes{i}(:, 1:4);
@@ -192,6 +164,13 @@ function do_proposal_test_widerface_multibox_final(conf, model_stage, imdb, roid
     fprintf('gt recall rate = %.4f\n', gt_re_num / gt_num);
     % 1007 added
     fprintf('gt recall rate after nms-%d = %.4f\n', nms_option, gt_re_num_nms / gt_num_nms);
+    
+    % save raw detected bboxes
+    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_conv4_%d_conv5_%d.txt', ave_per_image_topN_conv4, ave_per_image_topN_conv5));
+    save_bbox_to_txt(aboxes, imdb.image_ids, bbox_save_name);
+    % save bboxs after nms
+    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_nms%d_conv4_%d_conv5_%d.txt', nms_option, ave_per_image_topN_conv4, ave_per_image_topN_conv5));
+    save_bbox_to_txt(aboxes_nms, imdb.image_ids, bbox_save_name);
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)

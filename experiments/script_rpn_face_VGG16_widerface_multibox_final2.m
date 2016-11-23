@@ -1,4 +1,4 @@
-function script_rpn_face_VGG16_widerface_multibox()
+function script_rpn_face_VGG16_widerface_multibox_final2()
 % script_rpn_face_VGG16_widerface_conv4()
 % --------------------------------------------------------
 % RPN_BF
@@ -33,7 +33,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface_multibox(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox_final(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -100,7 +100,7 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_mult
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_multibox(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_multibox_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');
