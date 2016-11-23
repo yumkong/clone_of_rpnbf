@@ -165,6 +165,7 @@ Iter 28352, Image 1695: 3.9 Hz, accuarcy = 0.7368, loss_bbox = 0.0050, loss_cls 
 caffe_net.params('conv4_3_norm',1).get_data();
 
 #1121
+*** these are done by old code ()
 (1) when add 32 to conv4 (now it is in charge of [8 16 32]), while conv5 still [32 64 128 256 512 900], normalize_layer scale is 40
 gt recall rate = 0.7958
 gt recall rate after nms-3 = 0.6050
@@ -181,4 +182,6 @@ gt recall rate after nms-3 = 0.4525
 
 #1121 added multibox_final2: add a conv4_atros (or conv3_atros? or both?) in parallel with conv4
 ==> conv3_atros cannot be used because of different size from conv4
->>>>>>> 1db2bb140b50964530042ab0637d5b3eec0d318c
+(5)(1)+conv4_atros this is done by new code ()
+gt recall rate = 0.6732
+gt recall rate after nms-3 = 0.6111
