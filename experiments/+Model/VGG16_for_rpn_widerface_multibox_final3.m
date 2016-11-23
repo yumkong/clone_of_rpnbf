@@ -21,6 +21,6 @@ model.stage1_rpn.nms.nms_overlap_thres       	= 1;%0.7
 %model.stage1_rpn.nms.after_nms_topN         	= 300;  %1000
 model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %1000
 model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %1000
-model.stage1_rpn.nms.after_nms_topN_conv6      	= 50;  %1000
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 20;  %1000
 
 end
