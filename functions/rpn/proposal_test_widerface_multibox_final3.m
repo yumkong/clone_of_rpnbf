@@ -32,6 +32,7 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_widerface_mu
         ld = load(fullfile(cache_dir, ['proposal_boxes_' imdb.name opts.suffix]));
         aboxes_conv4 = ld.aboxes_conv4;
         aboxes_conv5 = ld.aboxes_conv5;
+        aboxes_conv6 = ld.aboxes_conv6;
         clear ld;
     catch    
         %% init net

@@ -185,3 +185,20 @@ gt recall rate after nms-3 = 0.4525
 (5)(1)+conv4_atros this is done by new code ()
 gt recall rate = 0.6732
 gt recall rate after nms-3 = 0.6111
+#1123
+(6) multibox final3 (conv4 + conv5 + conv6)
+gt recall rate = 0.6649
+gt recall rate after nms-3 = 0.6106
+(7) multibox_ohem (conv4 + conv5 + conv6)
+gt recall rate = 0.6604
+gt recall rate after nms-3 = 0.6278
+#1124
+(8) multibox final3_flip
+gt recall rate = 0.6309
+gt recall rate after nms-3 = 0.5769
+(9) since conv4 val err diverges as iteration goes, reduce conv4 clf loss weight from 4 to 2, call it  multibox_ohem_2
+gt recall rate = 0.6400
+gt recall rate after nms-3 = 0.5982
+(10) althought in multibox_ohem_2, the conv4 val err seems to be convergent, there is still space to improve it.
+now reduce conv4 clf loss weight from 2 to 1, conv4 bbox loss weight from 20 to 10, also add flipped training data, double training iterations and stepsize ==> name it multibox_ohem_3
+

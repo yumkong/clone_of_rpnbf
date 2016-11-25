@@ -32,7 +32,7 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     box_deltas_conv4 = reshape(box_deltas_conv4, 4, [])';
     
     %[anchors_conv4, anchors_conv5] = proposal_locate_anchors_multibox(conf, size(im), conf.test_scales, featuremap_size);
-    [anchors_conv4, anchors_conv5] = proposal_locate_anchors_multibox(conf, size(im), conf.test_scales);
+    [anchors_conv4, anchors_conv5, anchors_conv6] = proposal_locate_anchors_multibox_final3(conf, size(im), conf.test_scales);
     pred_boxes_conv4 = fast_rcnn_bbox_transform_inv(anchors_conv4, box_deltas_conv4);
       % scale back
     pred_boxes_conv4 = bsxfun(@times, pred_boxes_conv4 - 1, ...
