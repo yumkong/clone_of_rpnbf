@@ -51,7 +51,7 @@ exp_name = 'VGG16_widerface_multibox_ohem';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
-use_flipped                 = true;  %true --> false
+use_flipped                 = false;  %true --> false
 event_num                   = 11; %3
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);

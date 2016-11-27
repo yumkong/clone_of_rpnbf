@@ -95,7 +95,7 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     
     % drop too small boxes *** liu@1114: here tempararily set conv5's
     % thresh as 20, may change later (conv5 minimal anchor size is 32)
-    [pred_boxes_conv5, scores_conv5] = filter_boxes(30, pred_boxes_conv5, scores_conv5);
+    [pred_boxes_conv5, scores_conv5] = filter_boxes(28, pred_boxes_conv5, scores_conv5);
     
     % sort
     [scores_conv5, scores_ind] = sort(scores_conv5, 'descend');
@@ -141,7 +141,7 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     
     % drop too small boxes *** liu@1114: here tempararily set conv5's
     % thresh as 20, may change later (conv5 minimal anchor size is 32)
-    [pred_boxes_conv6, scores_conv6] = filter_boxes(30, pred_boxes_conv6, scores_conv6);
+    [pred_boxes_conv6, scores_conv6] = filter_boxes(300, pred_boxes_conv6, scores_conv6);
     
     % sort
     [scores_conv6, scores_ind] = sort(scores_conv6, 'descend');

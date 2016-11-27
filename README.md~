@@ -201,4 +201,17 @@ gt recall rate = 0.6400
 gt recall rate after nms-3 = 0.5982
 (10) althought in multibox_ohem_2, the conv4 val err seems to be convergent, there is still space to improve it.
 now reduce conv4 clf loss weight from 2 to 1, conv4 bbox loss weight from 20 to 10, also add flipped training data, double training iterations and stepsize ==> name it multibox_ohem_3
-
+gt recall rate = 0.5701
+gt recall rate after nms-3 = 0.5194
+(score_threshold conv4 = 0.851287, conv5 = 0.803228, conv6 = 0.902687)
+#1125
+(11)
+Since (10) is so bad, recover to multibox ohem's setting:
+conv4: cls 4, reg 20; conv5: cls 1-->2, 5--> 10; conv6: cls 1, reg 5.
+base_lr also return to previous 0.0005 (in multibox_ohem3 set to 0.001). 
+multibox_ohem_4
+gt recall rate = 0.6139
+gt recall rate after nms-3 = 0.5702
+score_threshold conv4 = 0.783169, conv5 = 0.776060, conv6 = 0.770421
+(12) 
+since (11) is still not so good as (7), is it because of the flipped image? remove them,just use the normal image
