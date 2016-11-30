@@ -67,6 +67,8 @@ function do_proposal_test_widerface_multibox_ohem(conf, model_stage, imdb, roidb
     addpath(fullfile('external','export_fig'));
     res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic');
     mkdir_if_missing(res_dir);
+    %1126 added to refresh figure
+    close all;
 
     for i = 1:length(aboxes_conv4)
         

@@ -20,7 +20,7 @@ elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_ohem_final'; %'caffe_faster_rcnn_rfcn_normlayer'
+    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_ohem_final_noprint'; %'caffe_faster_rcnn_rfcn_normlayer'
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -52,7 +52,7 @@ exp_name = 'VGG16_widerface_multibox_ohem';
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
-event_num                   = 11; %3
+event_num                   = -1; %3
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 

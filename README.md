@@ -217,4 +217,9 @@ score_threshold conv4 = 0.783169, conv5 = 0.776060, conv6 = 0.770421
 since (11) is still not so good as (7), is it because of the flipped image? remove them,just use the normal image
 gt recall rate = 0.6564
 gt recall rate after nms-3 = 0.6251
+(13)
+train with all train images (with multi-box ohem model)
+gt recall rate = 0.6802
+gt recall rate after nms-3 = 0.6441
+
 
