@@ -51,6 +51,7 @@ function do_proposal_test_widerface_multibox_ohem(conf, model_stage, imdb, roidb
     fprintf('score_threshold conv4 = %f, conv5 = %f, conv6 = %f\n', score_thresh_conv4, score_thresh_conv5, score_thresh_conv6);
     % drop the boxes which scores are lower than the threshold
     show_image = true;
+    save_result = false;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);
@@ -96,7 +97,7 @@ function do_proposal_test_widerface_multibox_ohem(conf, model_stage, imdb, roidb
             if ~isempty(bbs_conv5)
               bbs_conv5(:, 3) = bbs_conv5(:, 3) - bbs_conv5(:, 1) + 1;
               bbs_conv5(:, 4) = bbs_conv5(:, 4) - bbs_conv5(:, 2) + 1;
-              bbApply('draw',bbs_conv5,'r');
+              bbApply('draw',bbs_conv5,'c');
             end
             if ~isempty(bbs_conv6)
               bbs_conv6(:, 3) = bbs_conv6(:, 3) - bbs_conv6(:, 1) + 1;
@@ -151,10 +152,12 @@ function do_proposal_test_widerface_multibox_ohem(conf, model_stage, imdb, roidb
             end
             hold off
             % 1121: save result
-            strs = strsplit(imdb.image_at(i), '/');
-            saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
-            export_fig(saveName, '-png', '-a1', '-native');
-            fprintf('image %d saved.\n', i);
+            if save_result
+                strs = strsplit(imdb.image_at(i), '/');
+                saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
+                export_fig(saveName, '-png', '-a1', '-native');
+                fprintf('image %d saved.\n', i);
+            end
         end
     end
 	
