@@ -222,4 +222,14 @@ train with all train images (with multi-box ohem model)
 gt recall rate = 0.6802
 gt recall rate after nms-3 = 0.6441
 
+#1201
+(14)
+multibox ohem with flip (randomly ud, lr, rot90, rot90+lr)
+gt recall rate = 0.6438
+gt recall rate after nms-3 = 0.6138
+(15) [The current best result!] 
+remove the conv4 atros from [multibox ohem] to see if it can improve small faces detection rate, see  script_rpn_face_VGG16_widerface_multibox_ohem_singleconv4.m
+the training gpu memory usage reduces to [3862M]!
+gt recall rate = 0.6850
+gt recall rate after nms-3 = 0.6530
 
