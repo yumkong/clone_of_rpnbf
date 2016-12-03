@@ -177,7 +177,8 @@ function bbox_targets = compute_targets(conf, gt_rois, gt_labels, ex_rois, image
     % Indices of examples for which we try to make predictions
     % both (ex_max_overlaps >= conf.fg_thresh) and gt_best_matches are
     % assigned as positive examples
-    fg_inds = unique([find(ex_max_overlaps >= conf.fg_thresh); gt_best_matches]);
+    %fg_inds = unique([find(ex_max_overlaps >= conf.fg_thresh); gt_best_matches]);
+    fg_inds = unique(find(ex_max_overlaps >= conf.fg_thresh));
         
     % Indices of examples for which we try to used as negtive samples
     % the logic for assigning labels to anchors can be satisfied by both the positive label and the negative label

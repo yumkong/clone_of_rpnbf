@@ -464,15 +464,17 @@ layer {
    top: "accuarcy"
 }
 
-layer {
-  name: "loss_bbox"
-  type: "SmoothL1Loss"
-  bottom: "proposal_bbox_pred" #[1 28 28 28]
-  bottom: "bbox_targets"       #[1 28 28 28]
-  bottom: "bbox_loss_weights"  #[1 28 28 28]
-  top: "loss_bbox"
-  loss_weight: 5  #1017: 10-->5
-}
+
+# previous bbox regress func
+#layer {
+#  name: "loss_bbox"
+#  type: "SmoothL1Loss"
+#  bottom: "proposal_bbox_pred" #[1 28 28 28]
+#  bottom: "bbox_targets"       #[1 28 28 28]
+#  bottom: "bbox_loss_weights"  #[1 28 28 28]
+#  top: "loss_bbox"
+#  loss_weight: 5  #1017: 10-->5
+#}
 
 # previous loss function
 #layer {
@@ -505,20 +507,20 @@ layer {
 layer {
    # bottom: "rois"
    bottom: "per_anchor_cls_loss"  #[1, 1, 7*28, 28] == [num ch hei wid]
-   bottom: "labels_reshape"		  #[1, 1, 7*28, 28]
-   # bottom: "bbox_loss_weights"
+   bottom: "labels_reshape"	  #[1, 1, 7*28, 28]
+   bottom: "bbox_loss_weights"    #[1, 4*7, 28, 28]
    top: "labels_ohem"
-   # top: "bbox_loss_weights_ohem"
+   top: "bbox_loss_weights_ohem"
    name: "cls_ohem"
    type: "RpnClsOHEM"
    rpn_cls_ohem_param {
-        bg_per_img: 256
+        bg_per_img: 256  #256
         ignore_label: -1
    }
    propagate_down: false
    propagate_down: false
    propagate_down: false
-   propagate_down: false
+   #propagate_down: false
 }
 
 layer {
@@ -542,4 +544,14 @@ layer {
    }
    propagate_down: true
    propagate_down: false
+}
+
+layer {
+  name: "loss_bbox"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred" #[1 28 28 28]
+  bottom: "bbox_targets"       #[1 28 28 28]
+  bottom: "bbox_loss_weights_ohem"  #[1 28 28 28]
+  top: "loss_bbox"
+  loss_weight: 50  #1017: 10-->5
 }

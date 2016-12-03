@@ -63,7 +63,7 @@ function save_model_path = proposal_train_widerface_ohem(conf, imdb_train, roidb
     caffe.init_log(caffe_log_file_base);
     caffe_solver = caffe.Solver(opts.solver_def_file);
     caffe_solver.net.copy_from(opts.net_file);
-    %caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_conv4', 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_7000'));
+    %caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_conv4_ohem', 'rpn_cachedir', 'ohem_random_shuffle_iter_1000'));
     % init log
     timestamp = datestr(datevec(now()), 'yyyymmdd_HHMMSS');
     mkdir_if_missing(fullfile(cache_dir, 'log'));
@@ -120,6 +120,25 @@ function save_model_path = proposal_train_widerface_ohem(conf, imdb_train, roidb
     
     conf.classes        = opts.imdb_train{1}.classes;
     
+    % 1117 added: recover the weight scale used in the training process
+    if 1
+        anchor_size = size(conf.anchors, 1);
+        bbox_stds_flatten = repmat(reshape(bbox_stds', [], 1), anchor_size, 1);
+        bbox_means_flatten = repmat(reshape(bbox_means', [], 1), anchor_size, 1);
+
+        % merge bbox_means, bbox_stds into the model
+        bbox_pred_layer_name = 'proposal_bbox_pred';
+        weights = caffe_solver.net.params(bbox_pred_layer_name, 1).get_data();
+        biase = caffe_solver.net.params(bbox_pred_layer_name, 2).get_data();
+
+        weights = ...
+            bsxfun(@rdivide, weights, permute(bbox_stds_flatten, [2, 3, 4, 1])); % weights = weights / stds; 
+        biase = ...
+            (biase - bbox_means_flatten)./ bbox_stds_flatten; % bias = (bias - means)/ stds;
+
+        caffe_solver.net.set_params_data(bbox_pred_layer_name, 1, weights);
+        caffe_solver.net.set_params_data(bbox_pred_layer_name, 2, biase);
+    end
 %%  try to train/val with images which have maximum size potentially, to validate whether the gpu memory is enough  
     check_gpu_memory(conf, caffe_solver, opts.do_val);
      
@@ -164,6 +183,26 @@ function save_model_path = proposal_train_widerface_ohem(conf, imdb_train, roidb
         
         rst = caffe_solver.net.get_output();
         rst = check_error(rst, caffe_solver);
+        
+        % 1116 added for debugging
+        if 0
+            [anchors, im_scales] = proposal_locate_anchors(conf, image_roidb_train(sub_db_inds).im_size);
+            anchors = anchors{1}; % for 1x1 cell to Nx4 array
+            labels_weights_ohem = caffe_solver.net.blobs('labels_ohem').get_data();
+            tmp_wid = size(labels_weights_ohem, 1);
+            labels_weights_ohem = reshape(labels_weights_ohem, tmp_wid,[],7); %wid x hei x 7
+            labels_weights_ohem = permute(labels_weights_ohem, [3 2 1]); %7 x hei x wid
+            hard_neg_idx = find(labels_weights_ohem(:) == 0);
+            ohem_anchors = anchors(hard_neg_idx,:);
+            im = imread(image_roidb_train(sub_db_inds).image_path);
+            im_resize = imresize(im, im_scales{1});
+            figure(1), imshow(im_resize);
+            ohem_anchors(:, 3) = ohem_anchors(:, 3) - ohem_anchors(:, 1);
+            ohem_anchors(:, 4) = ohem_anchors(:, 4) - ohem_anchors(:, 2);
+            bbApply('draw',ohem_anchors);
+            pause();
+        end
+        % =============
         
         %format long
         fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds, 1/cost_time);
@@ -272,8 +311,12 @@ function rst = check_error(rst, caffe_solver)
     cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape').get_data();
     %labels = caffe_solver.net.blobs('labels_reshape').get_data();
     %labels_weights = caffe_solver.net.blobs('labels_weights_reshape').get_data();
-    labels_weights_ohem = caffe_solver.net.blobs('labels_ohem').get_data();
-    
+    debug_ohem = false;
+    if debug_ohem
+        labels_weights_ohem = caffe_solver.net.blobs('labels_reshape').get_data();
+    else
+        labels_weights_ohem = caffe_solver.net.blobs('labels_ohem').get_data();
+    end
     %accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     %accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
     %accurate = accurate_fg | accurate_bg;
@@ -301,12 +344,13 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     output_height = conf.output_width_map.values({size(im_blob, 2)});
     output_height = output_height{1};
     labels_blob = single(zeros(output_width, output_height, anchor_num, conf.ims_per_batch));
-    %labels_weights = labels_blob;
+    labels_weights = labels_blob;
     bbox_targets_blob = single(zeros(output_width, output_height, anchor_num*4, conf.ims_per_batch));
     bbox_loss_weights_blob = bbox_targets_blob;
-
-    %net_inputs = {im_blob, labels_blob, labels_weights, bbox_targets_blob, bbox_loss_weights_blob};
-    net_inputs = {im_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
+    
+    %1116 reuse labels_weights to balance fg and bg
+    net_inputs = {im_blob, labels_blob, labels_weights, bbox_targets_blob, bbox_loss_weights_blob};
+    %net_inputs = {im_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
     
      % Reshape net's input blobs
     caffe_solver.net.reshape_as_input(net_inputs);

@@ -33,6 +33,11 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
     %aboxes_nms2 = cell(length(aboxes), 1);
     %nms_option2 = 2; %1, 2, 3
     
+    % 1121: add these 3 lines for drawing
+    addpath(fullfile('external','export_fig'));
+    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic');
+    mkdir_if_missing(res_dir);
+    
     for i = 1:length(aboxes)
         
         aboxes{i} = aboxes{i}(aboxes{i}(:, end) > score_thresh, :);
@@ -47,7 +52,7 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
               bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
               %I=imread(imgNms{i});
               figure(1); 
-              im(img);  %im(I)
+              imshow(img);  %im(img)
               bbApply('draw',bbs);
             end
         end
@@ -60,36 +65,35 @@ function aboxes = do_proposal_test_widerface_my(conf, model_stage, imdb, roidb, 
         if show_image
             %draw boxes after 'smart' NMS
             bbs = aboxes_nms{i};
+            
+            %1121 also draw gt boxes
+            bbs_gt = roidb.rois(i).boxes;
+            bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+            bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+            bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+            % if a box has only 1 pixel in either size, remove it
+            invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+            bbs_gt(invalid_idx, :) = [];
+            
+            figure(2); 
+            imshow(img);  %im(img)
+            hold on
             if ~isempty(bbs)
               bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
               bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
               %I=imread(imgNms{i});
-              figure(2); 
-              im(img);  %im(I)
-              bbApply('draw',bbs);
+              bbApply('draw',bbs, 'g');
             end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
+            hold off
+            % 1121: save result
+            strs = strsplit(imdb.image_at(i), filesep);
+            saveName = fullfile(res_dir, sprintf('res_%s',strs{end}(1:end-4)));
+            export_fig(saveName, '-png', '-a1', '-native');
+            fprintf('image %d saved.\n', i);
         end
-        
-%         time = tic;
-%         % 1007 do nms
-%         %if i == 102
-%         %   fprintf('Hoori\n'); 
-%         %end
-%         aboxes_nms2{i} = pseudoNMS_v3(aboxes{i}, nms_option2);
-%         
-%         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
-%         if show_image
-%             %draw boxes after 'smart' NMS
-%             bbs = aboxes_nms2{i};
-%             if ~isempty(bbs)
-%               bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-%               bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-%               %I=imread(imgNms{i});
-%               figure(3); 
-%               im(img);  %im(I)
-%               bbApply('draw',bbs);
-%             end
-%         end
     end
     
     % save bbox before nms

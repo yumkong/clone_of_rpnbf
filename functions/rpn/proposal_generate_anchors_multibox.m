@@ -38,7 +38,7 @@ function [anchors_conv4, anchors_conv5] = proposal_generate_anchors_multibox(cac
         anchors                 = cellfun(@(x) scale_jitter(x, opts.scales, opts.add_size), num2cell(ratio_anchors, 2), 'UniformOutput', false);
         anchors                 = cat(1, anchors{:});
         % 1112 added
-        anchors_conv4 = anchors(1:2, :);  %[8 16]
+        anchors_conv4 = anchors(1:2, :);  %[8 16] ==> [8 16 32]
         anchors_conv5 = anchors(3:end, :);  % [32 64 128 256 512 900]
         if ~opts.ignore_cache
             save(anchor_cache_file, 'anchors_conv4', 'anchors_conv5');
