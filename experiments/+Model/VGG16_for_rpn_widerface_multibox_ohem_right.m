@@ -1,4 +1,4 @@
-function model = VGG16_for_rpn_widerface_multibox_ohem(exp_name, model)
+function model = VGG16_for_rpn_widerface_multibox_ohem_right(exp_name, model)
 
 
 model.mean_image                                = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'mean_image');
@@ -17,10 +17,13 @@ model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting
 model.stage1_rpn.nms.per_nms_topN               = -1; %20000
-model.stage1_rpn.nms.nms_overlap_thres       	= 1;%0.7
+%model.stage1_rpn.nms.nms_overlap_thres       	= 1;%0.7
+model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 1; % no nms for conv4
+model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
+model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
 %model.stage1_rpn.nms.after_nms_topN         	= 300;  %1000
 model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %1000
-model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %100
-model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %10
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %100
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 5;  %10
 
 end
