@@ -163,7 +163,7 @@ opts.first_nNeg = 150000;  %#neg of the 1st stage 40000 --> 150000
 opts.nNeg = 30000;  % #neg needed by every stage 5000--> 300000
 opts.nAccNeg = 200000;  % #accumulated neg from stage2 -- 7 % 60000-->200000
 % 1203 added
-opts.nPerNeg = 3;
+opts.nPerNeg = 10;
 pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
 opts.pLoad = [pLoad 'hRng',[50 inf], 'vRng',[1 1] ];   % delete?
 
@@ -225,7 +225,7 @@ tmp_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
 % opts.max_rois_num_in_gpu = 3000, opts.ratio = 1
 feat = rois_get_features_ratio(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
 toc;
-opts.feat_len = length(feat);
+opts.feat_len = size(feat,2); %1203 changed: length(feat)
 
 % fs=bbGt('getFiles',{posGtDir});
 % train_gts = cell(length(fs), 1);

@@ -110,7 +110,7 @@ function do_proposal_test_widerface_multibox_ohem(conf, model_stage, imdb, roidb
         %1006 added to do NPD-style nms
         time = tic;
         aboxes_nms_conv4{i} = pseudoNMS_v6(aboxes_conv4{i}, nms_option);
-        aboxes_nms_conv5{i} = pseudoNMS_v6(aboxes_conv5{i}, nms_option);
+        aboxes_nms_conv5{i} = pseudoNMS_v8(aboxes_conv5{i}, nms_option, img);
         aboxes_nms_conv6{i} = pseudoNMS_v6(aboxes_conv6{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));

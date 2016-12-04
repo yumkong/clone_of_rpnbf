@@ -168,7 +168,7 @@ for stage = 0:numel(opts.nWeak)-1
         load([opts.name '_initNeg.mat']);
     catch
         [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 ); %neg
-        save([opts.name '_initNeg.mat'], 'X0', 'X0_score', '-v7.3');
+        save([opts.name '_initNeg.mat'], 'X0', 'X0_score', 'sel_idxes', '-v7.3');
     end  
   end
 
@@ -415,6 +415,7 @@ if positive
         feats = fg_feat;
         scores = fg_score;
 %         if opts.load_gt == false
+%           sel_idx = sel_idx(retain_idx);
 %             save(mat_name, 'fg_feat', 'fg_score', 'sel_idxes', '-v7.3');
 %         end
     end

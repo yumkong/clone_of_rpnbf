@@ -20,7 +20,7 @@ model.stage1_rpn.nms.per_nms_topN               = -1; %20000
 model.stage1_rpn.nms.nms_overlap_thres       	= 1;%0.7
 %model.stage1_rpn.nms.after_nms_topN         	= 300;  %1000
 model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %1000
-model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %100
-model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %10
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 150;  %1202: 100--150
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %1000
 
 end
