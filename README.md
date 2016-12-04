@@ -222,4 +222,35 @@ train with all train images (with multi-box ohem model)
 gt recall rate = 0.6802
 gt recall rate after nms-3 = 0.6441
 
+#1201
+(14)
+multibox ohem with flip (randomly ud, lr, rot90, rot90+lr)
+gt recall rate = 0.6438
+gt recall rate after nms-3 = 0.6138
+(15) [The current best result!] 
+remove the conv4 atros from [multibox ohem] to see if it can improve small faces detection rate, see  script_rpn_face_VGG16_widerface_multibox_ohem_singleconv4.m
+the training gpu memory usage reduces to [3862M]!
+gt recall rate = 0.6850
+gt recall rate after nms-3 = 0.6530
+
+(16) Res50 multibox_ohem [gpu memory usage 6689M]
+======================
+how to set normlize layer scale
+conv4: caffe_solver.net.blobs('conv_proposal_conv4').get_data();
+conv5: caffe_solver.net.blobs('reduce_proposal').get_data();
+conv6: caffe_solver.net.blobs('reduce_proposal_conv6').get_data();
+
+=== code =========
+aa = caffe_solver.net.blobs('conv_proposal_conv4').get_data();
+bb = caffe_solver.net.blobs('reduce_proposal').get_data();
+cc = caffe_solver.net.blobs('reduce_proposal_conv6').get_data();
+fprintf('conv4: %.2f, %.2f\n', median(aa(:)), max(aa(:)));
+fprintf('conv5: %.2f, %.2f\n', median(bb(:)), max(bb(:)));
+fprintf('conv6: %.2f, %.2f\n', median(cc(:)), max(cc(:)));
+
+==> found that they are of the same magnitude level, so temperarily not use normlize layer
+=================
+result: slightly better than vgg16 multibox_ohem, but worse than 15
+gt recall rate = 0.6640
+gt recall rate after nms-3 = 0.6299
 

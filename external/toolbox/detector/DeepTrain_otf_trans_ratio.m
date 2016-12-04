@@ -168,7 +168,7 @@ for stage = 0:numel(opts.nWeak)-1
         load([opts.name '_initNeg.mat']);
     catch
         [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 ); %neg
-        save([opts.name '_initNeg.mat'], 'X0', 'X0_score', '-v7.3');
+        save([opts.name '_initNeg.mat'], 'X0', 'X0_score', 'sel_idxes', '-v7.3');
     end  
   end
 
@@ -403,7 +403,8 @@ if positive
                 % liu@1001: max_rois_num_in_gpu -- how many roi features can be extract at one pass,
                 % if the total features are larger than this, will divide it into several parts to extract gradually
                 %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
-                fg_feat_cell{idx} = rois_get_features_ratio2(opts.conf, opts.caffe_net, im, sel_boxes, opts.max_rois_num_in_gpu, opts.ratio);
+                % 1203 change back to rois_get_features_ratio
+                fg_feat_cell{idx} = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_boxes, opts.max_rois_num_in_gpu, opts.ratio);
 %                 assert(size(fg_feat_cell{idx}, 2)==opts.feat_len, sprintf('assert fail: feat_len should set to %d', size(fg_feat_cell{idx}, 2)));
                 fg_score_cell{idx} =  rois(idx).scores(sel_idx);
             end
@@ -414,6 +415,7 @@ if positive
         feats = fg_feat;
         scores = fg_score;
 %         if opts.load_gt == false
+%           sel_idx = sel_idx(retain_idx);
 %             save(mat_name, 'fg_feat', 'fg_score', 'sel_idxes', '-v7.3');
 %         end
     end
@@ -480,7 +482,8 @@ else
            end 
            im = imread(opts.imdb_train.image_at(idx)); 
            %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
-           sel_feat = rois_get_features_ratio2(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
+           % 1203 change back to rois_get_features_ratio
+           sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
            
            if ~isempty(sel_idx)               
                scores = DeepDetect_otf_trans(sel_feat, sel_scores, detector);
@@ -494,7 +497,8 @@ else
            sel_idx = sel_idx(retain_idx);
            sel_box = rois(idx).boxes(sel_idx, :);
            %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
-           sel_feat = rois_get_features_ratio2(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
+           % 1203 change back to rois_get_features_ratio
+           sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
        end
        
        

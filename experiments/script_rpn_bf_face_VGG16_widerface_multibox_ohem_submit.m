@@ -44,7 +44,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ohem_all';
+exp_name = 'VGG16_widerface_multibox_ohem';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -98,13 +98,25 @@ end
             
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
-model.stage1_rpn.nms.nms_overlap_thres = 1; %1004: 1-->0.5
+%model.stage1_rpn.nms.nms_overlap_thres = 1; %1004: 1-->0.5
+model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
+model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
+model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
 %1201: since only 3 anchors, 100 is enough(in RPN: only 50 for conv4)
-model.stage1_rpn.nms.after_nms_topN = 600;  %600 --> 100 
+%model.stage1_rpn.nms.after_nms_topN = 50;  %600 --> 100 
+model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %1000
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %100
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %10
 is_test = true;
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
-model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
-model.stage1_rpn.nms.after_nms_topN = 200; %1000--> 200. 200 is enough (double of test topN), only keep the hard negative one
+%model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
+model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
+model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
+model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
+%model.stage1_rpn.nms.after_nms_topN = 50; %1000--> 200. 200 is enough (double of test topN), only keep the hard negative one
+model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %1000
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %100
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %10
 roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
@@ -147,9 +159,11 @@ opts.bg_hard_min_ratio = [1 1 1 1 1 1 1];
 opts.pBoost.pTree.maxDepth = 5; 
 opts.pBoost.discrete = 0;  %?
 opts.pBoost.pTree.fracFtrs = 1/4;  %? 
-opts.first_nNeg = 40000;  %#neg of the 1st stage 30000 --> 40000
-opts.nNeg = 5000;  % #neg needed by every stage
-opts.nAccNeg = 60000;  % #accumulated neg from stage2 -- 7 % 50000-->60000
+opts.first_nNeg = 150000;  %#neg of the 1st stage 40000 --> 150000
+opts.nNeg = 30000;  % #neg needed by every stage 5000--> 300000
+opts.nAccNeg = 200000;  % #accumulated neg from stage2 -- 7 % 60000-->200000
+% 1203 added
+opts.nPerNeg = 10;
 pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
 opts.pLoad = [pLoad 'hRng',[50 inf], 'vRng',[1 1] ];   % delete?
 
@@ -174,7 +188,7 @@ opts.roidb_test = roidb_test_BF;
 opts.imdb_train = dataset.imdb_train{1};
 opts.imdb_test = dataset.imdb_test;
 opts.fg_thres_hi = 1;
-opts.fg_thres_lo = 0.5; %[lo, hi) 1018: 0.8 --> 0.5
+opts.fg_thres_lo = 0.6; %[lo, hi) 1018: 0.8 --> 0.5 --> 0.6 (1203)
 opts.bg_thres_hi = 0.3; %1018: 0.5 --> 0.3
 opts.bg_thres_lo = 0; %[lo hi)
 opts.dataDir = dataDir;
@@ -184,7 +198,7 @@ opts.exp_name = exp_name;
 opts.fg_nms_thres = 1;
 opts.fg_use_gt = true;
 opts.bg_nms_thres = 1;
-opts.max_rois_num_in_gpu = 100; %3000
+opts.max_rois_num_in_gpu = 3000;
 opts.init_detector = '';
 opts.load_gt = false;
 opts.ratio = 2.0;  %1018: 1.0 --> 2.0: left-0.5*width, right+0.5*width, top-0.2*height, bottom + 0.8height
@@ -211,7 +225,7 @@ tmp_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
 % opts.max_rois_num_in_gpu = 3000, opts.ratio = 1
 feat = rois_get_features_ratio(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
 toc;
-opts.feat_len = length(feat);
+opts.feat_len = size(feat,2); %1203 changed: length(feat)
 
 % fs=bbGt('getFiles',{posGtDir});
 % train_gts = cell(length(fs), 1);

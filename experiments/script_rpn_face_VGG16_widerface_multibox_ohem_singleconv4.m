@@ -1,4 +1,4 @@
-function script_rpn_face_VGG16_widerface_multibox_ohem()
+function script_rpn_face_VGG16_widerface_multibox_ohem_singleconv4()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -14,7 +14,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_rfcn_win_ohem_final'; %caffe_faster_rcnn_win
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn'; %caffe_faster_rcnn_win
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
@@ -32,8 +32,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-%model                       = Model.VGG16_for_rpn_widerface_multibox_ohem(exp_name);
-model                       = Model.VGG16_for_rpn_widerface_multibox_ohem_right(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox_ohem_singleconv4(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -48,12 +47,12 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ohem';
+exp_name = 'VGG16_widerface_multibox_ohem_singleconv4';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
-event_num                   = -1; %3
+event_num                   = 11; %-1
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 
@@ -104,8 +103,8 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_mult
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-%Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
-Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem_right(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');
 % % train
