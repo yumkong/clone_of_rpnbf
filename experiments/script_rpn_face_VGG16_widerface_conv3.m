@@ -13,7 +13,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_rfcn_win_ohem_final'; %'caffe_faster_rcnn_win_cudnn'
+    opts.caffe_version          = 'caffe_rfcn_win_multibox_ohem'; %'caffe_faster_rcnn_win_cudnn'
     cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn';
@@ -41,9 +41,9 @@ dataset                     = [];
 cache_data_root = 'output';  %cache_data
 mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
-model_name_base = 'vgg16_conv4';  % ZF, vgg16_conv5
+model_name_base = 'vgg16_conv3';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_conv4';
+exp_name = 'VGG16_widerface_conv3';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -75,14 +75,14 @@ output_map_name = 'output_map_conv3';  % output_map_conv4, output_map_conv5
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_map, conf_proposal.output_height_map] = proposal_calc_output_size(conf_proposal, ...
                                                                     model.stage1_rpn.test_net_def_file, output_map_save_name);
-conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'ratios', [1], 'scales',  2.^[-1:5]);  %[8 16 32 64 128 256 512]
+conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'ratios', [1], 'scales',  2.^[-1:1]);  %[8 16 32]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
 %conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_conv3(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 %% test
 % get predicted rois (bboxes) to be used in later stages
@@ -90,10 +90,10 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf
 %nms_option_test = 3;
 %dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, x, y, nms_option_train), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
 %dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-cache_name = 'widerface';
-method_name = 'RPN-ped';
-nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_my(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+%cache_name = 'widerface';
+%method_name = 'RPN-ped';
+%nms_option_test = 3;
+%Faster_RCNN_Train.do_proposal_test_widerface_conv3(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');
