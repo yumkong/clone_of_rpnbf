@@ -40,8 +40,8 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ohem(con
         
         labels_blob = reshape(labels, size(conf.anchors, 1), output_size(1), output_size(2));
         label_weights_blob = reshape(label_weights, size(conf.anchors, 1), output_size(1), output_size(2));
-        bbox_targets_blob = reshape(bbox_targets', size(conf.anchors, 1)*4, output_size(1), output_size(2));
-        bbox_loss_blob = reshape(bbox_loss', size(conf.anchors, 1)*4, output_size(1), output_size(2));
+        bbox_targets_blob = reshape(bbox_targets', 4*size(conf.anchors, 1), output_size(1), output_size(2)); %'
+        bbox_loss_blob = reshape(bbox_loss', 4*size(conf.anchors, 1), output_size(1), output_size(2)); %'
         
         % permute from [channel, height, width], where channel is the
         % fastest dimension to [width, height, channel]
