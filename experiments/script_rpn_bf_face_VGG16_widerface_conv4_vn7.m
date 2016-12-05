@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_conv4()
+function script_rpn_bf_face_VGG16_widerface_conv4_vn7()
 
 clc;
 clear mex;
@@ -11,7 +11,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win';
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn';
     cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn';
@@ -28,9 +28,9 @@ opts.do_val                 = true;
 model                       = Model.VGG16_for_rpn_widerface_conv4(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
-cache_base_fast_rcnn        = '';
+%cache_base_fast_rcnn        = '';
 % set cache folder for each stage
-model                       = Faster_RCNN_Train.set_cache_folder_widerface(cache_base_proposal,cache_base_fast_rcnn, model);
+model                       = Faster_RCNN_Train.set_cache_folder_widerface(cache_base_proposal, model);
 % train/test data
 dataset                     = [];
 % the root directory to hold any useful intermediate data during training process
@@ -44,9 +44,10 @@ exp_name = 'VGG16_widerface_conv4'; %VGG16_widerface_twelve_anchors
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
-event_num                   = 11; %3
+event_num                   = 11; %3 11
+event_num_test              = 11;  %1007 added: test all val images
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
-dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num_test, cache_data_this_model_dir, model_name_base);
 
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
@@ -179,25 +180,6 @@ opts.ratio = 2.0;  %1018: 1.0 --> 2.0: left-0.5*width, right+0.5*width, top-0.2*
 opts.nms_thres = 0.5;
 
 % forward an image to check error and get the feature length
-%1018 added for windows
-%if image path is of unix format but in windows platform, replace it with windows path
-if ispc && ~isempty(strfind(dataset.imdb_test.image_at(1), '/'))  %unix path must have '/'
-    % train set
-    dataset.imdb_train{1}.image_dir = 'D:\\datasets\\WIDERFACE';
-    for k = 1:length(dataset.imdb_train{1}.image_ids)
-        dataset.imdb_train{1}.image_ids{k} = strrep(dataset.imdb_train{1}.image_ids{k}, '/', '\\'); % '/' --> '\'
-    end
-    train_root = fullfile(dataset.imdb_train{1}.image_dir, 'WIDER_train','images');
-    dataset.imdb_train{1}.image_at = @(i) sprintf('%s\\%s.%s', train_root, dataset.imdb_train{1}.image_ids{i}, dataset.imdb_train{1}.extension); 
-    %test set
-    dataset.imdb_test.image_dir = 'D:\\datasets\\WIDERFACE';
-    for k = 1:length(dataset.imdb_test.image_ids)
-        dataset.imdb_test.image_ids{k} = strrep(dataset.imdb_test.image_ids{k}, '/', '\\'); % '/' --> '\'
-    end
-    test_root = fullfile(dataset.imdb_train{1}.image_dir, 'WIDER_val','images');
-    dataset.imdb_test.image_at = @(i) sprintf('%s\\%s.%s', test_root, dataset.imdb_test.image_ids{i}, dataset.imdb_test.extension); 
-end
-
 img = imread(dataset.imdb_test.image_at(1));
 tic;
 tmp_box = roidb_test_BF.rois(1).boxes;
@@ -241,86 +223,51 @@ opts.train_gts = train_gts;
 % train BF detector
 detector = DeepTrain_otf_trans_ratio( opts );
 
-% visual
-%if 1 % set to 1 for visual
-    % ########## save the final result (after BF) here #############
-    cache_dir1 = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
-    fid = fopen(fullfile(cache_dir1, 'VGG16_e1-e11-RPN+BF-ave-300-nms-op3.txt'), 'a');
-  rois = opts.roidb_test.rois;
-  %imgNms=bbGt('getFiles',{[dataDir 'test/images']});
-  for i = 1:length(rois)
-      if ~isempty(rois(i).boxes)
-          img = imread(dataset.imdb_test.image_at(i));  
-          feat = rois_get_features_ratio(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
-          scores = adaBoostApply(feat, detector.clf);
-          bbs = [rois(i).boxes scores];
- 
-          % do nms
-          % nms_thres  = 0.5
-          %if i~=29
-          %sel_idx = nms(bbs, opts.nms_thres);
-          %end
-          sel_idx = (1:size(bbs,1))';
-          sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
-          
-          % ########## save the final result (after BF) here #############
-          %fid = fopen(fullfile(cache_dir, 'ZF_e1-e3-RPN+BF.txt'), 'a');
-            %for i = 1:size(aboxes, 1)
-            bbs = bbs(sel_idx, :);
-                if ~isempty(bbs)
-                    % filesep  '/' in linux and '\' in windows 
-                    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
-                    % [x1 y1 x2 y2] pascal VOC style
-                    for j = 1:size(bbs,1)
-                        %each row: [image_name score x1 y1 x2 y2]
-                        fprintf(fid, '%s %f %d %d %d %d\n', sstr{2}, bbs(j, 5), round(bbs(j, 1:4)));
-                    end
-                end
-                %if i == 29
-                disp(i);
-                %end
-            %end
-            %fclose(fid);
-            %fprintf('Done with saving RPN+BF detected boxes.\n');
-    
-          % liu@1001: use a higher thresh to get rid of false alarms:  opts.cascThr = -1,  new set 5
-          %sel_idx = intersect(sel_idx, find(bbs(:, end) > opts.cascThr));
-%           sel_idx = intersect(sel_idx, find(bbs(:, end) > 5));
-%           bbs = bbs(sel_idx, :);
-%           bbs(:, 3) = bbs(:, 3) - bbs(:, 1);
-%           bbs(:, 4) = bbs(:, 4) - bbs(:, 2);
-%           if ~isempty(bbs)
-%               %I=imread(imgNms{i});
-%               figure(1); 
-%               im(img);  %im(I)
-%               bbApply('draw',bbs); pause();
-%           end
-      end
-  end
-  %1004 added
-  fclose(fid);
-  fprintf('Done with saving RPN+BF+nms detected boxes.\n');
-%end
+%===============  save the final result (after BF) here to submit to
+%widerface evaluation code
+SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
+mkdir_if_missing(SUBMIT_cachedir);
+nms_option = 3; %1019 added
+show_image = false;
+rois = opts.roidb_test.rois;
 
-% test detector and plot roc
-% method_name = 'RPN+BF';
-% folder1 = fullfile(pwd, 'output', exp_name, 'bf_cachedir', method_name);
-% folder2 = fullfile('..', 'external', 'code3.2.1', 'data-USA', 'res', method_name);
-% 
-% %liu@0929: 'show' 2-->0
-% if ~exist(folder1, 'dir')
-%     [~,~,gt,dt]=DeepTest_otf_trans_ratio('name',opts.name,'roidb_test', opts.roidb_test, 'imdb_test', opts.imdb_test, ...
-%         'gtDir',[dataDir 'test/annotations'],'pLoad',[pLoad, 'hRng',[50 inf],...
-%         'vRng',[.65 1],'xRng',[5 635],'yRng',[5 475]],...
-%         'reapply',1,'show',0, 'nms_thres', opts.nms_thres, ...
-%         'conf', opts.conf, 'caffe_net', opts.caffe_net, 'silent', false, 'cache_dir', opts.cache_dir, 'ratio', opts.ratio);
-% end
-% 
-% copyfile(folder1, folder2);
-% tmp_dir = pwd;
-% cd(fullfile(pwd, 'external', 'code3.2.1'));
-% dbEval_RPNBF;
-% cd(tmp_dir);
+for i = 1:length(rois)
+    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
+    event_name = sstr{1};
+    event_dir = fullfile(SUBMIT_cachedir, event_name);
+    mkdir_if_missing(event_dir);
+    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
+    fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
+    if ~isempty(rois(i).boxes)
+        img = imread(dataset.imdb_test.image_at(i));  
+        feat = rois_get_features_ratio(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
+        scores = adaBoostApply(feat, detector.clf);
+        bbs = [rois(i).boxes scores];
+
+        sel_idx = (1:size(bbs,1))'; %'
+        sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+
+        bbs = bbs(sel_idx, :);
+        %1019 added: do nms here
+        bbs = pseudoNMS_v6(bbs, nms_option);
+        % print the bbox number
+        fprintf(fid, '%d\n', size(bbs, 1));
+        if ~isempty(bbs)
+            for j = 1:size(bbs,1)
+                %each row: [x1 y1 w h score]
+                fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+            end
+        end
+
+        if show_image && ~isempty(bbs)
+            figure(1); 
+            im(img);
+            bbApply('draw',bbs); pause();
+        end
+    end
+    fclose(fid);
+    fprintf('Done with saving image %d bboxes.\n', i);
+end
 
 caffe.reset_all();
 end
