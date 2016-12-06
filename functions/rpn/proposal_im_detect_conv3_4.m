@@ -1,4 +1,4 @@
-function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect_conv3(conf, caffe_net, im, im_idx)
+function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect_conv3_4(conf, caffe_net, im, im_idx)
 % [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect(conf, im, net_idx)
 % --------------------------------------------------------
 % Faster R-CNN
@@ -48,26 +48,27 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     % 1204: spatially decimate anchors by one half (only keep highest scoring boxes out of eight spatial neighbors)
     % in this way the output boxes should be similar with that of conv4_3
     % in vertical direction
-    score_mask = false(size(scores));
-    score_mask(:,1,:) = scores(:,1,:) >= scores(:,2,:);
-    for idx = 2:size(scores, 2)-1
-        score_mask(:,idx,:) = (scores(:,idx,:) >= scores(:,idx-1,:)) & (scores(:,idx,:) >= scores(:,idx+1,:));
+    if 0
+        score_mask = false(size(scores));
+        score_mask(:,1,:) = scores(:,1,:) >= scores(:,2,:);
+        for idx = 2:size(scores, 2)-1
+            score_mask(:,idx,:) = (scores(:,idx,:) >= scores(:,idx-1,:)) & (scores(:,idx,:) >= scores(:,idx+1,:));
+        end
+        score_mask(:,end,:) = scores(:,end,:) >= scores(:,end-1,:);
+        % in horizontal direction
+        score_mask(:,:,1) = scores(:,:,1) >= scores(:,:,2);
+        for idx = 2:size(scores, 3)-1
+            score_mask(:,:,idx) = (scores(:,:,idx) >= scores(:,:,idx-1)) & (scores(:,:,idx) >= scores(:,:, idx+1));
+        end
+        score_mask(:,:, end) = scores(:,:, end) >= scores(:,:, end-1);
+        score_mask = score_mask(:);
+        % end of 1204
     end
-    score_mask(:,end,:) = scores(:,end,:) >= scores(:,end-1,:);
-    % in horizontal direction
-    score_mask(:,:,1) = scores(:,:,1) >= scores(:,:,2);
-    for idx = 2:size(scores, 3)-1
-        score_mask(:,:,idx) = (scores(:,:,idx) >= scores(:,:,idx-1)) & (scores(:,:,idx) >= scores(:,:, idx+1));
-    end
-    score_mask(:,:, end) = scores(:,:, end) >= scores(:,:, end-1);
-    score_mask = score_mask(:);
-    % end of 1204
-    
     scores = scores(:);
 
     %1205 added: keep only those local maximum scores
-    scores = scores(score_mask,:);
-    pred_boxes = pred_boxes(score_mask,:);  % new pred_boxes
+    %scores = scores(score_mask,:);
+    %pred_boxes = pred_boxes(score_mask,:);  % new pred_boxes
     
     box_deltas_ = box_deltas;
     anchors_ = anchors;

@@ -254,3 +254,36 @@ result: slightly better than vgg16 multibox_ohem, but worse than 15
 gt recall rate = 0.6640
 gt recall rate after nms-3 = 0.6299
 
+================== 
+1205
+on puck, "script_rpn_bf_face_VGG16_widerface_multibox_ohem_submit" is so slow while doing the following:
+In caffe.Net/forward (line 142)
+      self.forward_prefilled();
+
+In rois_get_features_ratio (line 75)
+        output_blobs = caffe_net.forward(net_inputs);
+
+In DeepTrain_otf_trans_ratio>sampleWins (line 486)
+           sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
+
+In DeepTrain_otf_trans_ratio (line 165)
+    [X0, X0_score, sel_idxes] = sampleWins( detector, stage, 0 );
+
+In script_rpn_bf_face_VGG16_widerface_multibox_ohem_submit (line 249)
+detector = DeepTrain_otf_trans_ratio( opts );
+
+In run (line 96)
+evalin('caller', [script ';']);
+======================
+
+
+1205
+conv3 series:
+(1) conv3  afternms-100
+gt recall rate = 0.5317
+gt recall rate after nms-3 = 0.3967
+(2) conv3_4  afternms-100
+gt recall rate = 0.5950
+gt recall rate after nms-3 = 0.4695
+
+https://groups.google.com/forum/#!topic/caffe-users/owQEvAhP7gM

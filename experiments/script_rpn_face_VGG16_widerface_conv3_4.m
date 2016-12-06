@@ -1,4 +1,4 @@
-function script_rpn_face_VGG16_widerface_conv3()
+function script_rpn_face_VGG16_widerface_conv3_4()
 % script_rpn_face_VGG16_widerface_conv3()
 % --------------------------------------------------------
 % 1204 created by Yuguang Liu
@@ -28,7 +28,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface_conv3(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_conv3_4(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -41,9 +41,9 @@ dataset                     = [];
 cache_data_root = 'output';  %cache_data
 mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
-model_name_base = 'vgg16_conv3';  % ZF, vgg16_conv5
+model_name_base = 'vgg16_conv3_4';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_conv3';
+exp_name = 'VGG16_widerface_conv3_4';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -82,7 +82,7 @@ conf_proposal.anchors = proposal_generate_anchors(cache_data_this_model_dir, 'ra
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_conv3(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_conv3_4(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 %% test
 % get predicted rois (bboxes) to be used in later stages
@@ -93,7 +93,7 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_conv
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_conv3(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_conv3_4(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');
