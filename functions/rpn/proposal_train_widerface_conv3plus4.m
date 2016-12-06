@@ -94,8 +94,9 @@ function save_model_path = proposal_train_widerface_conv3plus4(conf, imdb_train,
         %load('output\train_roidb_event123.mat');
         load(train_roi_name);
     catch
+        %1206 changed to make the dimension of conv3 and conv4 compatible
         [image_roidb_train, bbox_means, bbox_stds]...
-                            = proposal_prepare_image_roidb_widerface(conf, opts.imdb_train, opts.roidb_train);
+                            = proposal_prepare_image_roidb_conv3plus4(conf, opts.imdb_train, opts.roidb_train);
         save(train_roi_name, 'image_roidb_train','bbox_means', 'bbox_stds','-v7.3');
     end
     fprintf('Done.\n');
@@ -106,7 +107,7 @@ function save_model_path = proposal_train_widerface_conv3plus4(conf, imdb_train,
             load(test_roi_name);
         catch
             [image_roidb_val]...
-                                = proposal_prepare_image_roidb_widerface(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
+                                = proposal_prepare_image_roidb_conv3plus4(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
             save(test_roi_name, 'image_roidb_val','-v7.3');
         end
         fprintf('Done.\n');
@@ -125,7 +126,7 @@ function save_model_path = proposal_train_widerface_conv3plus4(conf, imdb_train,
      
 %% -------------------- Training -------------------- 
 
-    proposal_generate_minibatch_fun = @proposal_generate_minibatch;
+    proposal_generate_minibatch_fun = @proposal_generate_minibatch_conv3plus4;
 
     % training
     shuffled_inds = [];
@@ -288,7 +289,9 @@ function check_gpu_memory(conf, caffe_solver, do_val)
 %%  try to train/val with images which have maximum size potentially, to validate whether the gpu memory is enough  
 
     % generate pseudo training data with max size
-    im_blob = single(zeros(max(conf.scales), conf.max_size, 3, conf.ims_per_batch));
+    im_size = [max(conf.scales), conf.max_size];
+    im_size = ceil(im_size/8) * 8;
+    im_blob = single(zeros(im_size(1), im_size(2), 3, conf.ims_per_batch));
     
     anchor_num = size(conf.anchors, 1);
     output_width = conf.output_width_map.values({size(im_blob, 1)});

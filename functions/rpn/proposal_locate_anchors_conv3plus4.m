@@ -1,4 +1,4 @@
-function [anchors, im_scales] = proposal_locate_anchors(conf, im_size, target_scale, feature_map_size)
+function [anchors, im_scales] = proposal_locate_anchors_conv3plus4(conf, im_size, target_scale, feature_map_size)
 % [anchors, im_scales] = proposal_locate_anchors(conf, im_size, target_scale, feature_map_size)
 % --------------------------------------------------------
 % Faster R-CNN
@@ -28,6 +28,8 @@ function [anchors, im_scale] = proposal_locate_anchors_single_scale(im_size, con
         im_scale = prep_im_for_blob_size(im_size, target_scale, conf.max_size);
         img_size = round(im_size * im_scale);
         % 1206 added: enlarge the height and width to 8N
+        img_size = ceil(img_size/8)*8;
+        
         output_size = cell2mat([conf.output_height_map.values({img_size(1)}), conf.output_width_map.values({img_size(2)})]);
     else
         im_scale = prep_im_for_blob_size(im_size, target_scale, conf.max_size);
