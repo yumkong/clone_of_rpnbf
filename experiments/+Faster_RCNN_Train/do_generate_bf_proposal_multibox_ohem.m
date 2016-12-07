@@ -74,7 +74,10 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem(conf, model_stage, imd
     gt_re_num_8 = 0;
     gt_re_num_9 = 0;
     for i = 1:length(roidb.rois)
-        aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
+        %aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
+        aboxes{i} = cat(1, aboxes_conv4{i}(aboxes_conv4{i}(:, end) > score_thresh_conv4, :),...
+                           aboxes_conv5{i}(aboxes_conv5{i}(:, end) > score_thresh_conv5, :),...
+                           aboxes_conv6{i}(aboxes_conv6{i}(:, end) > score_thresh_conv6, :));
         %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
         gts = roidb.rois(i).boxes;
         if ~isempty(gts)
