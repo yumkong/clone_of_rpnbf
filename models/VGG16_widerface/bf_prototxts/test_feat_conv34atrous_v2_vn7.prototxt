@@ -27,7 +27,6 @@ layer {
 		num_output: 64
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
 	}
 }
 
@@ -53,7 +52,6 @@ layer {
 		num_output: 64
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
 	}
 }
 
@@ -91,7 +89,6 @@ layer {
 		num_output: 128
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
 	}
 }
 
@@ -117,7 +114,6 @@ layer {
 		num_output: 128
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
 	}
 }
 
@@ -155,7 +151,6 @@ layer {
 		num_output: 256
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
 	}
 }
 
@@ -181,7 +176,6 @@ layer {
 		num_output: 256
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
 	}
 }
 
@@ -207,7 +201,6 @@ layer {
 		num_output: 256
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
 	}
 }
 
@@ -246,7 +239,6 @@ layer {
 		pad: 2
 		kernel_size: 3
 		dilation: 2  #filter_stride: 2
-		#engine: CUDNN
 	}
 }
 
@@ -273,7 +265,6 @@ layer {
 		pad: 2
 		kernel_size: 3
 		dilation: 2  #filter_stride: 2
-		#engine: CUDNN
 	}
 }
 
@@ -300,7 +291,6 @@ layer {
 		pad: 2
 		kernel_size: 3
 		dilation: 2  #filter_stride: 2
-		#engine: CUDNN
 	}
 }
 
