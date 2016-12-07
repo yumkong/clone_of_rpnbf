@@ -285,5 +285,7 @@ gt recall rate after nms-3 = 0.3967
 (2) conv3_4  afternms-100
 gt recall rate = 0.5950
 gt recall rate after nms-3 = 0.4695
-
+(3) conv3plus4 afternms-100 (thresh: 0.943959)
+gt recall rate = 0.6122
+gt recall rate after nms-3 = 0.5055
 https://groups.google.com/forum/#!topic/caffe-users/owQEvAhP7gM

@@ -284,7 +284,7 @@ layer {
 	type: "Pooling"
 	pooling_param {
 		pool: MAX
-		kernel_size: 3
+		kernel_size: 2
 		stride: 2
 		#pad: 1
 	}

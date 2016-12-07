@@ -1,4 +1,4 @@
-function [output_width_map, output_height_map] = proposal_calc_output_size(conf, test_net_def_file, output_map_save_name)
+function [output_width_map, output_height_map] = proposal_calc_output_size_conv3plus4(conf, test_net_def_file, output_map_save_name)
 % [output_width_map, output_height_map] = proposal_calc_output_size(conf, test_net_def_file)
 % --------------------------------------------------------
 % Faster R-CNN
@@ -25,16 +25,15 @@ function [output_width_map, output_height_map] = proposal_calc_output_size(conf,
         else
             caffe.set_mode_cpu();
         end
-        %input = 100:conf.max_size;
-        input = 100:conf.max_size+10;
+        input = 100:conf.max_size+10;  %100:1510
         output_w = nan(size(input));
         output_h = nan(size(input));
         for i = 1:length(input)
             fprintf('calulating input size %d / %d\n',i,conf.max_size);
-            s = input(i);
+            s = ceil(input(i)/8)*8;
             %liu@0926 changed,because when s>= 1000, s x s is too big to feed to a net
             %im_blob = single(zeros(s, s, 3, 1));
-            im_blob = single(zeros(s, 500, 3, 1));
+            im_blob = single(zeros(s, 504, 3, 1));
             net_inputs = {im_blob};
 
             % Reshape net's input blobs
