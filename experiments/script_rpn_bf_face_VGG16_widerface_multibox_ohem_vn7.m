@@ -11,7 +11,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_rfcn_win_multibox_ohem'; %caffe_rfcn_win_ohem_final
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_dilate'; %'caffe_rfcn_win_multibox_ohem'; %'caffe_faster_rcnn_win_cudnn'; %
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
@@ -198,7 +198,7 @@ opts.exp_name = exp_name;
 opts.fg_nms_thres = 1;
 opts.fg_use_gt = true;
 opts.bg_nms_thres = 1;
-opts.max_rois_num_in_gpu = 1;%3000--> 1
+opts.max_rois_num_in_gpu = 3000;%3000--> 1
 opts.init_detector = '';
 opts.load_gt = false;
 opts.ratio = 2.0;  %1018: 1.0 --> 2.0: left-0.5*width, right+0.5*width, top-0.2*height, bottom + 0.8height

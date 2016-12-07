@@ -11,7 +11,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn';
+    opts.caffe_version          = 'caffe_rfcn_win_multibox_ohem'; %'caffe_faster_rcnn_win_cudnn';
     cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn';
@@ -103,7 +103,7 @@ posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be repla
 addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 %addpath(fullfile('..','external', 'toolbox'));
-BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
+BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_v2_vn7.prototxt');
 %BF_prototxt_path = fullfile('..','models', exp_name, 'bf_prototxts', 'test_feat_conv34atrous_v2.prototxt');
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
