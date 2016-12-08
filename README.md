@@ -289,3 +289,11 @@ gt recall rate after nms-3 = 0.4695
 gt recall rate = 0.6122
 gt recall rate after nms-3 = 0.5055
 https://groups.google.com/forum/#!topic/caffe-users/owQEvAhP7gM
+
+
+------------------------- Iteration 1000 -------------------------
+Training : error 0.449, loss (cls 0.698, reg 0.0942)
+Testing  : error 0.604, loss (cls 0.698, reg 0.0486)
+------------------------- Iteration 2000 -------------------------
+Training : error 0.461, loss (cls 0.698, reg 0.0936)
+Testing  : error 0.396, loss (cls 0.681, reg 0.049)
