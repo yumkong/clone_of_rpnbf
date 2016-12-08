@@ -26,7 +26,8 @@ function [im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_blob] = 
     % build the region of interest and label blobs
     rois_blob = zeros(0, 5, 'single');
     labels_blob = zeros(0, 1, 'single');
-    bbox_targets_blob = zeros(0, 4 * (num_classes+1), 'single');
+    %bbox_targets_blob = zeros(0, 4 * (num_classes+1), 'single');
+    bbox_targets_blob = zeros(0, 4 * (num_classes), 'single');
     bbox_loss_blob = zeros(size(bbox_targets_blob), 'single');
     
     for i = 1:num_images
@@ -138,15 +139,19 @@ function [bbox_targets, bbox_loss_weights] = get_bbox_regression_labels(conf, bb
  % by the network (i.e. only one class has non-zero targets).
  % The loss weights are similarly expanded.
 % Return (N, (num_classes+1) * 4, 1, 1) blob of regression targets
-% Return (N, (num_classes+1 * 4, 1, 1) blob of loss weights
+% Return (N, (num_classes+1) * 4, 1, 1) blob of loss weights
     clss = bbox_target_data(:, 1);
-    bbox_targets = zeros(length(clss), 4 * (num_classes+1), 'single');
+    %1208 changed
+    %bbox_targets = zeros(length(clss), 4 * (num_classes+1), 'single');
+    bbox_targets = zeros(length(clss), 4 * (num_classes), 'single');
     bbox_loss_weights = zeros(size(bbox_targets), 'single');
     inds = find(clss > 0);
     for i = 1:length(inds)
        ind = inds(i);
        cls = clss(ind);
-       targets_inds = (1+cls*4):((cls+1)*4);
+       %1208 changed: 8--> 4
+       %targets_inds = (1+cls*4):((cls+1)*4);
+       targets_inds = (1):(cls*4);
        bbox_targets(ind, targets_inds) = bbox_target_data(ind, 2:end);
        bbox_loss_weights(ind, targets_inds) = 1;  
     end
