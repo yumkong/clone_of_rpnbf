@@ -228,7 +228,9 @@ function check_gpu_memory(conf, caffe_solver, num_classes, do_val)
     rois_blob = permute(rois_blob, [3, 4, 1, 2]);
     labels_blob = single(ones(conf.batch_size, 1));
     labels_blob = permute(labels_blob, [3, 4, 2, 1]);
-    bbox_targets_blob = zeros(4 * (num_classes+1), conf.batch_size, 'single');
+    %1208 changed: 8-->4
+    %bbox_targets_blob = zeros(4 * (num_classes+1), conf.batch_size, 'single');
+    bbox_targets_blob = zeros(4 * (num_classes), conf.batch_size, 'single');
     bbox_targets_blob = single(permute(bbox_targets_blob, [3, 4, 1, 2])); 
     bbox_loss_weights_blob = bbox_targets_blob;
     
