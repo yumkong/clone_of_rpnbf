@@ -89,8 +89,9 @@ function save_model_path = fast_rcnn_train_widerface(conf, imdb_train, roidb_tra
     end
     
 %%  try to train/val with images which have maximum size potentially, to validate whether the gpu memory is enough  
-    num_classes = size(image_roidb_train(1).overlap, 2);
-    check_gpu_memory(conf, caffe_solver, num_classes, opts.do_val);
+    %1207 temperarily masked, open it when officially training
+    %num_classes = size(image_roidb_train(1).overlap, 2);
+    %check_gpu_memory(conf, caffe_solver, num_classes, opts.do_val);
     
 %% training
     shuffled_inds = [];
@@ -112,7 +113,7 @@ function save_model_path = fast_rcnn_train_widerface(conf, imdb_train, roidb_tra
         % generate minibatch training data
         [shuffled_inds, sub_db_inds] = generate_random_minibatch(shuffled_inds, image_roidb_train, conf.ims_per_batch);
         [im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob] = ...
-            fast_rcnn_get_minibatch(conf, image_roidb_train(sub_db_inds));
+            fast_rcnn_get_minibatch_ohem(conf, image_roidb_train(sub_db_inds));
 
         net_inputs = {im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
         caffe_solver.net.reshape_as_input(net_inputs);

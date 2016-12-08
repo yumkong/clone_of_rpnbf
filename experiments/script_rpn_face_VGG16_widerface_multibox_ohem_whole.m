@@ -95,8 +95,8 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 fprintf('\n***************\nstage one RPN \n***************\n');
 model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_multibox_ohem(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 % 1207: use rpn's result to update roidb_train and roidb_test
-dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_whole(conf_proposal, model.stage1_rpn, x, y, train_file_suffix, train_save_dir), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
-dataset.roidb_test       	= Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_whole(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, test_file_suffix, test_save_dir);
+dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_whole(conf_proposal, model.stage1_rpn, x, y), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
+dataset.roidb_test       	= Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_whole(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test);
 
 % liu@0816 masked --> not necessary currently
 %%  stage one fast rcnn
