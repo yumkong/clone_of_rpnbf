@@ -432,7 +432,7 @@ else
    rand_idx = randperm(length(rois));  %randomly shuffle the order of neg images, to extract bbox with large variance
    for i = 1:length(rand_idx)
        idx = rand_idx(i);
-       fprintf('Begin sampling hard negs from image %d\n', idx);
+       %fprintf('Begin sampling hard negs from image %d\n', idx);
        tic
        if mod(i, 100) == 0
        		% n = max samples that can be extracted this time
@@ -487,7 +487,7 @@ else
            % 1203 change back to rois_get_features_ratio
            sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
            %1206 added
-           fprintf('Extract deep feat of %d neg samples COSTS %.2f seconds\n', size(sel_box,1), toc);
+           %fprintf('Extract deep feat of %d neg samples COSTS %.2f seconds\n', size(sel_box,1), toc);
            if ~isempty(sel_idx)               
                scores = DeepDetect_otf_trans(sel_feat, sel_scores, detector);
                hard_idx = scores > detector.opts.cascThr;
@@ -495,7 +495,7 @@ else
                sel_feat = sel_feat(hard_idx, :);
            end
            %1206 added
-           fprintf('Use current BF detector to rescore neg samples and select hard ones COSTS %.2f seconds\n', toc);
+           %fprintf('Use current BF detector to rescore neg samples and select hard ones COSTS %.2f seconds\n', toc);
        else % for the first stage
            im = imread(opts.imdb_train.image_at(idx)); 
            retain_idx = randperm(length(sel_idx), min(opts.nPerNeg, length(sel_idx)));
@@ -523,7 +523,7 @@ else
            break;  %1020: stop criterion
        end
        %1206 added
-       fprintf('End sampling hard negs from image %d TOTALLY COSTS %.2f seconds\n', idx, toc);
+       %fprintf('End sampling hard negs from image %d TOTALLY COSTS %.2f seconds\n', idx, toc);
    end
    if bg_feat_idx < n
        feats = bg_feat(1:bg_feat_idx-1, :);
