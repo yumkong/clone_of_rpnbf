@@ -90,8 +90,9 @@ function save_model_path = fast_rcnn_train_widerface(conf, imdb_train, roidb_tra
     
 %%  try to train/val with images which have maximum size potentially, to validate whether the gpu memory is enough  
     %1207 temperarily masked, open it when officially training
-    %num_classes = size(image_roidb_train(1).overlap, 2);
-    %check_gpu_memory(conf, caffe_solver, num_classes, opts.do_val);
+    %1208 reopen
+    num_classes = size(image_roidb_train(1).overlap, 2);
+    check_gpu_memory(conf, caffe_solver, num_classes, opts.do_val);
     
 %% training
     shuffled_inds = [];

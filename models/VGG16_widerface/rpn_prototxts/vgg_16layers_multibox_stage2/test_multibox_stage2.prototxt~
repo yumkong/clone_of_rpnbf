@@ -359,7 +359,7 @@ layer {
 }
 
 layer {
-	bottom: "conv4_3_norm"
+	bottom: "conv4_3"
 	bottom: "rois"
 	top: "roi_pool4_3"
 	name: "roi_pool4_3"
