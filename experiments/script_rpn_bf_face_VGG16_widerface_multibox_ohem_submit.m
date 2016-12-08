@@ -11,7 +11,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_rfcn_win_multibox_ohem'; %caffe_rfcn_win_ohem_final
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_dilate'; %'caffe_rfcn_win_multibox_ohem'; %caffe_rfcn_win_ohem_final
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
@@ -44,7 +44,11 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ohem';
+if ispc
+    exp_name = 'VGG16_widerface_multibox_ohem_all';
+else
+    exp_name = 'VGG16_widerface_multibox_ohem';
+end
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);

@@ -21,15 +21,15 @@ function conf = fast_rcnn_config_widerface(varargin)
     % Images per batch
     ip.addParamValue('ims_per_batch',   1,              @isscalar); %2-->1
     % Minibatch size
-    ip.addParamValue('batch_size',      256,            @isscalar);  %32
+    ip.addParamValue('batch_size',      128,            @isscalar);  %1207: 256 --> 128
     % Fraction of minibatch that is foreground labeled (class > 0)
-    ip.addParamValue('fg_fraction',     0.25,           @isscalar);
+    ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1207: 32 faces for an average image
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)
-    ip.addParamValue('fg_thresh',       0.5,            @isscalar);
+    ip.addParamValue('fg_thresh',       0.6,            @isscalar);%1207: 0.5--> 0.6
     % Overlap threshold for a ROI to be considered background (class = 0 if
     % overlap in [bg_thresh_lo, bg_thresh_hi))
-    ip.addParamValue('bg_thresh_hi',    0.5,            @isscalar);
-    ip.addParamValue('bg_thresh_lo',    0.1,            @isscalar);
+    ip.addParamValue('bg_thresh_hi',    0.3,            @isscalar);%1207: 0.5--> 0.3
+    ip.addParamValue('bg_thresh_lo',    0,            @isscalar);  %1207: 0.1--> 0
     % mean image, in RGB order
     ip.addParamValue('image_means',     128,            @ismatrix);
     % Use horizontally-flipped images during training?

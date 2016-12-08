@@ -34,6 +34,7 @@ function [im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_blob] = 
             sample_rois(conf, image_roidb(i), fg_rois_per_image, rois_per_image);
         
         % Add to ROIs blob
+        %1207: extend to [left, top, right, bottom] = [-0.5 -0.2 0.5 0.8]
         feat_rois = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scales(i), image_roidb.im_size);
         batch_ind = i * ones(size(feat_rois, 1), 1);
         rois_blob_this_image = [batch_ind, feat_rois];
