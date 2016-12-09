@@ -77,8 +77,11 @@ function [image_roidb, means, stds] = append_bbox_regression_targets(conf, image
         stds = (bsxfun(@minus, bsxfun(@rdivide, squared_sums, class_counts), means.^2)).^0.5;
         
         % add background class
-        means = [0, 0, 0, 0; means]; 
-        stds = [0, 0, 0, 0; stds];
+        % 1209 changed: 8--> 4
+        %means = [0, 0, 0, 0; means]; 
+        %stds = [0, 0, 0, 0; stds];
+        %means = [means]; 
+        %stds = [stds];
     end
     
     % Normalize targets
@@ -87,10 +90,15 @@ function [image_roidb, means, stds] = append_bbox_regression_targets(conf, image
         for cls = 1:num_classes
             cls_inds = find(targets(:, 1) == cls);
             if ~isempty(cls_inds)
+                %1209 added
+%                 image_roidb(i).bbox_targets(cls_inds, 2:end) = ...
+%                     bsxfun(@minus, image_roidb(i).bbox_targets(cls_inds, 2:end), means(cls+1, :));
+%                 image_roidb(i).bbox_targets(cls_inds, 2:end) = ...
+%                     bsxfun(@rdivide, image_roidb(i).bbox_targets(cls_inds, 2:end), stds(cls+1, :));
                 image_roidb(i).bbox_targets(cls_inds, 2:end) = ...
-                    bsxfun(@minus, image_roidb(i).bbox_targets(cls_inds, 2:end), means(cls+1, :));
+                    bsxfun(@minus, image_roidb(i).bbox_targets(cls_inds, 2:end), means(cls, :));
                 image_roidb(i).bbox_targets(cls_inds, 2:end) = ...
-                    bsxfun(@rdivide, image_roidb(i).bbox_targets(cls_inds, 2:end), stds(cls+1, :));
+                    bsxfun(@rdivide, image_roidb(i).bbox_targets(cls_inds, 2:end), stds(cls, :));
             end
         end
     end

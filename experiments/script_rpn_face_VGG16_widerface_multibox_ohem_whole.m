@@ -33,7 +33,7 @@ exp_name = 'VGG16_widerface';
 opts.do_val                 = true; 
 % model
 %model                       = Model.VGG16_for_rpn_widerface_multibox_ohem(exp_name);
-model                       = Model.VGG16_for_rpn_widerface_multibox_ohem_whole(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox_ohem_whole_unshared(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -102,7 +102,10 @@ dataset.roidb_test       	= Faster_RCNN_Train.do_generate_bf_proposal_multibox_o
 %%  stage one fast rcnn
 fprintf('\n***************\nstage one fast rcnn\n***************\n');
 % train
+%shared
 model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % init with trained rpn model
+%unshared
+%model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.init_net_file;
 model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
 % test
 opts.mAP                    = Faster_RCNN_Train.do_fast_rcnn_test_widerface(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
