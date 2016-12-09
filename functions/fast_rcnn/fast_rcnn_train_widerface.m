@@ -144,7 +144,7 @@ function save_model_path = fast_rcnn_train_widerface(conf, imdb_train, roidb_tra
                 for i = 1:length(shuffled_inds_val)
                     sub_db_inds = shuffled_inds_val{i};
                     [im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob] = ...
-                        fast_rcnn_get_minibatch(conf, image_roidb_val(sub_db_inds));
+                        fast_rcnn_get_minibatch_ohem(conf, image_roidb_val(sub_db_inds));
 
                     % Reshape net's input blobs
                     net_inputs = {im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
