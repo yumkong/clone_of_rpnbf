@@ -247,58 +247,88 @@ if nms_option >=3
             end
         end
     end
-
+    
     % merge nearby detections
     [label, numCandidates] = Partition(predicate);
-    %rects = zeros(numCandidates, 5); % output rects
-    rects = []; % output rects
+    rects = zeros(numCandidates, 5); % output rects
+
     for i = 1 : numCandidates
         index = find(label == i);
-        if numel(index) == 1
-            % direct assign for singleton rect
-            %rects(i, :) = candi_rects(index, :);
-            rects = cat(1, rects, candi_rects(index, :));
-        else
-            combined_flag = false(length(index),1);
-            new_rects = candi_rects(index,:);
-            % sort the rects by descending score
-            [~, idx1] = sort(new_rects(:,5), 'descend');
-            new_rects = new_rects(idx1,:);
-            % index -- cluster index
-            local_w_all = new_rects(:,3) - new_rects(:,1) + 1;
-            local_h_all = new_rects(:,4) - new_rects(:,2) + 1;
-            local_x_all = (new_rects(:,3) + new_rects(:,1))/2;
-            local_y_all = (new_rects(:,4) + new_rects(:,2))/2;
-            if std(local_x_all) >= 0.3 * mean(local_w_all) || std(local_y_all) >= 0.3 * mean(local_h_all)
-                stop_num = 2;  % since std is large, guess there are 2 faces
-            else
-                stop_num = 1;  % guess there is only one face
-            end
- 
-            cnt = 0;
-            local_area_all = (new_rects(:,3) - new_rects(:,1) + 1) .* (new_rects(:,4) - new_rects(:,2) + 1);
-            for ii = 1:length(index)
-                if ~combined_flag(ii)
-                    rects_one = new_rects(ii, :);
-                    h = min(rects_one(4), new_rects(:,4)) - max(rects_one(2), new_rects(:,2)) + 1;
-                    w = min(rects_one(3), new_rects(:,3)) - max(rects_one(1), new_rects(:,1)) + 1;
-                    s = max(h,0) .* max(w,0);
-                    % 1006 changed to make it more strict
-                    nearby_idx = s ./ (local_area_all(ii) + local_area_all - s) >= 0.7;
-                    combined_flag(nearby_idx) = true;
-                    % use ii to represent all nearby boxes
-                    rects = cat(1, rects, new_rects(ii, :));
-                    cnt = cnt+1;
-                    combined_flag(ii) = true;
-                end
-                if cnt >= stop_num
-                   break; %only keep one or two bboxes 
-                end
-            end
-        end
+        %weight = Logistic([candi_rects(index).score]');
+        % now a row vector
+        %weight = candi_rects(index, 5)';
+        weight = candi_rects(index, 5);
+        rects(i,5) = max( weight );  %1006: sum --> max
+        %weight = weight .^ 3; %make big score bigger and small score smaller
+
+        %normalize weight
+        weight = weight / sum(weight);
+
+        ave_center_x = weight' * (candi_rects(index, 1) + candi_rects(index, 3))/2;
+        ave_center_y = weight' * (candi_rects(index, 2) + candi_rects(index, 4))/2;
+        ave_w = weight' * (candi_rects(index, 3) - candi_rects(index, 1) + 1);
+        ave_h = weight' * (candi_rects(index, 4) - candi_rects(index, 2) + 1);
+        %1007 no rounding, single value is ok
+        rects(i,1) = ave_center_x - (ave_w-1)/2; %round(ave_center_x - (ave_w-1)/2);
+        rects(i,2) = ave_center_y - (ave_h-1)/2; %round(ave_center_y - (ave_h-1)/2);
+        rects(i,3) = ave_center_x + (ave_w-1)/2; %round(ave_center_x + (ave_w-1)/2);
+        rects(i,4) = ave_center_y + (ave_h-1)/2; %round(ave_center_y + (ave_h-1)/2);
+        %rects(i,1:4) = candi_rects(index(idx), 1:4);
     end
 
 end
+
+%     % merge nearby detections
+%     [label, numCandidates] = Partition(predicate);
+%     %rects = zeros(numCandidates, 5); % output rects
+%     rects = []; % output rects
+%     for i = 1 : numCandidates
+%         index = find(label == i);
+%         if numel(index) == 1
+%             % direct assign for singleton rect
+%             %rects(i, :) = candi_rects(index, :);
+%             rects = cat(1, rects, candi_rects(index, :));
+%         else
+%             combined_flag = false(length(index),1);
+%             new_rects = candi_rects(index,:);
+%             % sort the rects by descending score
+%             [~, idx1] = sort(new_rects(:,5), 'descend');
+%             new_rects = new_rects(idx1,:);
+%             % index -- cluster index
+%             local_w_all = new_rects(:,3) - new_rects(:,1) + 1;
+%             local_h_all = new_rects(:,4) - new_rects(:,2) + 1;
+%             local_x_all = (new_rects(:,3) + new_rects(:,1))/2;
+%             local_y_all = (new_rects(:,4) + new_rects(:,2))/2;
+%             if std(local_x_all) >= 0.3 * mean(local_w_all) || std(local_y_all) >= 0.3 * mean(local_h_all)
+%                 stop_num = 2;  % since std is large, guess there are 2 faces
+%             else
+%                 stop_num = 1;  % guess there is only one face
+%             end
+%  
+%             cnt = 0;
+%             local_area_all = (new_rects(:,3) - new_rects(:,1) + 1) .* (new_rects(:,4) - new_rects(:,2) + 1);
+%             for ii = 1:length(index)
+%                 if ~combined_flag(ii)
+%                     rects_one = new_rects(ii, :);
+%                     h = min(rects_one(4), new_rects(:,4)) - max(rects_one(2), new_rects(:,2)) + 1;
+%                     w = min(rects_one(3), new_rects(:,3)) - max(rects_one(1), new_rects(:,1)) + 1;
+%                     s = max(h,0) .* max(w,0);
+%                     % 1006 changed to make it more strict
+%                     nearby_idx = s ./ (local_area_all(ii) + local_area_all - s) >= 0.7;
+%                     combined_flag(nearby_idx) = true;
+%                     % use ii to represent all nearby boxes
+%                     rects = cat(1, rects, new_rects(ii, :));
+%                     cnt = cnt+1;
+%                     combined_flag(ii) = true;
+%                 end
+%                 if cnt >= stop_num
+%                    break; %only keep one or two bboxes 
+%                 end
+%             end
+%         end
+%     end
+% 
+% end
 if nms_debug
     figure(5),clf;
     imshow(img);  %im(img)

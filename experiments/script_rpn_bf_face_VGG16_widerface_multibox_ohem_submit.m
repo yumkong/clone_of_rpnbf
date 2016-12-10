@@ -276,9 +276,51 @@ for i = 1:length(rois)
         sel_idx = (1:size(bbs,1))'; %'
         sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
 
-        bbs = bbs(sel_idx, :);
+        bbs_ori = bbs(sel_idx, :);
+        
+%         bbs_gt = rois(i).boxes(rois(i).gt,:);
+%         bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+%         bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+%         bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+%         % if a box has only 1 pixel in either size, remove it
+%         invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+%         bbs_gt(invalid_idx, :) = [];
+%         %1019 added: do nms here
+%         bbs = pseudoNMS_v6(bbs_ori, nms_option);
+        % print the bbox number
+%        fprintf(fid, '%d\n', size(bbs, 1));
+%         if ~isempty(bbs)
+%             for j = 1:size(bbs,1)
+%                 %each row: [x1 y1 w h score]
+%                 fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+%             end
+%         end
+        
+        if show_image
+            if ~isempty(bbs)
+                %1209: filter low scoring bboxes
+                %mean_score = mean(bbs(:,5));
+                bbs = bbs(bbs(:,5)>=10, :);  %0.8 * mean_score
+
+                figure(1); 
+                im(img);
+                bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+                bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+                %1209 added: display new score + old score
+                %bbs = [bbs scores(sel_idx,:)];
+                bbApply('draw',bbs, 'g');% pause();
+            end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
+        end
+        
+        
         %1019 added: do nms here
-        bbs = pseudoNMS_v6(bbs, nms_option);
+        bbs = pseudoNMS_v8(bbs_ori, nms_option);
+        if ~isempty(bbs)
+            bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
+        end
         % print the bbox number
         fprintf(fid, '%d\n', size(bbs, 1));
         if ~isempty(bbs)
@@ -287,11 +329,24 @@ for i = 1:length(rois)
                 fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
             end
         end
+        
+        if show_image 
+            if ~isempty(bbs)
+                %1209: filter low scoring bboxes
+                %mean_score = mean(bbs(:,5));
+                bbs = bbs(bbs(:,5)>=10, :);
 
-        if show_image && ~isempty(bbs)
-            figure(1); 
-            im(img);
-            bbApply('draw',bbs); pause();
+                figure(2); 
+                im(img);
+                bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+                bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+                %1209 added: display new score + old score
+                %bbs = [bbs scores(sel_idx,:)];
+                bbApply('draw',bbs);% pause();
+            end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
         end
     end
     fclose(fid);

@@ -1,4 +1,4 @@
-function detector = DeepTrain_otf_trans_ratio( varargin )
+function detector = DeepTrain_otf_trans_ratio_twopath( varargin )
 % Train aggregate channel features object detector.
 %
 % Train aggregate channel features (ACF) object detector as described in:
@@ -403,8 +403,8 @@ if positive
                 % liu@1001: max_rois_num_in_gpu -- how many roi features can be extract at one pass,
                 % if the total features are larger than this, will divide it into several parts to extract gradually
                 %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
-                % 1203 change back to rois_get_features_ratio
-                fg_feat_cell{idx} = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_boxes, opts.max_rois_num_in_gpu, opts.ratio);
+                %1210: rois_get_features_ratio --> rois_get_features_ratio_twopath
+                fg_feat_cell{idx} = rois_get_features_ratio_twopath(opts.conf, opts.caffe_net, im, sel_boxes, opts.max_rois_num_in_gpu, opts.ratio);
 %                 assert(size(fg_feat_cell{idx}, 2)==opts.feat_len, sprintf('assert fail: feat_len should set to %d', size(fg_feat_cell{idx}, 2)));
                 fg_score_cell{idx} =  rois(idx).scores(sel_idx);
             end
@@ -432,6 +432,8 @@ else
    rand_idx = randperm(length(rois));  %randomly shuffle the order of neg images, to extract bbox with large variance
    for i = 1:length(rand_idx)
        idx = rand_idx(i);
+       %fprintf('Begin sampling hard negs from image %d\n', idx);
+       %tic
        if mod(i, 100) == 0
        		% n = max samples that can be extracted this time
        		% bg_feat_idx = till now have many neg boxes have been samples
@@ -482,27 +484,28 @@ else
            end 
            im = imread(opts.imdb_train.image_at(idx)); 
            %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
-           % 1203 change back to rois_get_features_ratio
-           sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
-           
+           %1210 rois_get_features_ratio --> rois_get_features_ratio_twopath
+           sel_feat = rois_get_features_ratio_twopath(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
+           %1206 added
+           %fprintf('Extract deep feat of %d neg samples COSTS %.2f seconds\n', size(sel_box,1), toc);
            if ~isempty(sel_idx)               
                scores = DeepDetect_otf_trans(sel_feat, sel_scores, detector);
                hard_idx = scores > detector.opts.cascThr;
                sel_idx = sel_idx(hard_idx);
                sel_feat = sel_feat(hard_idx, :);
            end
+           %1206 added
+           %fprintf('Use current BF detector to rescore neg samples and select hard ones COSTS %.2f seconds\n', toc);
        else % for the first stage
            im = imread(opts.imdb_train.image_at(idx)); 
            retain_idx = randperm(length(sel_idx), min(opts.nPerNeg, length(sel_idx)));
            sel_idx = sel_idx(retain_idx);
            sel_box = rois(idx).boxes(sel_idx, :);
            %1027 changed: rois_get_features_ratio --> rois_get_features_ratio2
-           % 1203 change back to rois_get_features_ratio
-           sel_feat = rois_get_features_ratio(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
+           %1210 rois_get_features_ratio --> rois_get_features_ratio_twopath
+           sel_feat = rois_get_features_ratio_twopath(opts.conf, opts.caffe_net, im, sel_box, opts.max_rois_num_in_gpu, opts.ratio);
        end
-       
-       
-       
+
 %        disp(length(sel_idx));
        if length(sel_idx) > opts.nPerNeg
            retain_idx = randperm(length(sel_idx), opts.nPerNeg);
@@ -519,7 +522,8 @@ else
        if bg_feat_idx > n
            break;  %1020: stop criterion
        end
-       
+       %1206 added
+       %fprintf('End sampling hard negs from image %d TOTALLY COSTS %.2f seconds\n', idx, toc);
    end
    if bg_feat_idx < n
        feats = bg_feat(1:bg_feat_idx-1, :);
