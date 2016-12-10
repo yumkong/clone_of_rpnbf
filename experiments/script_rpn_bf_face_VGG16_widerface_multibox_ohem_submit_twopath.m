@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_multibox_ohem_vn7()
+function script_rpn_bf_face_VGG16_widerface_multibox_ohem_submit_twopath()
 
 clc;
 clear mex;
@@ -11,13 +11,13 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_dilate'; %'caffe_rfcn_win_multibox_ohem'; %'caffe_faster_rcnn_win_cudnn'; %
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_dilate'; %'caffe_rfcn_win_multibox_ohem'; %caffe_rfcn_win_ohem_final
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_rfcn_ohem_final_noprint'; %'caffe_faster_rcnn_rfcn_normlayer'
+    opts.caffe_version          = 'caffe_faster_rcnn_dilate'; %'caffe_faster_rcnn_rfcn_ohem_final_noprint';
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -44,7 +44,11 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ohem_all';
+if ispc
+    exp_name = 'VGG16_widerface_multibox_ohem_all';
+else
+    exp_name = 'VGG16_widerface_multibox_ohem';
+end
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -120,7 +124,7 @@ model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %10
 roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
-BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir');
+BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_twopath');
 mkdir_if_missing(BF_cachedir);
 dataDir = fullfile('datasets','caltech');                % Caltech ==> to be replaced?
 %posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
@@ -188,7 +192,7 @@ opts.roidb_test = roidb_test_BF;
 opts.imdb_train = dataset.imdb_train{1};
 opts.imdb_test = dataset.imdb_test;
 opts.fg_thres_hi = 1;
-opts.fg_thres_lo = 0.6; %[lo, hi) 1018: 0.8 --> 0.5 --> 0.6 (1203)
+opts.fg_thres_lo = 0.5; %[lo, hi) 1018: 0.8 --> 0.5 --> 0.6 (1203) --> 0.5 (1210)
 opts.bg_thres_hi = 0.3; %1018: 0.5 --> 0.3
 opts.bg_thres_lo = 0; %[lo hi)
 opts.dataDir = dataDir;
@@ -198,7 +202,7 @@ opts.exp_name = exp_name;
 opts.fg_nms_thres = 1;
 opts.fg_use_gt = true;
 opts.bg_nms_thres = 1;
-opts.max_rois_num_in_gpu = 3000;%3000--> 1
+opts.max_rois_num_in_gpu = 3000;
 opts.init_detector = '';
 opts.load_gt = false;
 opts.ratio = 2.0;  %1018: 1.0 --> 2.0: left-0.5*width, right+0.5*width, top-0.2*height, bottom + 0.8height
@@ -223,7 +227,7 @@ end
 tmp_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
 % liu@1001: extract deep features from tmp_box
 % opts.max_rois_num_in_gpu = 3000, opts.ratio = 1
-feat = rois_get_features_ratio(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
+feat = rois_get_features_ratio_twopath(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
 toc;
 opts.feat_len = size(feat,2); %1203 changed: length(feat)
 
@@ -246,7 +250,7 @@ end
 opts.train_gts = train_gts;
 
 % train BF detector
-detector = DeepTrain_otf_trans_ratio( opts );
+detector = DeepTrain_otf_trans_ratio_twopath( opts );
 
 %===============  save the final result (after BF) here to submit to
 %widerface evaluation code
@@ -265,16 +269,58 @@ for i = 1:length(rois)
     fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
     if ~isempty(rois(i).boxes)
         img = imread(dataset.imdb_test.image_at(i));  
-        feat = rois_get_features_ratio(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
+        feat = rois_get_features_ratio_twopath(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
         scores = adaBoostApply(feat, detector.clf);
         bbs = [rois(i).boxes scores];
 
         sel_idx = (1:size(bbs,1))'; %'
         sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
 
-        bbs = bbs(sel_idx, :);
+        bbs_ori = bbs(sel_idx, :);
+        
+%         bbs_gt = rois(i).boxes(rois(i).gt,:);
+%         bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+%         bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+%         bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+%         % if a box has only 1 pixel in either size, remove it
+%         invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+%         bbs_gt(invalid_idx, :) = [];
+%         %1019 added: do nms here
+%         bbs = pseudoNMS_v6(bbs_ori, nms_option);
+        % print the bbox number
+%        fprintf(fid, '%d\n', size(bbs, 1));
+%         if ~isempty(bbs)
+%             for j = 1:size(bbs,1)
+%                 %each row: [x1 y1 w h score]
+%                 fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+%             end
+%         end
+        
+        if show_image
+            if ~isempty(bbs)
+                %1209: filter low scoring bboxes
+                %mean_score = mean(bbs(:,5));
+                bbs = bbs(bbs(:,5)>=10, :);  %0.8 * mean_score
+
+                figure(1); 
+                im(img);
+                bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+                bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+                %1209 added: display new score + old score
+                %bbs = [bbs scores(sel_idx,:)];
+                bbApply('draw',bbs, 'g');% pause();
+            end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
+        end
+        
+        
         %1019 added: do nms here
-        bbs = pseudoNMS_v6(bbs, nms_option);
+        bbs = pseudoNMS_v8(bbs_ori, nms_option);
+        if ~isempty(bbs)
+            bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
+        end
         % print the bbox number
         fprintf(fid, '%d\n', size(bbs, 1));
         if ~isempty(bbs)
@@ -283,11 +329,24 @@ for i = 1:length(rois)
                 fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
             end
         end
+        
+        if show_image 
+            if ~isempty(bbs)
+                %1209: filter low scoring bboxes
+                %mean_score = mean(bbs(:,5));
+                bbs = bbs(bbs(:,5)>=10, :);
 
-        if show_image && ~isempty(bbs)
-            figure(1); 
-            im(img);
-            bbApply('draw',bbs); pause();
+                figure(2); 
+                im(img);
+                bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+                bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+                %1209 added: display new score + old score
+                %bbs = [bbs scores(sel_idx,:)];
+                bbApply('draw',bbs);% pause();
+            end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
         end
     end
     fclose(fid);

@@ -6,6 +6,8 @@ function [feats] = rois_get_features_ratio2(conf, caffe_net, im, boxes, max_rois
 % Copyright (c) 2015, Shaoqing Ren
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------
+% 1027 added for double rois feature (small context: [l r t b] = [0.5w 0.5w 0.2h 0.8h]
+%                                    + big  context: [l r t b] = [1w   1w   0.2h  3h ])
 
     boxes_cxt = boxes; %1027 added full body context
     % liu@1001: ratio = 1, so no bbox width and height changes
