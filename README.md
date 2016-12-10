@@ -282,7 +282,7 @@ conv3 series:
 (1) conv3  afternms-100
 gt recall rate = 0.5317
 gt recall rate after nms-3 = 0.3967
-(2) conv3_4  afternms-100
+(2) conv3_4 (aka conv4) afternms-100
 gt recall rate = 0.5950
 gt recall rate after nms-3 = 0.4695
 (3) conv3plus4 afternms-100 (thresh: 0.943959)
