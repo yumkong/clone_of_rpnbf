@@ -43,7 +43,7 @@ function [output_width_map_conv34, output_height_map_conv34, ...
             s = ceil(input(i)/8)*8;
             %liu@0926 changed,because when s>= 1000, s x s is too big to feed to a net
             %im_blob = single(zeros(s, s, 3, 1));
-            im_blob = single(zeros(s, 500, 3, 1));
+            im_blob = single(zeros(s, 504, 3, 1)); %1210: 500-->504
             net_inputs = {im_blob};
 
             % Reshape net's input blobs

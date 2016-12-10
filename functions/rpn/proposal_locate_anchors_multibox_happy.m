@@ -38,12 +38,12 @@ function [anchors_conv4,anchors_conv5,anchors_conv6, im_scale] = proposal_locate
         output_size_conv4 = feature_map_size;
     end
     
-    shift_x_conv4 = [0:(output_size_conv4(2)-1)] * conf.feat_stride_conv4;
-    shift_y_conv4 = [0:(output_size_conv4(1)-1)] * conf.feat_stride_conv4;
+    shift_x_conv4 = [0:(output_size_conv4(2)-1)] * conf.feat_stride_conv34;
+    shift_y_conv4 = [0:(output_size_conv4(1)-1)] * conf.feat_stride_conv34;
     [shift_x_conv4, shift_y_conv4] = meshgrid(shift_x_conv4, shift_y_conv4);
     
     % concat anchors as [channel, height, width], where channel is the fastest dimension.
-    anchors_conv4 = reshape(bsxfun(@plus, permute(conf.anchors_conv4, [1, 3, 2]), ...
+    anchors_conv4 = reshape(bsxfun(@plus, permute(conf.anchors_conv34, [1, 3, 2]), ...
         permute([shift_x_conv4(:), shift_y_conv4(:), shift_x_conv4(:), shift_y_conv4(:)], [3, 1, 2])), [], 4);
     
     % 1112: add conv5 similarly

@@ -43,11 +43,11 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_multibox
         assert(img_size(1) == size(im_blob, 1) && img_size(2) == size(im_blob, 2));
         
         % =============== for conv4 =================
-        output_size_conv4 = cell2mat([conf.output_height_conv4.values({img_size(1)}), conf.output_width_conv4.values({img_size(2)})]);
-        labels_blob_conv4 = reshape(labels_conv4, size(conf.anchors_conv4, 1), output_size_conv4(1), output_size_conv4(2));
-        label_weights_blob_conv4 = reshape(label_weights_conv4, size(conf.anchors_conv4, 1), output_size_conv4(1), output_size_conv4(2));
-        bbox_targets_blob_conv4 = reshape(bbox_targets_conv4', size(conf.anchors_conv4, 1)*4, output_size_conv4(1), output_size_conv4(2));
-        bbox_loss_blob_conv4 = reshape(bbox_loss_conv4', size(conf.anchors_conv4, 1)*4, output_size_conv4(1), output_size_conv4(2));
+        output_size_conv4 = cell2mat([conf.output_height_conv34.values({img_size(1)}), conf.output_width_conv34.values({img_size(2)})]);
+        labels_blob_conv4 = reshape(labels_conv4, size(conf.anchors_conv34, 1), output_size_conv4(1), output_size_conv4(2));
+        label_weights_blob_conv4 = reshape(label_weights_conv4, size(conf.anchors_conv34, 1), output_size_conv4(1), output_size_conv4(2));
+        bbox_targets_blob_conv4 = reshape(bbox_targets_conv4', size(conf.anchors_conv34, 1)*4, output_size_conv4(1), output_size_conv4(2));
+        bbox_loss_blob_conv4 = reshape(bbox_loss_conv4', size(conf.anchors_conv34, 1)*4, output_size_conv4(1), output_size_conv4(2));
         % permute from [channel, height, width], where channel is the
         % fastest dimension to [width, height, channel]
         labels_blob_conv4 = permute(labels_blob_conv4, [3, 2, 1]);

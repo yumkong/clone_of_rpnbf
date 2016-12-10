@@ -15,10 +15,10 @@ function save_model_path = proposal_train_widerface_multibox_ohem_happy(conf, im
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           201,                 @isscalar);%100
-    ip.addParamValue('val_interval',        1000,               @isscalar);%2000
+    ip.addParamValue('val_iters',           201,                 @isscalar);%201
+    ip.addParamValue('val_interval',        1000,               @isscalar);%1000
     ip.addParamValue('snapshot_interval',...
-                                            1000,              @isscalar); % 10000
+                                            1000,              @isscalar); %1000
                                                                        
     % Max pixel size of a scaled input image
     ip.addParamValue('solver_def_file',     fullfile(pwd, 'proposal_models', 'Zeiler_conv5', 'solver.prototxt'), ...
@@ -284,9 +284,9 @@ end
 
 function rst = check_error(rst, caffe_solver)
 
-    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_conv4').get_data();
-    labels = caffe_solver.net.blobs('labels_ohem_conv4').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_ohem_conv4').get_data();
+    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_conv34').get_data();
+    labels = caffe_solver.net.blobs('labels_ohem_conv34').get_data();
+    labels_weights = caffe_solver.net.blobs('labels_weights_ohem_conv34').get_data();
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
@@ -335,10 +335,10 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     im_size = ceil(im_size/8) * 8;
     im_blob = single(zeros(im_size(1), im_size(2), 3, conf.ims_per_batch));
     
-    anchor_num_conv4 = size(conf.anchors_conv4, 1);
-    output_width_conv4 = conf.output_width_conv4.values({size(im_blob, 1)});
+    anchor_num_conv4 = size(conf.anchors_conv34, 1);
+    output_width_conv4 = conf.output_width_conv34.values({size(im_blob, 1)});
     output_width_conv4 = output_width_conv4{1};
-    output_height_conv4 = conf.output_height_conv4.values({size(im_blob, 2)});
+    output_height_conv4 = conf.output_height_conv34.values({size(im_blob, 2)});
     output_height_conv4 = output_height_conv4{1};
     labels_blob_conv4 = single(zeros(output_width_conv4, output_height_conv4, anchor_num_conv4, conf.ims_per_batch));
     labels_weights_conv4 = labels_blob_conv4;
@@ -388,12 +388,12 @@ end
 function model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5,bbox_means_conv6, bbox_stds_conv6, cache_dir, file_name)
     % conv4
     % ================================
-    anchor_size_conv4 = size(conf.anchors_conv4, 1);
+    anchor_size_conv4 = size(conf.anchors_conv34, 1);
     bbox_stds_flatten = repmat(reshape(bbox_stds_conv4', [], 1), anchor_size_conv4, 1);
     bbox_means_flatten = repmat(reshape(bbox_means_conv4', [], 1), anchor_size_conv4, 1);
     
     % merge bbox_means, bbox_stds into the model
-    bbox_pred_layer_name_conv4 = 'proposal_bbox_pred_conv4';
+    bbox_pred_layer_name_conv4 = 'proposal_bbox_pred_conv34';
     weights = caffe_solver.net.params(bbox_pred_layer_name_conv4, 1).get_data();
     biase = caffe_solver.net.params(bbox_pred_layer_name_conv4, 2).get_data();
     weights_back_conv4 = weights;
@@ -468,8 +468,8 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     fprintf('\n------------------------- Iteration %d -------------------------\n', iter);
     fprintf('Training : err_fg_conv4 %.3g, err_bg_conv4 %.3g, loss_conv4 (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg_conv4.data), 1 - mean(train_results.accuracy_bg_conv4.data), ...
-        mean(train_results.loss_cls_conv4.data), ...
-        mean(train_results.loss_bbox_conv4.data));
+        mean(train_results.loss_cls_conv34.data), ...
+        mean(train_results.loss_bbox_conv34.data));
     fprintf('\t err_fg_conv5 %.3g, err_bg_conv5 %.3g, loss_conv5 (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg_conv5.data), 1 - mean(train_results.accuracy_bg_conv5.data), ...
         mean(train_results.loss_cls_conv5.data), ...
@@ -482,8 +482,8 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     if exist('val_results', 'var') && ~isempty(val_results)
         fprintf('Testing  : err_fg_conv4 %.3g, err_bg_conv4 %.3g, loss_conv4 (cls %.3g + reg %.3g)\n', ...
             1 - mean(val_results.accuracy_fg_conv4.data), 1 - mean(val_results.accuracy_bg_conv4.data), ...
-            mean(val_results.loss_cls_conv4.data), ...
-            mean(val_results.loss_bbox_conv4.data));
+            mean(val_results.loss_cls_conv34.data), ...
+            mean(val_results.loss_bbox_conv34.data));
         fprintf('\t err_fg_conv5 %.3g, err_bg_conv5 %.3g, loss_conv5 (cls %.3g + reg %.3g)\n', ...
             1 - mean(val_results.accuracy_fg_conv5.data), 1 - mean(val_results.accuracy_bg_conv5.data), ...
             mean(val_results.loss_cls_conv5.data), ...
@@ -498,12 +498,12 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     %conv4
     history_rec.train.err_fg_conv4 = [history_rec.train.err_fg_conv4; 1 - mean(train_results.accuracy_fg_conv4.data)];
     history_rec.train.err_bg_conv4 = [history_rec.train.err_bg_conv4; 1 - mean(train_results.accuracy_bg_conv4.data)];
-    history_rec.train.loss_cls_conv4 = [history_rec.train.loss_cls_conv4; mean(train_results.loss_cls_conv4.data)];
-    history_rec.train.loss_bbox_conv4 = [history_rec.train.loss_bbox_conv4; mean(train_results.loss_bbox_conv4.data)];
+    history_rec.train.loss_cls_conv4 = [history_rec.train.loss_cls_conv4; mean(train_results.loss_cls_conv34.data)];
+    history_rec.train.loss_bbox_conv4 = [history_rec.train.loss_bbox_conv4; mean(train_results.loss_bbox_conv34.data)];
     history_rec.val.err_fg_conv4 = [history_rec.val.err_fg_conv4; 1 - mean(val_results.accuracy_fg_conv4.data)];
     history_rec.val.err_bg_conv4 = [history_rec.val.err_bg_conv4; 1 - mean(val_results.accuracy_bg_conv4.data)];
-    history_rec.val.loss_cls_conv4 = [history_rec.val.loss_cls_conv4; mean(val_results.loss_cls_conv4.data)];
-    history_rec.val.loss_bbox_conv4 = [history_rec.val.loss_bbox_conv4; mean(val_results.loss_bbox_conv4.data)];
+    history_rec.val.loss_cls_conv4 = [history_rec.val.loss_cls_conv4; mean(val_results.loss_cls_conv34.data)];
+    history_rec.val.loss_bbox_conv4 = [history_rec.val.loss_bbox_conv4; mean(val_results.loss_bbox_conv34.data)];
     %conv5
     history_rec.train.err_fg_conv5 = [history_rec.train.err_fg_conv5; 1 - mean(train_results.accuracy_fg_conv5.data)];
     history_rec.train.err_bg_conv5 = [history_rec.train.err_bg_conv5; 1 - mean(train_results.accuracy_bg_conv5.data)];
