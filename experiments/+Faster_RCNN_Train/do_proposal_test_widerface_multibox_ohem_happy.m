@@ -7,13 +7,13 @@ function do_proposal_test_widerface_multibox_ohem_happy(conf, model_stage, imdb,
                                
     fprintf('Doing nms ... ');   
     % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
-    ave_per_image_topN_conv4 = model_stage.nms.after_nms_topN_conv4; % conv4
+    ave_per_image_topN_conv4 = model_stage.nms.after_nms_topN_conv34; % conv4
     ave_per_image_topN_conv5 = model_stage.nms.after_nms_topN_conv5; % conv5
     ave_per_image_topN_conv6 = model_stage.nms.after_nms_topN_conv6; % conv6
-    model_stage.nms.after_nms_topN_conv4 = -1;
+    model_stage.nms.after_nms_topN_conv34 = -1;
     model_stage.nms.after_nms_topN_conv5 = -1;
     model_stage.nms.after_nms_topN_conv6 = -1;
-    aboxes_conv4              = boxes_filter(aboxes_conv4, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_conv4, conf.use_gpu);
+    aboxes_conv4              = boxes_filter(aboxes_conv4, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_conv34, conf.use_gpu);
     aboxes_conv5              = boxes_filter(aboxes_conv5, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_conv5, conf.use_gpu);
     aboxes_conv6              = boxes_filter(aboxes_conv6, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_conv6, conf.use_gpu);
     fprintf(' Done.\n');  
