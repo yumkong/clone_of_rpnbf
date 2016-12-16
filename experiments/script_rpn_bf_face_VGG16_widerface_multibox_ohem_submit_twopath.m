@@ -257,16 +257,33 @@ detector = DeepTrain_otf_trans_ratio_twopath( opts );
 SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
 mkdir_if_missing(SUBMIT_cachedir);
 nms_option = 3; %1019 added
-show_image = false;
+show_image = true;
+write_bbox = false;  %1214 added: whether to write resulting bbox to txt file
+save_image = false; %1214 added: to save the shown image
+if save_image
+    addpath(fullfile('external','export_fig'));
+    res_dir = fullfile('output',exp_name, 'wrong_medium_cachdir'); % medium and hard partitions can similarly do
+    mkdir_if_missing(res_dir); 
+end
 rois = opts.roidb_test.rois;
-
+%1214 load easy partitions of widerface val set for comparison with pred
+gt_boxes = load(fullfile('datasets','wider_medium_val.mat'));% medium and hard partitions can similarly do
 for i = 1:length(rois)
     sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
     event_name = sstr{1};
-    event_dir = fullfile(SUBMIT_cachedir, event_name);
-    mkdir_if_missing(event_dir);
-    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
-    fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
+    %1214 added
+    aa = strcmp(event_name, gt_boxes.event_list);
+    event_idx = find(aa);
+    aa = strcmp(sstr{2}, gt_boxes.file_list{event_idx});
+    img_idx = find(aa);
+    bbs_easy_gt = gt_boxes.face_bbx_list{event_idx}{img_idx}(gt_boxes.gt_list{event_idx}{img_idx},:);
+    
+    if write_bbox
+        event_dir = fullfile(SUBMIT_cachedir, event_name);
+        mkdir_if_missing(event_dir);
+        fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
+        fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
+    end
     if ~isempty(rois(i).boxes)
         img = imread(dataset.imdb_test.image_at(i));  
         feat = rois_get_features_ratio_twopath(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
@@ -295,23 +312,21 @@ for i = 1:length(rois)
 %                 fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
 %             end
 %         end
-        
+        %1215 show bbs before BF
+        bbs_ori_copy = bbs_ori(:,1:4); % remove BF scores
+        bbs_scores = rois(i).scores(sel_idx, :);
         if show_image
-            if ~isempty(bbs)
-                %1209: filter low scoring bboxes
-                %mean_score = mean(bbs(:,5));
-                bbs = bbs(bbs(:,5)>=10, :);  %0.8 * mean_score
-
+            if ~isempty(bbs_ori_copy)
                 figure(1); 
                 im(img);
-                bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-                bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-                %1209 added: display new score + old score
-                %bbs = [bbs scores(sel_idx,:)];
-                bbApply('draw',bbs, 'g');% pause();
+                bbs_ori_copy(:, 3) = bbs_ori_copy(:, 3) - bbs_ori_copy(:, 1) + 1;
+                bbs_ori_copy(:, 4) = bbs_ori_copy(:, 4) - bbs_ori_copy(:, 2) + 1;
+                %1215 added: display RPN boxes and RPN scores
+                bbs_ori_copy = [bbs_ori_copy bbs_scores];
+                bbApply('draw',bbs_ori_copy, 'g');% pause();
             end
-            if ~isempty(bbs_gt)
-              bbApply('draw',bbs_gt,'r');
+            if ~isempty(bbs_easy_gt)
+              bbApply('draw',bbs_easy_gt,'r');
             end
         end
         
@@ -322,11 +337,13 @@ for i = 1:length(rois)
             bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
         end
         % print the bbox number
-        fprintf(fid, '%d\n', size(bbs, 1));
-        if ~isempty(bbs)
-            for j = 1:size(bbs,1)
-                %each row: [x1 y1 w h score]
-                fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+        if write_bbox
+            fprintf(fid, '%d\n', size(bbs, 1));
+            if ~isempty(bbs)
+                for j = 1:size(bbs,1)
+                    %each row: [x1 y1 w h score]
+                    fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+                end
             end
         end
         
@@ -336,7 +353,7 @@ for i = 1:length(rois)
                 %mean_score = mean(bbs(:,5));
                 bbs = bbs(bbs(:,5)>=10, :);
 
-                figure(2); 
+                figure(2); %figure(2)
                 im(img);
                 bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
                 bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
@@ -344,13 +361,19 @@ for i = 1:length(rois)
                 %bbs = [bbs scores(sel_idx,:)];
                 bbApply('draw',bbs);% pause();
             end
-            if ~isempty(bbs_gt)
-              bbApply('draw',bbs_gt,'r');
+            if ~isempty(bbs_easy_gt)
+                bbApply('draw',round(bbs_easy_gt),'r');
+            end
+            if save_image
+                saveName = sprintf('%s/res_%s',res_dir, sstr{2});
+                export_fig(saveName, '-png', '-a1', '-native');
             end
         end
     end
-    fclose(fid);
-    fprintf('Done with saving image %d bboxes.\n', i);
+    if write_bbox
+        fclose(fid);
+        fprintf('Done with saving image %d bboxes.\n', i);
+    end
 end
 
 caffe.reset_all();

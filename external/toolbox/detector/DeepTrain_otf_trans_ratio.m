@@ -411,6 +411,12 @@ if positive
         end
         sel_idx = cellfun(@(x) ~isempty(x), fg_feat_cell);
         fg_feat = cell2mat(fg_feat_cell(sel_idx));
+        % 1210 fix bug
+        for i = 1:length(rois)
+           if ~isa(fg_score_cell{i},'single') 
+               fg_score_cell{i} = single(fg_score_cell{i});
+           end
+        end
         fg_score = cell2mat(fg_score_cell(sel_idx));
         feats = fg_feat;
         scores = fg_score;
