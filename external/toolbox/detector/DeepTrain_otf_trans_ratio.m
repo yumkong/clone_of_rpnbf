@@ -433,7 +433,7 @@ else
    for i = 1:length(rand_idx)
        idx = rand_idx(i);
        %fprintf('Begin sampling hard negs from image %d\n', idx);
-       tic
+       %tic
        if mod(i, 100) == 0
        		% n = max samples that can be extracted this time
        		% bg_feat_idx = till now have many neg boxes have been samples
