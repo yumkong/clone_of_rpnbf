@@ -282,10 +282,91 @@ conv3 series:
 (1) conv3  afternms-100
 gt recall rate = 0.5317
 gt recall rate after nms-3 = 0.3967
-(2) conv3_4  afternms-100
+(2) conv3_4 (aka conv4) afternms-100
 gt recall rate = 0.5950
 gt recall rate after nms-3 = 0.4695
 (3) conv3plus4 afternms-100 (thresh: 0.943959)
 gt recall rate = 0.6122
 gt recall rate after nms-3 = 0.5055
 https://groups.google.com/forum/#!topic/caffe-users/owQEvAhP7gM
+
+
+------------------------- Iteration 1000 -------------------------
+Training : error 0.449, loss (cls 0.698, reg 0.0942)
+Testing  : error 0.604, loss (cls 0.698, reg 0.0486)
+------------------------- Iteration 2000 -------------------------
+Training : error 0.461, loss (cls 0.698, reg 0.0936)
+Testing  : error 0.396, loss (cls 0.681, reg 0.049)
+
+1210:
+==============================
+divergence problem occurs when training ohem happy
+Iter 12647, Image 2677: 0.6 Hz, accuarcy_conv34 = 0.9937, loss_bbox_conv34 = 0.0004, loss_cls_conv34 = 0.0311, accuracy_fg_conv4 = 1.0000, accuracy_bg_conv4 = 0.9740, 
+			    accuarcy_conv5 = 0.9947, loss_bbox_conv5 = 0.0041, loss_cls_conv5 = 0.1472, accuracy_fg_conv5 = 0.9444, accuracy_bg_conv5 = 0.9479, 
+			    accuarcy_conv6 = 1.0000, loss_bbox_conv6 = 0.0000, loss_cls_conv6 = 0.0000, accuracy_fg_conv6 = 0.0000, accuracy_bg_conv6 = 1.0000, 
+Iter 12648, Image 1012: 0.9 Hz, accuarcy_conv34 = 0.9976, loss_bbox_conv34 = 0.0000, loss_cls_conv34 = 0.0103, accuracy_fg_conv4 = 0.0000, accuracy_bg_conv4 = 0.9948, 
+			    accuarcy_conv5 = 0.9937, loss_bbox_conv5 = 0.0030, loss_cls_conv5 = 0.1339, accuracy_fg_conv5 = 0.5000, accuracy_bg_conv5 = 0.9688, 
+			    accuarcy_conv6 = 1.0000, loss_bbox_conv6 = 0.0000, loss_cls_conv6 = 0.0000, accuracy_fg_conv6 = 0.0000, accuracy_bg_conv6 = 1.0000, 
+Iter 12649, Image 2163: 0.7 Hz, accuarcy_conv34 = 0.9997, loss_bbox_conv34 = 0.0000, loss_cls_conv34 = 0.0061, accuracy_fg_conv4 = 0.0000, accuracy_bg_conv4 = 0.9948, 
+			    accuarcy_conv5 = 0.9888, loss_bbox_conv5 = 7.5825, loss_cls_conv5 = 16.9762, accuracy_fg_conv5 = 0.3125, accuracy_bg_conv5 = 0.9375, 
+			    accuarcy_conv6 = 0.9644, loss_bbox_conv6 = 43.7842, loss_cls_conv6 = 17.4673, accuracy_fg_conv6 = 0.0000, accuracy_bg_conv6 = 1.0000, 
+Iter 12650, Image 1499: 0.7 Hz, accuarcy_conv34 = 1.0000, loss_bbox_conv34 = 0.0000, loss_cls_conv34 = 0.0009, accuracy_fg_conv4 = 0.0000, accuracy_bg_conv4 = 1.0000, 
+			    accuarcy_conv5 = 0.7361, loss_bbox_conv5 = 0.0838, loss_cls_conv5 = 35.9632, accuracy_fg_conv5 = 0.0606, accuracy_bg_conv5 = 0.4010, 
+			    accuarcy_conv6 = 0.1197, loss_bbox_conv6 = 0.0000, loss_cls_conv6 = 43.6683, accuracy_fg_conv6 = 0.0000, accuracy_bg_conv6 = 0.5000, 
+Iter 12651, Image 2373: 0.6 Hz, accuarcy_conv34 = 1.0000, loss_bbox_conv34 = 0.0000, loss_cls_conv34 = 0.0002, accuracy_fg_conv4 = 0.0000, accuracy_bg_conv4 = 1.0000, 
+			    accuarcy_conv5 = 0.7346, loss_bbox_conv5 = 7910.9019, loss_cls_conv5 = 87.3365, accuracy_fg_conv5 = 0.0000, accuracy_bg_conv5 = 0.0000, 
+			    accuarcy_conv6 = 0.1236, loss_bbox_conv6 = 0.0000, loss_cls_conv6 = 32.7512, accuracy_fg_conv6 = 0.0000, accuracy_bg_conv6 = 0.6250, 
+Iter 12652, Image 373: 0.8 Hz, accuarcy_conv34 = 0.9975, loss_bbox_conv34 = 0.0014, loss_cls_conv34 = 1.1023, accuracy_fg_conv4 = 0.0000, accuracy_bg_conv4 = 1.0000, 
+			    accuarcy_conv5 = 0.5796, loss_bbox_conv5 = 906044189293610388276610334720.0000, loss_cls_conv5 = 17.4673, accuracy_fg_conv5 = 0.5938, accuracy_bg_conv5 = 0.9375, 
+
+=== debug code =========
+aa = caffe_solver.net.blobs('conv3_3').get_data();
+bb = caffe_solver.net.blobs('conv3_3_norm').get_data();
+cc = caffe_solver.net.blobs('conv4_3_2x').get_data();
+dd = caffe_solver.net.blobs('conv4_3_norm').get_data();
+ee = caffe_solver.net.blobs('conv5_3').get_data();
+ff = caffe_solver.net.blobs('conv6_2').get_data();
+fprintf('conv3_3: %.2f, %.2f\n', median(aa(:)), max(aa(:)));
+fprintf('conv3_3_norm: %.2f, %.2f\n', median(bb(:)), max(bb(:)));
+fprintf('conv4_3_deconv: %.2f, %.2f\n', median(cc(:)), max(cc(:)));
+fprintf('conv4_3_deconv_norm: %.2f, %.2f\n', median(dd(:)), max(dd(:)));
+fprintf('conv5_3: %.2f, %.2f\n', median(ee(:)), max(ee(:)));
+fprintf('conv6_2: %.2f, %.2f\n', median(ff(:)), max(ff(:)));
+
+img1:
+conv3_3: 0.00, 9137.48
+conv3_3_norm: 0.00, 32.59
+conv4_3_deconv: 0.00, 2093.30
+conv4_3_deconv_norm: 0.00, 34.51
+conv5_3: 0.00, 176.00
+conv6_2: 0.05, 24.14
+
+img2:
+conv3_3: 0.00, 10316.69
+conv3_3_norm: 0.00, 33.82
+conv4_3_deconv: 0.00, 1909.56
+conv4_3_deconv_norm: 0.00, 32.58
+conv5_3: 0.00, 193.89
+conv6_2: 0.08, 34.67
+
+img3:
+conv3_3: 0.00, 12206.08
+conv3_3_norm: 0.00, 31.41
+conv4_3_deconv: 0.00, 2408.85
+conv4_3_deconv_norm: 0.00, 34.88
+conv5_3: 0.00, 254.27
+conv6_2: 0.07, 36.82
+
+img10:
+conv3_3: 0.00, 9741.09
+conv3_3_norm: 0.00, 35.13
+conv4_3_deconv: 0.00, 2719.35
+conv4_3_deconv_norm: 0.00, 33.47
+conv5_3: 0.00, 179.52
+conv6_2: 0.06, 32.35
+==> from the above, the problem seems to derive from large scale of conv5_3 (around 200), compared to other conv layers(conv3_3_norm, conv4_3_deconv_norm and conv6_2
+all of which are around 35)
+
+1212
+ohem_happy (e1_e11) is done!
+score_threshold conv4 = 0.862857, conv5 = 0.828735, conv6 = 0.924826
