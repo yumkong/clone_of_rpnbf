@@ -51,7 +51,7 @@ function do_proposal_test_widerface_multibox_ohem_happy(conf, model_stage, imdb,
     fprintf('score_threshold conv4 = %f, conv5 = %f, conv6 = %f\n', score_thresh_conv4, score_thresh_conv5, score_thresh_conv6);
     % drop the boxes which scores are lower than the threshold
     show_image = true;
-    save_result = false;
+    save_result = true;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);
@@ -197,12 +197,12 @@ function do_proposal_test_widerface_multibox_ohem_happy(conf, model_stage, imdb,
     % 1007 added
     fprintf('gt recall rate after nms-%d = %.4f\n', nms_option, gt_re_num_nms / gt_num_nms);
     
-    % save raw detected bboxes
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_conv4_%d_conv5_%d_conv6_%d.txt', ave_per_image_topN_conv4, ave_per_image_topN_conv5, ave_per_image_topN_conv6));
-    save_bbox_to_txt(aboxes, imdb.image_ids, bbox_save_name);
-    % save bboxs after nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_nms%d_conv4_%d_conv5_%d.txt', nms_option, ave_per_image_topN_conv4, ave_per_image_topN_conv5, ave_per_image_topN_conv6));
-    save_bbox_to_txt(aboxes_nms, imdb.image_ids, bbox_save_name);
+%     % save raw detected bboxes
+%     bbox_save_name = fullfile(cache_dir, sprintf('VGG16_conv4_%d_conv5_%d_conv6_%d.txt', ave_per_image_topN_conv4, ave_per_image_topN_conv5, ave_per_image_topN_conv6));
+%     save_bbox_to_txt(aboxes, imdb.image_ids, bbox_save_name);
+%     % save bboxs after nms
+%     bbox_save_name = fullfile(cache_dir, sprintf('VGG16_nms%d_conv4_%d_conv5_%d.txt', nms_option, ave_per_image_topN_conv4, ave_per_image_topN_conv5, ave_per_image_topN_conv6));
+%     save_bbox_to_txt(aboxes_nms, imdb.image_ids, bbox_save_name);
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)

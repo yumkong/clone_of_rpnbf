@@ -125,9 +125,18 @@ function save_model_path = proposal_train_widerface_multibox_ohem_happy(conf, im
     check_gpu_memory(conf, caffe_solver, opts.do_val);
      
 %% -------------------- Training -------------------- 
-
+    
+    % 1219 added to fix bug***********************8
     proposal_generate_minibatch_fun = @proposal_generate_minibatch_multibox_ohem_happy;
+    for i = 1:length(image_roidb_train)
+        aa = strfind(image_roidb_train(i).image_path, '/');
+        image_roidb_train(i).image_path = [image_roidb_train(i).image_path(1:aa(end-1)) image_roidb_train(i).image_id '.jpg'];
+    end
 
+    for i = 1:length(image_roidb_val)
+        aa = strfind(image_roidb_val(i).image_path, '/');
+        image_roidb_val(i).image_path = [image_roidb_val(i).image_path(1:aa(end-1)) image_roidb_val(i).image_id '.jpg'];
+    end
     % training
     shuffled_inds = [];
     train_results = [];  
