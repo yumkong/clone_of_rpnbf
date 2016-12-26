@@ -51,7 +51,7 @@ function do_proposal_test_widerface_multibox_ohem_happy_flip(conf, model_stage, 
     fprintf('score_threshold conv4 = %f, conv5 = %f, conv6 = %f\n', score_thresh_conv4, score_thresh_conv5, score_thresh_conv6);
     % drop the boxes which scores are lower than the threshold
     show_image = true;
-    save_result = false;
+    save_result = true;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
     mkdir_if_missing(cache_dir);

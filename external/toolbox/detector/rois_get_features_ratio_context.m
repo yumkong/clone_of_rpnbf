@@ -1,4 +1,4 @@
-function [feats] = rois_get_features_ratio2(conf, caffe_net, im, boxes, max_rois_num_in_gpu, ratio)
+function [feats] = rois_get_features_ratio_context(conf, caffe_net, im, boxes, max_rois_num_in_gpu, ratio)
 % [pred_boxes, scores] = fast_rcnn_im_detect(conf, caffe_net, im, boxes, max_rois_num_in_gpu)
 % --------------------------------------------------------
 % Fast R-CNN
@@ -10,60 +10,33 @@ function [feats] = rois_get_features_ratio2(conf, caffe_net, im, boxes, max_rois
 %                                    + big  context: [l r t b] = [1w   1w   0.2h  3h ])
 
     boxes_cxt = boxes; %1027 added full body context
-    % liu@1001: ratio = 1, so no bbox width and height changes
-    outer_box_ratio = ratio;
-    %1004 changed
-    boxes_width_change = (boxes(:,3)-boxes(:,1) + 1)*(outer_box_ratio-1)/2;
-    boxes(:,1) = boxes(:,1) - boxes_width_change;
-    boxes(:,3) = boxes(:,3) + boxes_width_change;
-
-%     boxes_height_change = (boxes(:,4)-boxes(:,2) + 1)*(outer_box_ratio-1)/2;
-%     boxes(:,2) = boxes(:,2) - boxes_height_change;
-%     boxes(:,4) = boxes(:,4) + boxes_height_change;
-    top_ratio = 0.2; %0.25
-    bottom_ratio = 0.8; %1.75
-    boxes_top_change = (boxes(:,4)-boxes(:,2) + 1) * top_ratio;
-    boxes_bottom_change = (boxes(:,4)-boxes(:,2) + 1) * bottom_ratio;
-    boxes(:,2) = boxes(:,2) - boxes_top_change;
-    boxes(:,4) = boxes(:,4) + boxes_bottom_change;
-    [height, width, ~] = size(im);
-    %1018 changed: the previous was wrong
-    %boxes(:,1) = max(1, boxes(:,1));
-    %boxes(:,3) = max(1, boxes(:,3));
-    %boxes(:,2) = min(width, boxes(:,2));
-    %boxes(:,4) = min(height, boxes(:,4));
-    boxes(:,1) = max(1, boxes(:,1)); %left
-    boxes(:,2) = max(1, boxes(:,2)); %top
-    boxes(:,3) = min(width, boxes(:,3)); %right
-    boxes(:,4) = min(height, boxes(:,4)); % bottom
-
-    %[im_blob, rois_blob, ~] = get_blobs(conf, im, boxes);
-    
-%     % When mapping from image ROIs to feature map ROIs, there's some aliasing
-%     % (some distinct image ROIs get mapped to the same feature ROI).
-%     % Here, we identify duplicate feature ROIs, so we only compute features
-%     % on the unique subset.
-%     [~, index, inv_index] = unique(rois_blob, 'rows');
-%     rois_blob = rois_blob(index, :);
-%     boxes = boxes(index, :);
-%     
-%     % permute data into caffe c++ memory, thus [num, channels, height, width]
-%     im_blob = im_blob(:, :, [3, 2, 1], :); % from rgb to brg
-%     im_blob = permute(im_blob, [2, 1, 3, 4]);
-%     im_blob = single(im_blob);
-%     rois_blob = rois_blob - 1; % to c's index (start from 0)
-%     rois_blob = permute(rois_blob, [3, 4, 2, 1]);
-%     rois_blob = single(rois_blob);
-%     
-%     total_rois = size(rois_blob, 4);
+    % *** 1215 commented: Part I: generate features from pure face regions
+%     % liu@1001: ratio = 1, so no bbox width and height changes
+%     outer_box_ratio = ratio;
+%     %1004 changed
+%     boxes_width_change = (boxes(:,3)-boxes(:,1) + 1)*(outer_box_ratio-1)/2;
+%     boxes(:,1) = boxes(:,1) - boxes_width_change;
+%     boxes(:,3) = boxes(:,3) + boxes_width_change;
+%     top_ratio = 0.2; %0.25
+%     bottom_ratio = 0.8; %1.75
+%     boxes_top_change = (boxes(:,4)-boxes(:,2) + 1) * top_ratio;
+%     boxes_bottom_change = (boxes(:,4)-boxes(:,2) + 1) * bottom_ratio;
+%     boxes(:,2) = boxes(:,2) - boxes_top_change;
+%     boxes(:,4) = boxes(:,4) + boxes_bottom_change;
+%     [height, width, ~] = size(im);
+%     boxes(:,1) = max(1, boxes(:,1)); %left
+%     boxes(:,2) = max(1, boxes(:,2)); %top
+%     boxes(:,3) = min(width, boxes(:,3)); %right
+%     boxes(:,4) = min(height, boxes(:,4)); % bottom
     
     %========1027 add begin========================
+    % *** 1215: generate features from context regions [-w -0.2h w 2h]
     boxes_width_change = (boxes_cxt(:,3)-boxes_cxt(:,1) + 1);
     boxes_cxt(:,1) = boxes_cxt(:,1) - boxes_width_change;
     boxes_cxt(:,3) = boxes_cxt(:,3) + boxes_width_change;
 
-    top_ratio = 0.2; %0.25
-    bottom_ratio = 3; %1.75
+    top_ratio = 0.2; %0.2
+    bottom_ratio = 2; %3-->2
     boxes_top_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * top_ratio;
     boxes_bottom_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * bottom_ratio;
     boxes_cxt(:,2) = boxes_cxt(:,2) - boxes_top_change;

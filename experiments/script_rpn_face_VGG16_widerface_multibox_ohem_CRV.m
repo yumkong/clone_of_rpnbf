@@ -1,4 +1,4 @@
-function script_rpn_face_VGG16_widerface_multibox_ohem_happy_flip()
+function script_rpn_face_VGG16_widerface_multibox_ohem_CRV()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -32,7 +32,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface_multibox_ohem_happy_flip(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox_ohem_CRV(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -47,50 +47,14 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ohem_happy_flip';
+exp_name = 'VGG16_widerface_multibox_ohem_CRV';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
-use_flipped                 = true;  %true --> false
-event_num                   = -1; %11
-dataset                     = Dataset.widerface_all_flip(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
+use_flipped                 = false;  %true --> false
+event_num                   = 11; %-1
+dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
-
-train_sel_idx_name = fullfile(cache_data_this_model_dir, 'sel_idx.mat');
-try
-    %load('output\train_roidb_event123.mat');
-    load(train_sel_idx_name);
-catch
-    example_num = length(dataset.imdb_train.image_ids);
-    half_example_num = example_num/2; %12880
-    % only select half of the flipped image for memory efficiency
-    %tmp_idx = round(rand([half_example_num,1]));
-    tmp_idx = (rand([half_example_num,1])>=0.8);  %1/3 are 1, 2/3 are 0
-    sel_idx = ones(example_num, 1); % all original images are set as 1
-    sel_idx(2:2:end) = tmp_idx;  % flipped images are randomly set
-    
-    test_num = length(dataset.imdb_test.image_ids);
-    if test_num > 500
-        sel_val_idx = randperm(test_num, 500);
-    else
-        sel_val_idx = 1:test_num;
-    end
-    sel_val_idx = sel_val_idx';
-    save(train_sel_idx_name, 'sel_idx', 'sel_val_idx');
-end
-fprintf('Total training image is %d\n', sum(sel_idx));
-fprintf('Total test image is %d\n', length(sel_val_idx));
-% randomly select flipped train
-sel_idx = logical(sel_idx);
-dataset.imdb_train.image_ids = dataset.imdb_train.image_ids(sel_idx,:);
-dataset.imdb_train.flip_from = dataset.imdb_train.flip_from(sel_idx,:);
-dataset.imdb_train.sizes = dataset.imdb_train.sizes(sel_idx,:);
-dataset.roidb_train.rois = dataset.roidb_train.rois(:, sel_idx);
-% randomly select test 
-dataset.imdb_test.image_ids = dataset.imdb_test.image_ids(sel_val_idx,:);
-%dataset.imdb_test.flip_from = dataset.imdb_test.flip_from(sel_val_idx,:);
-dataset.imdb_test.sizes = dataset.imdb_test.sizes(sel_val_idx,:);
-dataset.roidb_test.rois = dataset.roidb_test.rois(:, sel_val_idx);
 
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
@@ -121,8 +85,8 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
  conf_proposal.output_width_conv6, conf_proposal.output_height_conv6]...
                              = proposal_calc_output_size_multibox_happy(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
 % 1209: no need to change: same with all multibox
-[conf_proposal.anchors_conv34,conf_proposal.anchors_conv5, conf_proposal.anchors_conv6] = proposal_generate_anchors_multibox_ohem_flip(cache_data_this_model_dir, ...
-                                                            'ratios', [1.25 0.8], 'scales',  2.^[-1:5], 'add_size', [360 720 900]);  %[8 16 32 64 128 256 360 512 720 900]
+[conf_proposal.anchors_conv34,conf_proposal.anchors_conv5, conf_proposal.anchors_conv6] = proposal_generate_anchors_multibox_CRV(cache_data_this_model_dir, ...
+                                                            'ratios', [1], 'scales',  2.^[-1:5], 'add_size', [360 720 900]);  %[8 16 32 64 128 256 360 512 720 900]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
 %conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);
@@ -140,6 +104,44 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_mult
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem_happy_flip(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem_happy(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+
+% %%  stage one fast rcnn
+% fprintf('\n***************\nstage one fast rcnn\n***************\n');
+% % train
+% model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+% % test
+% opts.mAP                    = Faster_RCNN_Train.do_fast_rcnn_test_widerface(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+%  
+% %%  stage two proposal
+% % net proposal
+% fprintf('\n***************\nstage two proposal\n***************\n');
+% % train
+% model.stage2_rpn.init_net_file = model.stage1_fast_rcnn.output_model_file;
+% model.stage2_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf_proposal, dataset, model.stage2_rpn, opts.do_val);
+% % test
+% dataset.roidb_train        	= cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, x, y, nms_option_train), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
+% dataset.roidb_test         	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+% 
+% %%  stage two fast rcnn
+% fprintf('\n***************\nstage two fast rcnn\n***************\n');
+% % train
+% model.stage2_fast_rcnn.init_net_file = model.stage1_fast_rcnn.output_model_file;
+% model.stage2_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface(conf_fast_rcnn, dataset, model.stage2_fast_rcnn, opts.do_val);
+% 
+% %% final test
+% fprintf('\n***************\nfinal test\n***************\n');
+%      
+% model.stage2_rpn.nms        = model.final_test.nms;
+% dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+% opts.final_mAP              = Faster_RCNN_Train.do_fast_rcnn_test_widerface(conf_fast_rcnn, model.stage2_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+
 
 end
+
+% function [anchors, output_width_map, output_height_map] = proposal_prepare_anchors(conf, cache_name, test_net_def_file)
+%     [output_width_map, output_height_map] ...                           
+%                                 = proposal_calc_output_size(conf, test_net_def_file);
+%     anchors                = proposal_generate_anchors(cache_name, ...
+%                                     'scales',  2.^[-1:5]);%0820:2.^[3:5] -->  2.^[-1:5]
+% end

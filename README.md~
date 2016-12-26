@@ -370,3 +370,43 @@ all of which are around 35)
 1212
 ohem_happy (e1_e11) is done!
 score_threshold conv4 = 0.862857, conv5 = 0.828735, conv6 = 0.924826
+gt recall rate = 0.6291
+gt recall rate after nms-3 = 0.6018
+
+1215
+ohem_happy_flip (e1_e11) is done!
+score_threshold conv4 = 0.891689, conv5 = 0.828444, conv6 = 0.910268
+gt recall rate = 0.6289
+gt recall rate after nms-3 = 0.6002  (similar to ohem_happy)
+
+1216
+CMS (keep average 200 proposal per image)
+gt recall rate = 0.5485
+gt recall rate after nms-3 = 0.5015
+
+
+===========
+1217
+training BF error:
+Training AdaBoost: nWeak=1536 nFtrs=38400 pos=159424 neg=200000
+Out of memory. Type HELP MEMORY for your options.
+==> so set the upper limit to pos=160000 neg=160000
+
+multibox_CRV
+gt recall rate = 0.6186
+gt recall rate after nms-3 = 0.5820
+==> not so good as conv4single, why?
+
+===========
+1218
+finally choose ohem_happy_flip as CRV submission version
+
+for i = 1:length(image_roidb_train)
+  aa = strfind(image_roidb_train(i).image_path, '/');
+  image_roidb_train(i).image_path = [image_roidb_train(i).image_path(1:aa(end-1)) image_roidb_train(i).image_id];
+end
+
+for i = 1:length(image_roidb_val)
+  aa = strfind(image_roidb_val(i).image_path, '/');
+  image_roidb_val(i).image_path = [image_roidb_val(i).image_path(1:aa(end-1)) image_roidb_val(i).image_id];
+end
