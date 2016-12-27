@@ -1,0 +1,1552 @@
+name: "VGG_ILSVRC_16"
+
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 224
+input_dim: 224
+
+input: "labels_conv34"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 3            # 3 anchors
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_conv34"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 3            # 3 anchors
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_conv34"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 12  		# 4 (coords) * 3(anchors)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_conv34"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 12  		# 4 (coords) * 3(anchors)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_conv5"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 6            # 6(anchors)        
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_conv5"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 6            # 6(anchors)        
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_conv5"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 24  		# 4 (coords) * 6(anchors) 
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_conv5"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 24  		# 4 (coords) * 6(anchors) 
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+# 1121 newly added for conv6
+input: "labels_conv6"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 4            # 4(anchors)        
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_conv6"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 4            # 4(anchors)        
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_conv6"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 16  		# 4 (coords) * 4(anchors) 
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_conv6"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 16  		# 4 (coords) * 4(anchors) 
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+layer {
+	bottom: "data"
+	top: "conv1_1"
+	name: "conv1_1"
+	type: "Convolution"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_1"
+	name: "relu1_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_2"
+	name: "conv1_2"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "conv1_2"
+	name: "relu1_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "pool1"
+	name: "pool1"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool1"
+	top: "conv2_1"
+	name: "conv2_1"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_1"
+	name: "relu2_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_2"
+	name: "conv2_2"
+	param {
+		lr_mult: 0.0
+	}
+	param {
+		lr_mult: 0.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "conv2_2"
+	name: "relu2_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "pool2"
+	name: "pool2"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool2"
+	top: "conv3_1"
+	name: "conv3_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_1"
+	name: "relu3_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_2"
+	name: "conv3_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_2"
+	name: "relu3_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_3"
+	name: "conv3_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_3"
+	top: "conv3_3"
+	name: "relu3_3"
+	type: "ReLU"
+}
+
+# ================conv3 buffering=============================
+#The rule of thumb: lower layer cannot directly affects the trunk network, need a buffer conv layer
+layer {
+  name: "conv3_3_norm"
+  type: "Normalize"
+  bottom: "conv3_3"
+  top: "conv3_3_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 40  #1120: 20-->40, since its channel is only 256, so need 80?
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+   name: "conv3_buffer"
+   type: "Convolution"
+   bottom: "conv3_3_norm"
+   top: "conv3_buffer"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 256
+	   kernel_size: 3
+	   pad: 1
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+# ================end conv3 buffering=================================
+
+# 1205: re-add conv4_1~conv4_3 to improve resolution
+
+layer {
+	bottom: "conv3_3"
+	top: "pool3"
+	name: "pool3"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool3"
+	top: "conv4_1"
+	name: "conv4_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv4_1"
+	top: "conv4_1"
+	name: "relu4_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv4_1"
+	top: "conv4_2"
+	name: "conv4_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv4_2"
+	top: "conv4_2"
+	name: "relu4_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv4_2"
+	top: "conv4_3"
+	name: "conv4_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv4_3"
+	top: "conv4_3"
+	name: "relu4_3"
+	type: "ReLU"
+}
+
+#=================== deconvolution upsample by 2 ======================
+layer {
+  bottom: "conv4_3" 
+  top: "conv4_3_2x"
+  name: "conv4_3_2x" 
+  type: "Deconvolution"
+  convolution_param {
+    kernel_size: 4 
+    stride: 2
+    num_output: 512
+    group: 512
+    pad: 1
+    weight_filler: { type: "bilinear" } 
+    bias_term: false
+  }
+  param { lr_mult: 0 decay_mult: 0 }
+}
+
+# ===============conv4 buffering===========================
+#1113 added norm layer
+layer {
+  name: "conv4_3_norm"
+  type: "Normalize"
+  bottom: "conv4_3_2x" #"conv4_3"
+  top: "conv4_3_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 40  #1120: 20-->40
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+   name: "conv4_buffer"
+   type: "Convolution"
+   bottom: "conv4_3_norm"
+   top: "conv4_buffer"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 1
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+# ===============end conv4 buffering===========================
+
+#-----------------------layer +-------------------------
+#layer {
+#   name: "conv_proposal1"
+#   type: "Convolution"
+#   bottom: "conv4_3_norm"
+#   top: "conv_proposal1"
+#	param {
+#		lr_mult: 1.0
+#	}
+#	param {
+#		lr_mult: 2.0
+#	}
+#   convolution_param{
+#	   num_output: 512
+#	   kernel_size: 3
+#	   pad: 1
+#	   stride: 1
+#	   weight_filler {
+#		 type: "gaussian"
+#		 std: 0.01
+#	   }
+#	   bias_filler {
+#		 type: "constant"
+#		 value: 0
+#	   }
+#  }
+#}
+
+layer {
+    bottom: "conv3_buffer"
+    bottom: "conv4_buffer"
+    top: "conv_proposal_conv34"
+    name: "conv_proposal_conv34"
+    type: "Concat"
+    concat_param {
+	axis: 1
+    }
+}
+
+layer {
+   name: "relu_proposal_conv34"
+   type: "ReLU"
+   bottom: "conv_proposal_conv34"
+   top: "conv_proposal_conv34"
+}
+
+layer {
+   name: "proposal_cls_score_conv34"
+   type: "Convolution"
+   bottom: "conv_proposal_conv34" #"reduce_proposal_conv4"
+   top: "proposal_cls_score_conv34"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 6   # 2(bg/fg) * 3(anchors) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "proposal_bbox_pred_conv34"
+   type: "Convolution"
+   bottom: "conv_proposal_conv34" #"reduce_proposal_conv4"
+   top: "proposal_bbox_pred_conv34"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 12	# 4 * 3(anchors) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+#--------------------- end of conv4 -----------------------------
+
+
+# -------------------- for conv5's -----------------------------
+layer {
+	bottom: "conv4_3"
+	top: "pool4"
+	name: "pool4"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool4"
+	top: "conv5_1"
+	name: "conv5_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv5_1"
+	top: "conv5_1"
+	name: "relu5_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv5_1"
+	top: "conv5_2"
+	name: "conv5_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv5_2"
+	top: "conv5_2"
+	name: "relu5_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv5_2"
+	top: "conv5_3"
+	name: "conv5_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv5_3"
+	top: "conv5_3"
+	name: "relu5_3"
+	type: "ReLU"
+}
+
+#1211 added to normalize conv5_3 before compute proposal feat
+layer {
+  name: "conv5_3_norm"
+  type: "Normalize"
+  bottom: "conv5_3"
+  top: "conv5_3_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 40
+    }
+    channel_shared: false
+  }
+}
+
+# normal 3x3 conv without atrous
+layer {
+   name: "conv_proposal1"
+   type: "Convolution"
+   bottom: "conv5_3_norm" #"conv5_3"
+   top: "conv_proposal1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 1
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+# atrous with hole_size = 2
+layer {
+   name: "conv_proposal2"
+   type: "Convolution"
+   bottom: "conv5_3_norm" #"conv5_3"
+   top: "conv_proposal2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 2 #1
+	   dilation: 2 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+# atrous with hole_size = 4
+layer {
+   name: "conv_proposal3"
+   type: "Convolution"
+   bottom: "conv5_3_norm" #"conv5_3"
+   top: "conv_proposal3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 4 #1
+	   dilation: 4 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+  name: "concat_proposal"
+  bottom: "conv_proposal1"
+  bottom: "conv_proposal2"
+  bottom: "conv_proposal3"
+  top: "concat_proposal"
+  type: "Concat"
+  concat_param {
+    axis: 1 # concat channels: 512+512+512 = 1536
+  }
+}
+
+layer {
+   name: "relu_proposal_concat"
+   type: "ReLU"
+   bottom: "concat_proposal"
+   top: "concat_proposal"
+}
+
+layer {
+   name: "reduce_proposal"
+   type: "Convolution"
+   bottom: "concat_proposal"
+   top: "reduce_proposal"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "relu_proposal_reduce"
+   type: "ReLU"
+   bottom: "reduce_proposal"
+   top: "reduce_proposal"
+}
+
+layer {
+   name: "proposal_cls_score_conv5"
+   type: "Convolution"
+   bottom: "reduce_proposal"
+   top: "proposal_cls_score_conv5"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 12   # 2(bg/fg) * 6(anchors) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "proposal_bbox_pred_conv5"
+   type: "Convolution"
+   bottom: "reduce_proposal"
+   top: "proposal_bbox_pred_conv5"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 24	# 4 * 6(anchors) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+# -------------------- for fc6's -----------------------------
+layer {
+	bottom: "conv5_3"
+	top: "pool5"
+	name: "pool5"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	name: "conv6_1"
+	bottom: "pool5"
+	top: "conv6_1"	
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 1024
+		pad: 1
+		kernel_size: 3
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv6_1"
+	top: "conv6_1"
+	name: "relu6_1"
+	type: "ReLU"
+}
+
+layer {
+	name: "conv6_2"
+	bottom: "conv6_1"
+	top: "conv6_2"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 0
+		kernel_size: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv6_2"
+	top: "conv6_2"
+	name: "relu6_2"
+	type: "ReLU"
+}
+
+# normal 3x3 conv without atrous
+layer {
+   name: "conv6_proposal1"
+   type: "Convolution"
+   bottom: "conv6_2"
+   top: "conv6_proposal1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 1
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+# atrous with hole_size = 2
+layer {
+   name: "conv6_proposal2"
+   type: "Convolution"
+   bottom: "conv6_2"
+   top: "conv6_proposal2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 2 #1
+	   dilation: 2 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+# atrous with hole_size = 4
+layer {
+   name: "conv6_proposal3"
+   type: "Convolution"
+   bottom: "conv6_2"
+   top: "conv6_proposal3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 3
+	   pad: 4 #1
+	   dilation: 4 #stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+  name: "concat_proposal_conv6"
+  bottom: "conv6_proposal1"
+  bottom: "conv6_proposal2"
+  bottom: "conv6_proposal3"
+  top: "concat_proposal_conv6"
+  type: "Concat"
+  concat_param {
+    axis: 1 # concat channels: 512+512+512 = 1536
+  }
+}
+
+layer {
+   name: "relu_proposal_concat_conv6"
+   type: "ReLU"
+   bottom: "concat_proposal_conv6"
+   top: "concat_proposal_conv6"
+}
+
+layer {
+   name: "reduce_proposal_conv6"
+   type: "Convolution"
+   bottom: "concat_proposal_conv6"
+   top: "reduce_proposal_conv6"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 512
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "relu_proposal_reduce_conv6"
+   type: "ReLU"
+   bottom: "reduce_proposal_conv6"
+   top: "reduce_proposal_conv6"
+}
+
+layer {
+   name: "proposal_cls_score_conv6"
+   type: "Convolution"
+   bottom: "reduce_proposal_conv6"
+   top: "proposal_cls_score_conv6"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 8   # 2(bg/fg) * 4(anchors) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "proposal_bbox_pred_conv6"
+   type: "Convolution"
+   bottom: "reduce_proposal_conv6"
+   top: "proposal_bbox_pred_conv6"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 16	# 4 * 4(anchors) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+#-----------------------output1 (for conv4)------------------------
+
+# to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
+layer {
+   bottom: "proposal_cls_score_conv34"
+   top: "proposal_cls_score_reshape_conv34"
+   name: "proposal_cls_score_reshape_conv34"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 2
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_conv34"
+   top: "labels_reshape_conv34"
+   name: "labels_reshape_conv34"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights_conv34"
+   top: "labels_weights_reshape_conv34"
+   name: "labels_weights_reshape_conv34"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+#1123 add ignore_label
+# this is the overall accuracy of all fgs (thresh >= 0.5) and bgs (0 <= thresh < 0.3)
+layer {
+   name: "accuarcy_conv34"
+   type: "Accuracy"
+   bottom: "proposal_cls_score_reshape_conv34"
+   bottom: "labels_reshape_conv34"
+   top: "accuarcy_conv34"
+   accuracy_param {
+        ignore_label: -1
+   }
+}
+
+#---conv4 ohem---
+#liu@1114: this layer is off-the-shelf by r-fcn caffe
+layer {
+   name: "per_anchor_cls_loss_conv34"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape_conv34"  #[1, 2, 7*56, 56]
+   bottom: "labels_reshape_conv34"              #[1, 1, 7*56, 56]
+   top: "temp_loss_cls_conv34"  #no use 
+   top: "temp_prob_cls_conv34"  #no use
+   top: "per_anchor_cls_loss_conv34"            # should be:[1, 1, 7*56, 56]
+   loss_weight: 0
+   loss_weight: 0
+   loss_weight: 0
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   bottom: "per_anchor_cls_loss_conv34"  #[1, 1, 7*56, 56] == [num ch hei wid]
+   bottom: "labels_reshape_conv34"	  #[1, 1, 7*56, 56]
+   bottom: "bbox_loss_weights_conv34"    #[1, 4*7, 56, 56]
+   bottom: "labels_weights_reshape_conv34"
+   top: "labels_ohem_conv34"
+   top: "bbox_loss_weights_ohem_conv34"
+   top: "labels_weights_ohem_conv34"
+   name: "cls_ohem_conv34"
+   type: "RpnClsOHEM"
+   rpn_cls_ohem_param {
+        bg_per_img: 256  #256
+	anchor_num: 3
+	random_shuffle_percent: 0.9
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   name: "silence"
+   type: "Silence"
+   bottom: "temp_loss_cls_conv34"
+   bottom: "temp_prob_cls_conv34"
+}
+
+# final loss cls output 
+layer {
+   name: "loss_conv34"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape_conv34"
+   bottom: "labels_ohem_conv34"
+   bottom: "labels_weights_ohem_conv34"
+   top: "loss_cls_conv34"
+   loss_weight: 2  #conv4: 1 --> 4 --> 2(1211)
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: true
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+  name: "loss_bbox_conv34"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_conv34" #[1 28 28 28]
+  bottom: "bbox_targets_conv34"       #[1 28 28 28]
+  bottom: "bbox_loss_weights_ohem_conv34"  #[1 28 28 28]
+  top: "loss_bbox_conv34"
+  loss_weight: 80  #conv4: 5-->20-->80(1211)
+}
+
+#-----------------------output2 (for conv5)------------------------
+
+# to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
+layer {
+   bottom: "proposal_cls_score_conv5"
+   top: "proposal_cls_score_reshape_conv5"
+   name: "proposal_cls_score_reshape_conv5"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 2
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_conv5"
+   top: "labels_reshape_conv5"
+   name: "labels_reshape_conv5"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights_conv5"
+   top: "labels_weights_reshape_conv5"
+   name: "labels_weights_reshape_conv5"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   name: "accuarcy_conv5"
+   type: "Accuracy"
+   bottom: "proposal_cls_score_reshape_conv5"
+   bottom: "labels_reshape_conv5"
+   top: "accuarcy_conv5"
+   accuracy_param {
+        ignore_label: -1
+   }
+}
+
+#---conv5 ohem---
+#liu@1114: this layer is off-the-shelf by r-fcn caffe
+layer {
+   name: "per_anchor_cls_loss_conv5"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape_conv5"  #[1, 2, 7*14, 14]
+   bottom: "labels_reshape_conv5"              #[1, 1, 7*14, 14]
+   top: "temp_loss_cls_conv5"  #no use 
+   top: "temp_prob_cls_conv5"  #no use
+   top: "per_anchor_cls_loss_conv5"            # should be:[1, 1, 7*14, 14]
+   loss_weight: 0
+   loss_weight: 0
+   loss_weight: 0
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   bottom: "per_anchor_cls_loss_conv5"  #[1, 1, 7*14, 14] == [num ch hei wid]
+   bottom: "labels_reshape_conv5"	  #[1, 1, 7*14, 14]
+   bottom: "bbox_loss_weights_conv5"    #[1, 4*7, 14, 14]
+   bottom: "labels_weights_reshape_conv5"
+   top: "labels_ohem_conv5"
+   top: "bbox_loss_weights_ohem_conv5"
+   top: "labels_weights_ohem_conv5"
+   name: "cls_ohem_conv5"
+   type: "RpnClsOHEM"
+   rpn_cls_ohem_param {
+        bg_per_img: 256  #256
+	anchor_num: 6
+	random_shuffle_percent: 0.9
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   name: "silence"
+   type: "Silence"
+   bottom: "temp_loss_cls_conv5"
+   bottom: "temp_prob_cls_conv5"
+}
+
+# final loss cls output 
+layer {
+   name: "loss_conv5"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape_conv5"
+   bottom: "labels_ohem_conv5"
+   bottom: "labels_weights_ohem_conv5"
+   top: "loss_cls_conv5"
+   loss_weight: 1
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: true
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+  name: "loss_bbox_conv5"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_conv5" #[1 28 28 28]
+  bottom: "bbox_targets_conv5"       #[1 28 28 28]
+  bottom: "bbox_loss_weights_ohem_conv5"  #[1 28 28 28]
+  top: "loss_bbox_conv5"
+  loss_weight: 10 #5-->10
+}
+
+#-----------------------output3 (for conv6)------------------------
+
+# to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
+layer {
+   bottom: "proposal_cls_score_conv6"
+   top: "proposal_cls_score_reshape_conv6"
+   name: "proposal_cls_score_reshape_conv5"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 2
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_conv6"
+   top: "labels_reshape_conv6"
+   name: "labels_reshape_conv6"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights_conv6"
+   top: "labels_weights_reshape_conv6"
+   name: "labels_weights_reshape_conv6"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   name: "accuarcy_conv6"
+   type: "Accuracy"
+   bottom: "proposal_cls_score_reshape_conv6"
+   bottom: "labels_reshape_conv6"
+   top: "accuarcy_conv6"
+   accuracy_param {
+        ignore_label: -1
+   }
+}
+
+#---conv6 ohem---
+#liu@1114: this layer is off-the-shelf by r-fcn caffe
+layer {
+   name: "per_anchor_cls_loss_conv6"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape_conv6"  #[1, 2, 7*7, 7]
+   bottom: "labels_reshape_conv6"              #[1, 1, 7*7, 7]
+   top: "temp_loss_cls_conv6"  #no use 
+   top: "temp_prob_cls_conv6"  #no use
+   top: "per_anchor_cls_loss_conv6"            # should be:[1, 1, 7*7, 7]
+   loss_weight: 0
+   loss_weight: 0
+   loss_weight: 0
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   bottom: "per_anchor_cls_loss_conv6"  #[1, 1, 7*7, 7] == [num ch hei wid]
+   bottom: "labels_reshape_conv6"	  #[1, 1, 7*7, 7]
+   bottom: "bbox_loss_weights_conv6"    #[1, 4*7, 7, 7]
+   bottom: "labels_weights_reshape_conv6"
+   top: "labels_ohem_conv6"
+   top: "bbox_loss_weights_ohem_conv6"
+   top: "labels_weights_ohem_conv6"
+   name: "cls_ohem_conv6"
+   type: "RpnClsOHEM"
+   rpn_cls_ohem_param {
+        bg_per_img: 256  #256
+	anchor_num: 4
+	random_shuffle_percent: 0.9
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   name: "silence"
+   type: "Silence"
+   bottom: "temp_loss_cls_conv6"
+   bottom: "temp_prob_cls_conv6"
+}
+
+# final loss cls output 
+layer {
+   name: "loss_conv6"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape_conv6"
+   bottom: "labels_ohem_conv6"
+   bottom: "labels_weights_ohem_conv6"
+   top: "loss_cls_conv6"
+   loss_weight: 1
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: true
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+  name: "loss_bbox_conv6"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_conv6" #[1 28 7 7]
+  bottom: "bbox_targets_conv6"       #[1 28 7 7]
+  bottom: "bbox_loss_weights_ohem_conv6"  #[1 28 7 7]
+  top: "loss_bbox_conv6"
+  loss_weight: 5
+}
