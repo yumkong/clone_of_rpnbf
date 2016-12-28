@@ -15,7 +15,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_dilate'; %caffe_faster_rcnn_win
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_final'; %caffe_faster_rcnn_win
     cd('D:\\RPN_BF_master');
 elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn_rfcn_ohem_final_noprint';
