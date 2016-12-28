@@ -106,7 +106,7 @@ catch
         for i = 1:length(imdb.image_ids)
             % no matter the flipped image exists or not, always regenerate
             % it.
-          %if ~exist(flip_image_at(i), 'file')
+          if ~exist(flip_image_at(i), 'file')
              im = imread(image_at(i));
              switch flip_type_pool(i)
                  case 1
@@ -120,7 +120,7 @@ catch
                  otherwise
                      disp('Unknown flip type.')
              end
-          %end
+          end
         end
         img_num = length(imdb.image_ids)*2;
         image_ids = imdb.image_ids;

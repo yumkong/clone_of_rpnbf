@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_multibox_ohem_submit_context()
+function script_rpn_bf_face_VGG16_widerface_multibox_ohem_happy_submit()
 
 clc;
 clear mex;
@@ -17,7 +17,7 @@ elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_dilate'; %'caffe_faster_rcnn_rfcn_ohem_final_noprint';
+    opts.caffe_version          = 'caffe_faster_rcnn_dilate_ohem'; %'caffe_faster_rcnn_dilate'; 
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -47,16 +47,49 @@ model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 if ispc
     exp_name = 'VGG16_widerface_multibox_ohem_all';
 else
-    exp_name = 'VGG16_widerface_multibox_ohem';
+    exp_name = 'VGG16_widerface_multibox_ohem_happy_flip';
 end
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
-use_flipped                 = false;  %true --> false
+use_flipped                 = true;  %true --> false
 event_num                   = -1; %11
 event_num_test              = -1;  %1007 added: test all val images
-dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
+%dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_all_flip(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num_test, cache_data_this_model_dir, model_name_base);
+
+train_sel_idx_name = fullfile(cache_data_this_model_dir, 'sel_idx.mat');
+try
+    %load('output\train_roidb_event123.mat');
+    load(train_sel_idx_name);
+catch
+    example_num = length(dataset.imdb_train.image_ids);
+    half_example_num = example_num/2; %12880
+    % only select half of the flipped image for memory efficiency
+    %tmp_idx = round(rand([half_example_num,1]));
+    tmp_idx = (rand([half_example_num,1])>=0.8);  %1/3 are 1, 2/3 are 0
+    sel_idx = ones(example_num, 1); % all original images are set as 1
+    sel_idx(2:2:end) = tmp_idx;  % flipped images are randomly set
+    
+    test_num = length(dataset.imdb_test.image_ids);
+    if test_num > 500
+        sel_val_idx = randperm(test_num, 500);
+    else
+        sel_val_idx = 1:test_num;
+    end
+    sel_val_idx = sel_val_idx';
+    save(train_sel_idx_name, 'sel_idx', 'sel_val_idx');
+end
+fprintf('Total training image is %d\n', sum(sel_idx));
+fprintf('Total test image is %d\n', length(sel_val_idx));
+% randomly select flipped train
+sel_idx = logical(sel_idx);
+dataset.imdb_train.image_ids = dataset.imdb_train.image_ids(sel_idx,:);
+dataset.imdb_train.flip_from = dataset.imdb_train.flip_from(sel_idx,:);
+dataset.imdb_train.sizes = dataset.imdb_train.sizes(sel_idx,:);
+dataset.roidb_train.rois = dataset.roidb_train.rois(:, sel_idx);
+% 1227: keep all test set
 
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
@@ -84,7 +117,7 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_conv34, conf_proposal.output_height_conv34, ...
  conf_proposal.output_width_conv5, conf_proposal.output_height_conv5, ...
  conf_proposal.output_width_conv6, conf_proposal.output_height_conv6]...
-= proposal_calc_output_size_multibox_happy(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
+                                            = proposal_calc_output_size_multibox_happy(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
 % 1209: no need to change: same with all multibox
 [conf_proposal.anchors_conv34,conf_proposal.anchors_conv5, conf_proposal.anchors_conv6] = proposal_generate_anchors_multibox_ohem_flip(cache_data_this_model_dir, ...
                                                             'ratios', [1.25 0.8], 'scales',  2.^[-1:5], 'add_size', [360 720 900]);  %[8 16 32 64 128 256 360 512 720 900]
@@ -109,20 +142,20 @@ model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
 model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
 %1201: since only 3 anchors, 100 is enough(in RPN: only 50 for conv4)
 %model.stage1_rpn.nms.after_nms_topN = 50;  %600 --> 100 
-model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %1000
-model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %100
+model.stage1_rpn.nms.after_nms_topN_conv4      	= 60;  %50
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 40;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %10
 is_test = true;
-roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
+roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
 %model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
 model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
 model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
 model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
 %model.stage1_rpn.nms.after_nms_topN = 50; %1000--> 200. 200 is enough (double of test topN), only keep the hard negative one
-model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %1000
-model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %100
-model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %10
-roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
+model.stage1_rpn.nms.after_nms_topN_conv4      	= 60;  %50
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 40;  %30
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %3
+roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
 BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context');
@@ -132,7 +165,7 @@ dataDir = fullfile('datasets','caltech');                % Caltech ==> to be rep
 addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 %addpath(fullfile('..','external', 'toolbox'));
-BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem_5x5.prototxt'); %test_feat_conv34atrous_v2
+BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem.prototxt'); %test_feat_conv34atrous_multibox_ohem_5x5
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
 conf.test_max_size = conf_proposal.max_size;
@@ -164,9 +197,9 @@ opts.bg_hard_min_ratio = [1 1 1 1 1 1 1];
 opts.pBoost.pTree.maxDepth = 5; 
 opts.pBoost.discrete = 0;  %?
 opts.pBoost.pTree.fracFtrs = 1/4;  %? 
-opts.first_nNeg = 150000;  %#neg of the 1st stage 40000 --> 150000
+opts.first_nNeg = 120000;  %1227: 150000 --> 120000
 opts.nNeg = 30000;  % #neg needed by every stage 5000--> 300000
-opts.nAccNeg = 200000;  % #accumulated neg from stage2 -- 7 % 60000-->200000
+opts.nAccNeg = 180000;  % #1227: 200000 --> 180000
 % 1203 added
 opts.nPerNeg = 10;
 pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
