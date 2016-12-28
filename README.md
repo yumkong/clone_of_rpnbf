@@ -410,3 +410,9 @@ for i = 1:length(image_roidb_val)
   aa = strfind(image_roidb_val(i).image_path, '/');
   image_roidb_val(i).image_path = [image_roidb_val(i).image_path(1:aa(end-1)) image_roidb_val(i).image_id];
 end
+
+=============
+1227
+ohem_happy_flip training done, result is very good!
+after nms: conv34:50, conv5:100, conv6=10
+score_threshold conv4 = 0.936758, conv5 = 0.870751, conv6 = 0.924484

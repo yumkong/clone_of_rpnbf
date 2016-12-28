@@ -62,8 +62,9 @@ function save_model_path = proposal_train_widerface_multibox_ohem_happy(conf, im
     caffe_log_file_base = fullfile(cache_dir, 'caffe_log');
     caffe.init_log(caffe_log_file_base);
     caffe_solver = caffe.Solver(opts.solver_def_file);
-    caffe_solver.net.copy_from(opts.net_file);
-    %caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_conv4', 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_7000'));
+    % 1224: restart from iter_71000 (iter_start)
+    %caffe_solver.net.copy_from(opts.net_file);
+    caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_multibox_ohem_happy_flip', 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_start'));
     % init log
     timestamp = datestr(datevec(now()), 'yyyymmdd_HHMMSS');
     mkdir_if_missing(fullfile(cache_dir, 'log'));
@@ -122,7 +123,9 @@ function save_model_path = proposal_train_widerface_multibox_ohem_happy(conf, im
     conf.classes        = opts.imdb_train{1}.classes;
     
 %%  try to train/val with images which have maximum size potentially, to validate whether the gpu memory is enough  
-    check_gpu_memory(conf, caffe_solver, opts.do_val);
+    %check_gpu_memory(conf, caffe_solver, opts.do_val);
+    %1224 added, change caffe_solver's weight
+    recover_weights(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5,bbox_means_conv6, bbox_stds_conv6);
      
 %% -------------------- Training -------------------- 
     
@@ -469,6 +472,66 @@ function model_path = snapshot(conf, caffe_solver, bbox_means_conv4, bbox_stds_c
     caffe_solver.net.set_params_data(bbox_pred_layer_name_conv5, 2, biase_back_conv5);
     caffe_solver.net.set_params_data(bbox_pred_layer_name_conv6, 1, weights_back_conv6);
     caffe_solver.net.set_params_data(bbox_pred_layer_name_conv6, 2, biase_back_conv6);
+end
+
+%1224 added: recover to training-time weights
+function recover_weights(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5,bbox_means_conv6, bbox_stds_conv6)
+    % conv4
+    % ================================
+    anchor_size_conv4 = size(conf.anchors_conv34, 1);
+    bbox_stds_flatten = repmat(reshape(bbox_stds_conv4', [], 1), anchor_size_conv4, 1);
+    bbox_means_flatten = repmat(reshape(bbox_means_conv4', [], 1), anchor_size_conv4, 1);
+    
+    % merge bbox_means, bbox_stds into the model
+    bbox_pred_layer_name_conv4 = 'proposal_bbox_pred_conv34';
+    weights = caffe_solver.net.params(bbox_pred_layer_name_conv4, 1).get_data();
+    biase = caffe_solver.net.params(bbox_pred_layer_name_conv4, 2).get_data();
+    
+    weights = ...
+        bsxfun(@rdivide, weights, permute(bbox_stds_flatten, [2, 3, 4, 1])); % weights = weights * stds (@times)==> weights = weights / stds (@rdivide)
+    biase = ...
+        (biase - bbox_means_flatten) ./ bbox_stds_flatten; % bias = bias * stds + means ==> bias = (bias - means) / stds
+    
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv4, 1, weights);
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv4, 2, biase);
+    
+    % conv5
+    % ================================
+    anchor_size_conv5 = size(conf.anchors_conv5, 1);
+    bbox_stds_flatten = repmat(reshape(bbox_stds_conv5', [], 1), anchor_size_conv5, 1);
+    bbox_means_flatten = repmat(reshape(bbox_means_conv5', [], 1), anchor_size_conv5, 1);
+    
+    % merge bbox_means, bbox_stds into the model
+    bbox_pred_layer_name_conv5 = 'proposal_bbox_pred_conv5';
+    weights = caffe_solver.net.params(bbox_pred_layer_name_conv5, 1).get_data();
+    biase = caffe_solver.net.params(bbox_pred_layer_name_conv5, 2).get_data();
+    
+    weights = ...
+        bsxfun(@rdivide, weights, permute(bbox_stds_flatten, [2, 3, 4, 1])); % weights = weights * stds (@times)==> weights = weights / stds (@rdivide)
+    biase = ...
+        (biase - bbox_means_flatten) ./ bbox_stds_flatten; % bias = bias * stds + means ==> bias = (bias - means) / stds
+    
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv5, 1, weights);
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv5, 2, biase);
+    
+    % conv6
+    % ================================
+    anchor_size_conv6 = size(conf.anchors_conv6, 1);
+    bbox_stds_flatten = repmat(reshape(bbox_stds_conv6', [], 1), anchor_size_conv6, 1);
+    bbox_means_flatten = repmat(reshape(bbox_means_conv6', [], 1), anchor_size_conv6, 1);
+    
+    % merge bbox_means, bbox_stds into the model
+    bbox_pred_layer_name_conv6 = 'proposal_bbox_pred_conv6';
+    weights = caffe_solver.net.params(bbox_pred_layer_name_conv6, 1).get_data();
+    biase = caffe_solver.net.params(bbox_pred_layer_name_conv6, 2).get_data();
+    
+    weights = ...
+        bsxfun(@rdivide, weights, permute(bbox_stds_flatten, [2, 3, 4, 1])); % weights = weights * stds (@times)==> weights = weights / stds (@rdivide)
+    biase = ...
+        (biase - bbox_means_flatten) ./ bbox_stds_flatten; % bias = bias * stds + means ==> bias = (bias - means) / stds
+    
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv6, 1, weights);
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv6, 2, biase);
 end
 
 %function show_state(iter, train_results, val_results)
