@@ -413,5 +413,18 @@ end
 
 =============
 1227
+(1)
 ohem_happy_flip training done, result is very good!
-
+after nms: conv34:50, conv5:100, conv6=10
+score_threshold conv4 = 0.936758, conv5 = 0.870751, conv6 = 0.924484
+(2)
+ohem_happy_flip bf, data preparation has some problem, debug:
+===
+i = 1;
+img = imread(dataset.imdb_train{1}.image_at(i));
+im(img);
+bbs = [roidb_train_BF.rois(i).boxes roidb_train_BF.rois(i).scores];
+bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+bbApply('draw',bbs, 'g');
+===

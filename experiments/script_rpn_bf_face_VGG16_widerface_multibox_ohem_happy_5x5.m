@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_multibox_ohem_happy_submit()
+function script_rpn_bf_face_VGG16_widerface_multibox_ohem_happy_5x5()
 
 clc;
 clear mex;
@@ -144,8 +144,8 @@ model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
 model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
 %1201: since only 3 anchors, 100 is enough(in RPN: only 50 for conv4)
 %model.stage1_rpn.nms.after_nms_topN = 50;  %600 --> 100 
-model.stage1_rpn.nms.after_nms_topN_conv4      	= 60;  %50
-model.stage1_rpn.nms.after_nms_topN_conv5      	= 40;  %30
+model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %50
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %10
 is_test = true;
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
@@ -154,20 +154,20 @@ model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
 model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
 model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
 %model.stage1_rpn.nms.after_nms_topN = 50; %1000--> 200. 200 is enough (double of test topN), only keep the hard negative one
-model.stage1_rpn.nms.after_nms_topN_conv4      	= 60;  %50
-model.stage1_rpn.nms.after_nms_topN_conv5      	= 40;  %30
+model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %50
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %3
 roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
-BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context');
+BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context_5x5_new');  %5x5
 mkdir_if_missing(BF_cachedir);
 dataDir = fullfile('datasets','caltech');                % Caltech ==> to be replaced?
 %posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
 addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 %addpath(fullfile('..','external', 'toolbox'));
-BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem.prototxt'); %test_feat_conv34atrous_multibox_ohem_5x5
+BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem_5x5.prototxt'); %test_feat_conv34atrous_multibox_ohem_5x5
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
 conf.test_max_size = conf_proposal.max_size;
@@ -199,9 +199,9 @@ opts.bg_hard_min_ratio = [1 1 1 1 1 1 1];
 opts.pBoost.pTree.maxDepth = 5; 
 opts.pBoost.discrete = 0;  %?
 opts.pBoost.pTree.fracFtrs = 1/4;  %? 
-opts.first_nNeg = 120000;  %1227: 150000 --> 120000
+opts.first_nNeg = 150000;  %1227: 150000 --> 120000
 opts.nNeg = 30000;  % #neg needed by every stage 5000--> 300000
-opts.nAccNeg = 180000;  % #1227: 200000 --> 180000
+opts.nAccNeg = 160000;  % #1227: 200000 --> 180000 --> 160000
 % 1203 added
 opts.nPerNeg = 10;
 pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
@@ -290,127 +290,127 @@ detector = DeepTrain_otf_trans_ratio_context( opts );
 
 %===============  save the final result (after BF) here to submit to
 %widerface evaluation code
-SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
-mkdir_if_missing(SUBMIT_cachedir);
-nms_option = 3; %1019 added
-show_image = false;
-write_bbox = true;  %1214 added: whether to write resulting bbox to txt file
-save_image = false; %1214 added: to save the shown image
-if save_image
-    addpath(fullfile('external','export_fig'));
-    res_dir = fullfile('output',exp_name, 'wrong_medium_cachdir'); % medium and hard partitions can similarly do
-    mkdir_if_missing(res_dir); 
-end
-rois = opts.roidb_test.rois;
-%1214 load easy partitions of widerface val set for comparison with pred
-gt_boxes = load(fullfile('datasets','wider_medium_val.mat'));% medium and hard partitions can similarly do
-for i = 1:length(rois)
-    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
-    event_name = sstr{1};
-    %1214 added
-    aa = strcmp(event_name, gt_boxes.event_list);
-    event_idx = find(aa);
-    aa = strcmp(sstr{2}, gt_boxes.file_list{event_idx});
-    img_idx = find(aa);
-    bbs_easy_gt = gt_boxes.face_bbx_list{event_idx}{img_idx}(gt_boxes.gt_list{event_idx}{img_idx},:);
-    
-    if write_bbox
-        event_dir = fullfile(SUBMIT_cachedir, event_name);
-        mkdir_if_missing(event_dir);
-        fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
-        fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
-    end
-    if ~isempty(rois(i).boxes)
-        img = imread(dataset.imdb_test.image_at(i));  
-        feat = rois_get_features_ratio_context(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
-        scores = adaBoostApply(feat, detector.clf);
-        bbs = [rois(i).boxes scores];
-
-        sel_idx = (1:size(bbs,1))'; %'
-        sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
-
-        bbs_ori = bbs(sel_idx, :);
-        
-%         bbs_gt = rois(i).boxes(rois(i).gt,:);
-%         bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
-%         bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
-%         bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
-%         % if a box has only 1 pixel in either size, remove it
-%         invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
-%         bbs_gt(invalid_idx, :) = [];
-%         %1019 added: do nms here
-%         bbs = pseudoNMS_v6(bbs_ori, nms_option);
-        % print the bbox number
-%        fprintf(fid, '%d\n', size(bbs, 1));
-%         if ~isempty(bbs)
-%             for j = 1:size(bbs,1)
-%                 %each row: [x1 y1 w h score]
-%                 fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+% SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
+% mkdir_if_missing(SUBMIT_cachedir);
+% nms_option = 3; %1019 added
+% show_image = false;
+% write_bbox = true;  %1214 added: whether to write resulting bbox to txt file
+% save_image = false; %1214 added: to save the shown image
+% if save_image
+%     addpath(fullfile('external','export_fig'));
+%     res_dir = fullfile('output',exp_name, 'wrong_medium_cachdir'); % medium and hard partitions can similarly do
+%     mkdir_if_missing(res_dir); 
+% end
+% rois = opts.roidb_test.rois;
+% %1214 load easy partitions of widerface val set for comparison with pred
+% gt_boxes = load(fullfile('datasets','wider_medium_val.mat'));% medium and hard partitions can similarly do
+% for i = 1:length(rois)
+%     sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
+%     event_name = sstr{1};
+%     %1214 added
+%     aa = strcmp(event_name, gt_boxes.event_list);
+%     event_idx = find(aa);
+%     aa = strcmp(sstr{2}, gt_boxes.file_list{event_idx});
+%     img_idx = find(aa);
+%     bbs_easy_gt = gt_boxes.face_bbx_list{event_idx}{img_idx}(gt_boxes.gt_list{event_idx}{img_idx},:);
+%     
+%     if write_bbox
+%         event_dir = fullfile(SUBMIT_cachedir, event_name);
+%         mkdir_if_missing(event_dir);
+%         fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
+%         fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
+%     end
+%     if ~isempty(rois(i).boxes)
+%         img = imread(dataset.imdb_test.image_at(i));  
+%         feat = rois_get_features_ratio_context(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
+%         scores = adaBoostApply(feat, detector.clf);
+%         bbs = [rois(i).boxes scores];
+% 
+%         sel_idx = (1:size(bbs,1))'; %'
+%         sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+% 
+%         bbs_ori = bbs(sel_idx, :);
+%         
+% %         bbs_gt = rois(i).boxes(rois(i).gt,:);
+% %         bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+% %         bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+% %         bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+% %         % if a box has only 1 pixel in either size, remove it
+% %         invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+% %         bbs_gt(invalid_idx, :) = [];
+% %         %1019 added: do nms here
+% %         bbs = pseudoNMS_v6(bbs_ori, nms_option);
+%         % print the bbox number
+% %        fprintf(fid, '%d\n', size(bbs, 1));
+% %         if ~isempty(bbs)
+% %             for j = 1:size(bbs,1)
+% %                 %each row: [x1 y1 w h score]
+% %                 fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+% %             end
+% %         end
+%         %1215 show bbs before BF
+%         bbs_ori_copy = bbs_ori(:,1:4); % remove BF scores
+%         bbs_scores = rois(i).scores(sel_idx, :);
+%         if show_image
+%             if ~isempty(bbs_ori_copy)
+%                 figure(1); 
+%                 im(img);
+%                 bbs_ori_copy(:, 3) = bbs_ori_copy(:, 3) - bbs_ori_copy(:, 1) + 1;
+%                 bbs_ori_copy(:, 4) = bbs_ori_copy(:, 4) - bbs_ori_copy(:, 2) + 1;
+%                 %1215 added: display RPN boxes and RPN scores
+%                 bbs_ori_copy = [bbs_ori_copy bbs_scores];
+%                 bbApply('draw',bbs_ori_copy, 'g');% pause();
+%             end
+%             if ~isempty(bbs_easy_gt)
+%               bbApply('draw',bbs_easy_gt,'r');
 %             end
 %         end
-        %1215 show bbs before BF
-        bbs_ori_copy = bbs_ori(:,1:4); % remove BF scores
-        bbs_scores = rois(i).scores(sel_idx, :);
-        if show_image
-            if ~isempty(bbs_ori_copy)
-                figure(1); 
-                im(img);
-                bbs_ori_copy(:, 3) = bbs_ori_copy(:, 3) - bbs_ori_copy(:, 1) + 1;
-                bbs_ori_copy(:, 4) = bbs_ori_copy(:, 4) - bbs_ori_copy(:, 2) + 1;
-                %1215 added: display RPN boxes and RPN scores
-                bbs_ori_copy = [bbs_ori_copy bbs_scores];
-                bbApply('draw',bbs_ori_copy, 'g');% pause();
-            end
-            if ~isempty(bbs_easy_gt)
-              bbApply('draw',bbs_easy_gt,'r');
-            end
-        end
-        
-        
-        %1019 added: do nms here
-        bbs = pseudoNMS_v8(bbs_ori, nms_option);
-        if ~isempty(bbs)
-            bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
-        end
-        % print the bbox number
-        if write_bbox
-            fprintf(fid, '%d\n', size(bbs, 1));
-            if ~isempty(bbs)
-                for j = 1:size(bbs,1)
-                    %each row: [x1 y1 w h score]
-                    fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
-                end
-            end
-        end
-        
-        if show_image 
-            if ~isempty(bbs)
-                %1209: filter low scoring bboxes
-                %mean_score = mean(bbs(:,5));
-                bbs = bbs(bbs(:,5)>=10, :);
-
-                figure(2); %figure(2)
-                im(img);
-                bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-                bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-                %1209 added: display new score + old score
-                %bbs = [bbs scores(sel_idx,:)];
-                bbApply('draw',bbs);% pause();
-            end
-            if ~isempty(bbs_easy_gt)
-                bbApply('draw',round(bbs_easy_gt),'r');
-            end
-            if save_image
-                saveName = sprintf('%s/res_%s',res_dir, sstr{2});
-                export_fig(saveName, '-png', '-a1', '-native');
-            end
-        end
-    end
-    if write_bbox
-        fclose(fid);
-        fprintf('Done with saving image %d bboxes.\n', i);
-    end
-end
+%         
+%         
+%         %1019 added: do nms here
+%         bbs = pseudoNMS_v8(bbs_ori, nms_option);
+%         if ~isempty(bbs)
+%             bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
+%         end
+%         % print the bbox number
+%         if write_bbox
+%             fprintf(fid, '%d\n', size(bbs, 1));
+%             if ~isempty(bbs)
+%                 for j = 1:size(bbs,1)
+%                     %each row: [x1 y1 w h score]
+%                     fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+%                 end
+%             end
+%         end
+%         
+%         if show_image 
+%             if ~isempty(bbs)
+%                 %1209: filter low scoring bboxes
+%                 %mean_score = mean(bbs(:,5));
+%                 bbs = bbs(bbs(:,5)>=10, :);
+% 
+%                 figure(2); %figure(2)
+%                 im(img);
+%                 bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+%                 bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+%                 %1209 added: display new score + old score
+%                 %bbs = [bbs scores(sel_idx,:)];
+%                 bbApply('draw',bbs);% pause();
+%             end
+%             if ~isempty(bbs_easy_gt)
+%                 bbApply('draw',round(bbs_easy_gt),'r');
+%             end
+%             if save_image
+%                 saveName = sprintf('%s/res_%s',res_dir, sstr{2});
+%                 export_fig(saveName, '-png', '-a1', '-native');
+%             end
+%         end
+%     end
+%     if write_bbox
+%         fclose(fid);
+%         fprintf('Done with saving image %d bboxes.\n', i);
+%     end
+% end
 
 caffe.reset_all();
 end
