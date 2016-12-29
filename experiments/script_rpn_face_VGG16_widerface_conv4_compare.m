@@ -51,6 +51,7 @@ cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
 event_num                   = 11; %3
+event_num_test              = -1; %3
 dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 
@@ -96,7 +97,9 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_CMS(
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_CMS(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+% 1229 added, use all validation set to evaluate
+dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num_test, cache_data_this_model_dir, model_name_base);
+Faster_RCNN_Train.do_proposal_test_widerface_compare(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 % %%  stage one fast rcnn
 % fprintf('\n***************\nstage one fast rcnn\n***************\n');
