@@ -140,6 +140,8 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_mult
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
+%0101: use all instead of 500
+dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem_happy_flip(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
 
 end
