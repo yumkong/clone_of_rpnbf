@@ -435,3 +435,32 @@ gt recall rate (ol >0.7) = 0.5190
 gt recall rate (ol >0.8) = 0.2950
 gt recall rate (ol >0.9) = 0.0502
 gt_num: 188676
+
+=============
+0103
+Ablation experiment finally use this
+nms = 0.8
+model.stage1_rpn.nms.after_nms_topN_conv34      = 150;  %50
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 40;  %100
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %1000
+32-500
+For det-4:
+All scales: gt recall rate = 0.6067
+8-32: gt recall rate = 0.7471
+33-360: gt recall rate = 0.3369
+361-900: gt recall rate = 0.0000
+For det-16:
+All scales: gt recall rate = 0.4747
+8-32: gt recall rate = 0.2579
+33-360: gt recall rate = 0.8957
+361-900: gt recall rate = 0.9839
+For det-32:
+All scales: gt recall rate = 0.0200
+8-32: gt recall rate = 0.0000
+33-360: gt recall rate = 0.0495
+361-900: gt recall rate = 0.9919
+For det-all:
+All scales: gt recall rate = 0.8083
+8-32: gt recall rate = 0.7524
+33-360: gt recall rate = 0.9164
+361-900: gt recall rate = 0.9919
