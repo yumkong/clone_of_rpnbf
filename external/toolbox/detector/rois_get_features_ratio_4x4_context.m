@@ -30,13 +30,13 @@ function [feats] = rois_get_features_ratio_4x4_context(conf, caffe_net, im, boxe
 %     boxes(:,4) = min(height, boxes(:,4)); % bottom
     
     %========1027 add begin========================
-    % *** 1215: generate features from context regions [-0.5w -0.5h 0.5w 0.5h]
-    boxes_width_change = (boxes_cxt(:,3)-boxes_cxt(:,1) + 1) * 0.5;
+    % *** 1215: generate features from context regions [-1.5w 0 1.5w 3h]
+    boxes_width_change = (boxes_cxt(:,3)-boxes_cxt(:,1) + 1) * 1.5;
     boxes_cxt(:,1) = boxes_cxt(:,1) - boxes_width_change;
     boxes_cxt(:,3) = boxes_cxt(:,3) + boxes_width_change;
 
-    top_ratio = 0.5; %1229: 0.2 --> 1
-    bottom_ratio = 0.5; % 1229: 2 --> 1
+    top_ratio = 0; %1229: 0.2 --> 1
+    bottom_ratio = 3; % 1229: 2 --> 1
     boxes_top_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * top_ratio;
     boxes_bottom_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * bottom_ratio;
     boxes_cxt(:,2) = boxes_cxt(:,2) - boxes_top_change;
