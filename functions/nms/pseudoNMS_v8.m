@@ -236,9 +236,9 @@ if nms_option >=3
                continue; 
             end
             s = max(h,0) * max(w,0);
-
+            %0.55
             if s / area_rect(i) >= embeddingThreshold || s / area_rect(j) >= embeddingThreshold
-                % the larger box should less or equal to 3 times of the size of
+                % the larger box should less or equal to 5 times of the size of
                 % the smaller one
                 if area_rect(i) / area_rect(j) >= large_small_ratio && area_rect(j) / area_rect(i) >= large_small_ratio
                     predicate(i,j) = true;
