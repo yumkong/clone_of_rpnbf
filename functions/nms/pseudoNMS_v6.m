@@ -1,7 +1,7 @@
 function rects = pseudoNMS_v6(candi_rects, nms_option)
 
 % overlapping threshold for grouping nearby detections
-overlappingThreshold = 0.9; %0.7:0.5233, 0.8:0.5218, 0.6:0.5233 %1012 0.7-->0.75
+overlappingThreshold = 0.8; %0.7:0.5233, 0.8:0.5218, 0.6:0.5233 %1012 0.7-->0.75
 overlappingThreshold2 = 0.8; %0.5: 0.5233, 0.6: 0.5420   %1012: 0.6 --> 0.7
 overlappingThreshold3 = 0.2;
 embeddingThreshold = 0.55; %0.5: 0.5279  0.55: 0.5337 
@@ -57,7 +57,7 @@ for i = 1 : numCandidates
     % now a row vector
     %weight = candi_rects(index, 5)';
     weight = candi_rects(index, 5);
-    rects(i,5) = max( weight );  %1006: sum --> max
+    rects(i,5) = sum( weight );  %1006: sum --> max
     % 1024 masked
     %weight = weight.^ 3; %make big score bigger and small score smaller
     
