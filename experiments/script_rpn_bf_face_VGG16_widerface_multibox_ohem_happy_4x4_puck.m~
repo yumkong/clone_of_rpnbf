@@ -409,7 +409,16 @@ SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
 mkdir_if_missing(SUBMIT_cachedir);
 nms_option = 3; %1019 added
 show_image = false;
-
+<<<<<<< HEAD
+write_bbox = true;  %1214 added: whether to write resulting bbox to txt file
+save_image = false; %1214 added: to save the shown image
+if save_image
+    addpath(fullfile('external','export_fig'));
+    res_dir = fullfile('output',exp_name, 'wrong_hard_cachdir'); % medium and hard partitions can similarly do
+    mkdir_if_missing(res_dir); 
+end
+=======
+>>>>>>> 56176f8ec64e2fada2e2d188b07c6809fcc6be09
 rois = opts.roidb_test.rois;
 
 for i = 1:length(rois)
@@ -451,8 +460,15 @@ for i = 1:length(rois)
         
         
         %1019 added: do nms here
+<<<<<<< HEAD
+        bbs_twoscore = [bbs_ori bbs_scores]; %[x y w h bf_score rpn_score]
+        %0104: some high scoring rpn regions have negative BF scores
+        bbs_twoscore(bbs_scores>=0.95, 5) = 12;
+        %bbs = pseudoNMS_v9(bbs_ori, nms_option);
+        bbs = pseudoNMS_v9(bbs_twoscore, nms_option);
+=======
         bbs = pseudoNMS_v8(bbs_ori, nms_option);
-
+>>>>>>> 56176f8ec64e2fada2e2d188b07c6809fcc6be09
         if ~isempty(bbs)
             bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
         end
