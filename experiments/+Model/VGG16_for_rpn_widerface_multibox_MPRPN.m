@@ -9,8 +9,12 @@ model.feat_stride_conv5                              = 16;
 model.feat_stride_conv6                              = 32;
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'solver_60k80k_widerface_MPRPN.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'test_widerface_MPRPN.prototxt');
+% xx_MPRPN: original happy flip; 
+% xx_MPRPN_noatrous: happy flip without atrous
+% xx_MPRPN_noohem: happy flip without OHEM
+% xx_MPRPN_noboth: happy flip without both atrous and OHEM
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'solver_60k80k_widerface_MPRPN_noatrous.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'test_widerface_MPRPN_noatrous.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting

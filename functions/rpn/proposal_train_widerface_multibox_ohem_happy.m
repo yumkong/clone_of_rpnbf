@@ -63,8 +63,8 @@ function save_model_path = proposal_train_widerface_multibox_ohem_happy(conf, im
     caffe.init_log(caffe_log_file_base);
     caffe_solver = caffe.Solver(opts.solver_def_file);
     % 1224: restart from iter_71000 (iter_start)
-    %caffe_solver.net.copy_from(opts.net_file);
-    caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_multibox_ohem_happy_flip', 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_start'));
+    caffe_solver.net.copy_from(opts.net_file);
+    %caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_multibox_ohem_happy_flip', 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_start'));
     % init log
     timestamp = datestr(datevec(now()), 'yyyymmdd_HHMMSS');
     mkdir_if_missing(fullfile(cache_dir, 'log'));
@@ -123,9 +123,9 @@ function save_model_path = proposal_train_widerface_multibox_ohem_happy(conf, im
     conf.classes        = opts.imdb_train{1}.classes;
     
 %%  try to train/val with images which have maximum size potentially, to validate whether the gpu memory is enough  
-    %check_gpu_memory(conf, caffe_solver, opts.do_val);
+    check_gpu_memory(conf, caffe_solver, opts.do_val);
     %1224 added, change caffe_solver's weight
-    recover_weights(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5,bbox_means_conv6, bbox_stds_conv6);
+    %recover_weights(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5,bbox_means_conv6, bbox_stds_conv6);
      
 %% -------------------- Training -------------------- 
     

@@ -47,7 +47,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_MPRPN';
+exp_name = 'VGG16_widerface_MPRPN_noatrous';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);

@@ -299,7 +299,7 @@ detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
 SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
 mkdir_if_missing(SUBMIT_cachedir);
 nms_option = 3; %1019 added
-show_image = true;
+show_image = false;
 write_bbox = true;  %1214 added: whether to write resulting bbox to txt file
 save_image = false; %1214 added: to save the shown image
 if save_image
@@ -358,7 +358,7 @@ for i = 1:length(rois)
         %1019 added: do nms here
         bbs_twoscore = [bbs_ori bbs_scores]; %[x y w h bf_score rpn_score]
         %0104: some high scoring rpn regions have negative BF scores
-        bbs_twoscore(bbs_scores>=0.95, 5) = 15;
+        bbs_twoscore(bbs_scores>=0.95, 5) = 12;
         %bbs = pseudoNMS_v9(bbs_ori, nms_option);
         bbs = pseudoNMS_v9(bbs_twoscore, nms_option);
         if ~isempty(bbs)

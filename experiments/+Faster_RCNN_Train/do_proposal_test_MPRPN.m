@@ -80,7 +80,7 @@ function do_proposal_test_MPRPN(conf, model_stage, imdb, roidb, cache_name, meth
 
     % 0103 added
     thr1 = 32;
-    thr2 = 450;
+    thr2 = 500;
 	fprintf('For det-4:\n');
     Get_Detector_Recall(roidb, aboxes_conv4, thr1, thr2);
     fprintf('For det-16:\n');
