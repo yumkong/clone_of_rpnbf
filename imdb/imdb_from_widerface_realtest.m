@@ -54,7 +54,6 @@ catch
     for eventIter = 1:eventNum
        event_ = annodoc.event_list{eventIter};
        images_ = annodoc.file_list{eventIter};
-       boxes_ = annodoc.face_bbx_list{eventIter};
 
        imageNum = numel(images_);
        for imgIter = 1:imageNum
