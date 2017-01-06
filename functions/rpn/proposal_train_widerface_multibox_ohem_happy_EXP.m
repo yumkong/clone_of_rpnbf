@@ -130,7 +130,10 @@ function save_model_path = proposal_train_widerface_multibox_ohem_happy_EXP(conf
 %% -------------------- Training -------------------- 
     
     % 1219 added to fix bug***********************8
-    proposal_generate_minibatch_fun = @proposal_generate_minibatch_multibox_ohem_happy;
+    %ohem
+    %proposal_generate_minibatch_fun = @proposal_generate_minibatch_multibox_ohem_happy;
+    %noohem
+    proposal_generate_minibatch_fun = @proposal_generate_minibatch_multibox_noohem_happy;
     for i = 1:length(image_roidb_train)
         aa = strfind(image_roidb_train(i).image_path, '/');
         image_roidb_train(i).image_path = [image_roidb_train(i).image_path(1:aa(end-1)) image_roidb_train(i).image_id '.jpg'];
@@ -297,8 +300,8 @@ end
 function rst = check_error(rst, caffe_solver)
 
     cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_conv34').get_data();
-    labels = caffe_solver.net.blobs('labels_ohem_conv34').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_ohem_conv34').get_data();
+    labels = caffe_solver.net.blobs('labels_reshape_conv34').get_data();  %labels_ohem_conv34
+    labels_weights = caffe_solver.net.blobs('labels_weights_reshape_conv34').get_data(); %labels_weights_ohem_conv34
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
@@ -308,8 +311,8 @@ function rst = check_error(rst, caffe_solver)
     
     % for conv5 ===============================
     cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_conv5').get_data();
-    labels = caffe_solver.net.blobs('labels_ohem_conv5').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_ohem_conv5').get_data();
+    labels = caffe_solver.net.blobs('labels_reshape_conv5').get_data();  %labels_ohem_conv5
+    labels_weights = caffe_solver.net.blobs('labels_weights_reshape_conv5').get_data(); %labels_weights_ohem_conv5
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
@@ -319,8 +322,8 @@ function rst = check_error(rst, caffe_solver)
     
     % for conv6 ===============================
     cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_conv6').get_data();
-    labels = caffe_solver.net.blobs('labels_ohem_conv6').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_ohem_conv6').get_data();
+    labels = caffe_solver.net.blobs('labels_reshape_conv6').get_data();  %labels_ohem_conv6
+    labels_weights = caffe_solver.net.blobs('labels_weights_reshape_conv6').get_data();  %labels_weights_ohem_conv6
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);

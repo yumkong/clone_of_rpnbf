@@ -13,15 +13,15 @@ model.feat_stride_conv6                              = 32;
 % xx_MPRPN_noatrous: happy flip without atrous
 % xx_MPRPN_noohem: happy flip without OHEM
 % xx_MPRPN_noboth: happy flip without both atrous and OHEM
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'solver_60k80k_widerface_MPRPN_noatrous.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'test_widerface_MPRPN_noatrous.prototxt');
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'solver_60k80k_widerface_MPRPN_noohem.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_experiment', 'test_widerface_MPRPN_noohem.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting
 model.stage1_rpn.nms.per_nms_topN               = -1; %20000
 model.stage1_rpn.nms.nms_overlap_thres       	= 0.8;%0.7
 %model.stage1_rpn.nms.after_nms_topN         	= 300;  %1000
-model.stage1_rpn.nms.after_nms_topN_conv34      	= 150;  %50
+model.stage1_rpn.nms.after_nms_topN_conv34      = 150;  %50
 model.stage1_rpn.nms.after_nms_topN_conv5      	= 40;  %100
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %1000
 

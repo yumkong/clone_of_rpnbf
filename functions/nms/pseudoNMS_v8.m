@@ -161,9 +161,10 @@ if nms_option >=2
                     cnt = cnt+1;
                     combined_flag(ii) = true;
                 end
-                if cnt>=2
+                %if cnt>=2
                 %if ~any(new_rects(~combined_flag, 5)>=0.9)
-                %if (cnt>=2) && (~any(new_rects(~combined_flag, 5)>=0.9))
+                % at most given out 3 boxes
+                if (cnt>=2) && any(new_rects(~combined_flag, 5)<0.8)
                    break; %only keep two bboxes 
                 end
             end

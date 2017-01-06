@@ -331,7 +331,9 @@ for i = 1:length(rois)
     if ~isempty(bbs)
         for j = 1:size(bbs,1)
             %each row: [x1 y1 w h score]
-            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), max(bbs(j, 5), bbs(j, 6)));
+            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + bbs(j, 6))/2);
         end
     end
 

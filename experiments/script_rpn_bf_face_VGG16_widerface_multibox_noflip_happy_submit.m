@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_multibox_ohem_happy_5x5_puck()
+function script_rpn_bf_face_VGG16_widerface_multibox_noflip_happy_submit()
 
 clc;
 clear mex;
@@ -45,7 +45,7 @@ mkdir_if_missing(cache_data_root);
 model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
 if ispc
-    exp_name = 'VGG16_widerface_multibox_ohem_happy_flip';
+    exp_name = 'VGG16_widerface_multibox_ohem_all';
 else
     exp_name = 'VGG16_widerface_multibox_ohem_happy_flip';
 end
@@ -55,43 +55,9 @@ mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = true;  %true --> false
 event_num                   = -1; %11
 event_num_test              = -1;  %1007 added: test all val images
-%dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all_flip(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
+%dataset                     = Dataset.widerface_all(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num_test, cache_data_this_model_dir, model_name_base);
-
-train_sel_idx_name = fullfile(cache_data_this_model_dir, 'sel_idx.mat');
-try
-    %load('output\train_roidb_event123.mat');
-    load(train_sel_idx_name);
-catch
-    example_num = length(dataset.imdb_train.image_ids);
-    half_example_num = example_num/2; %12880
-    % only select half of the flipped image for memory efficiency
-    %tmp_idx = round(rand([half_example_num,1]));
-    tmp_idx = (rand([half_example_num,1])>=0.8);  %1/3 are 1, 2/3 are 0
-    sel_idx = ones(example_num, 1); % all original images are set as 1
-    sel_idx(2:2:end) = tmp_idx;  % flipped images are randomly set
-    
-    test_num = length(dataset.imdb_test.image_ids);
-    if test_num > 500
-        sel_val_idx = randperm(test_num, 500);
-    else
-        sel_val_idx = 1:test_num;
-    end
-    sel_val_idx = sel_val_idx';
-    save(train_sel_idx_name, 'sel_idx', 'sel_val_idx');
-end
-fprintf('Total training image is %d\n', sum(sel_idx));
-fprintf('Total test image is %d\n', length(sel_val_idx));
-% randomly select flipped train
-sel_idx = logical(sel_idx);
-dataset.imdb_train.image_ids = dataset.imdb_train.image_ids(sel_idx,:);
-dataset.imdb_train.flip_from = dataset.imdb_train.flip_from(sel_idx,:);
-dataset.imdb_train.sizes = dataset.imdb_train.sizes(sel_idx,:);
-% 1227 fix a bug here: the inconsistency between image path and labels
-dataset.imdb_train.image_at = @(i)sprintf('%s%c%s.%s',dataset.imdb_train.image_dir,filesep, dataset.imdb_train.image_ids{i},dataset.imdb_train.extension);
-dataset.roidb_train.rois = dataset.roidb_train.rois(:, sel_idx);
-% 1227: keep all test set
 
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
@@ -148,8 +114,6 @@ model.stage1_rpn.nms.after_nms_topN_conv4      	= 100;  %50
 model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %3
 is_test = true;
-% 0101: reget all val images
-%dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num_test, cache_data_this_model_dir, model_name_base);
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
 %model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
 model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
@@ -162,14 +126,14 @@ model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %3
 roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
-BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context_5x5_puck');  %puck
+BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context_noflip');
 mkdir_if_missing(BF_cachedir);
 dataDir = fullfile('datasets','caltech');                % Caltech ==> to be replaced?
 %posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
 addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 %addpath(fullfile('..','external', 'toolbox'));
-BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem_5x5.prototxt'); %test_feat_conv34atrous_multibox_ohem_5x5
+BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem_5x5.prototxt'); %test_feat_conv34atrous_v2
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
 conf.test_max_size = conf_proposal.max_size;
@@ -201,9 +165,9 @@ opts.bg_hard_min_ratio = [1 1 1 1 1 1 1];
 opts.pBoost.pTree.maxDepth = 5; 
 opts.pBoost.discrete = 0;  %?
 opts.pBoost.pTree.fracFtrs = 1/4;  %? 
-opts.first_nNeg = 140000;  %1227: 150000 --> 120000
+opts.first_nNeg = 150000;  %#neg of the 1st stage 40000 --> 150000
 opts.nNeg = 30000;  % #neg needed by every stage 5000--> 300000
-opts.nAccNeg = 190000;  % #1227: 200000 --> 180000 --> 160000
+opts.nAccNeg = 160000;  % #accumulated neg from stage2 -- 7 % 60000-->200000-->160000
 % 1203 added
 opts.nPerNeg = 10;
 pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
@@ -265,7 +229,7 @@ end
 tmp_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
 % liu@1001: extract deep features from tmp_box
 % opts.max_rois_num_in_gpu = 3000, opts.ratio = 1
-feat = rois_get_features_ratio_4x4(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
+feat = rois_get_features_ratio_context(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
 toc;
 opts.feat_len = size(feat,2); %1203 changed: length(feat)
 
@@ -288,112 +252,59 @@ end
 opts.train_gts = train_gts;
 
 % train BF detector
-detector = DeepTrain_otf_trans_ratio_4x4( opts );
+detector = DeepTrain_otf_trans_ratio_context( opts );
 
-%===============  save the final result (after BF) here to submit to
-%widerface evaluation code
-SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
+SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_cachedir');
 mkdir_if_missing(SUBMIT_cachedir);
-nms_option = 3; %1019 added
-show_image = false;
-write_bbox = true;  %1214 added: whether to write resulting bbox to txt file
-save_image = false; %1214 added: to save the shown image
-if save_image
-    addpath(fullfile('external','export_fig'));
-    res_dir = fullfile('output',exp_name, 'wrong_hard_cachdir'); % medium and hard partitions can similarly do
-    mkdir_if_missing(res_dir); 
-end
+
 rois = opts.roidb_test.rois;
-%1214 load easy partitions of widerface val set for comparison with pred
-gt_boxes = load(fullfile('datasets','wider_hard_val.mat'));% medium and hard partitions can similarly do
+bf_score_min = 0;
+bf_score_max = 0;
+bbs_repo = cell(length(rois), 1);
+for i = 1:length(rois)
+    if ~isempty(rois(i).boxes)
+        img = imread(dataset.imdb_test.image_at(i));  
+        feat = rois_get_features_ratio_4x4_context(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
+        bf_scores = adaBoostApply(feat, detector.clf);
+        bf_score_min = min(bf_score_min, min(bf_scores));
+        bf_score_max = max(bf_score_max, max(bf_scores));
+        mprpn_scores = rois(i).scores;
+        bbs_all = [rois(i).boxes bf_scores mprpn_scores];
+
+        sel_idx = (1:size(bbs_all,1))'; %'
+        sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+
+        bbs = bbs_all(sel_idx, :);
+        bbs_repo{i} = bbs;
+    end
+end
+%normalize bf scores
+
+
 for i = 1:length(rois)
     sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
     event_name = sstr{1};
-    %1214 added
-    aa = strcmp(event_name, gt_boxes.event_list);
-    event_idx = find(aa);
-    aa = strcmp(sstr{2}, gt_boxes.file_list{event_idx});
-    img_idx = find(aa);
-    bbs_easy_gt = gt_boxes.face_bbx_list{event_idx}{img_idx}(gt_boxes.gt_list{event_idx}{img_idx},:);
-    
-    if write_bbox
-        event_dir = fullfile(SUBMIT_cachedir, event_name);
-        mkdir_if_missing(event_dir);
-        fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
-        fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
-    end
-    if ~isempty(rois(i).boxes)
-        img = imread(dataset.imdb_test.image_at(i));  
-        feat = rois_get_features_ratio_4x4(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
-        scores = adaBoostApply(feat, detector.clf);
-        bbs = [rois(i).boxes scores];
+    event_dir = fullfile(SUBMIT_cachedir, event_name);
+    mkdir_if_missing(event_dir);
+    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'w');
+    fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
 
-        sel_idx = (1:size(bbs,1))'; %'
-        sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+    bbs = bbs_repo{i};
+    bbs(:,5) = (bbs(:,5) - bf_score_min) / (bf_score_max - bf_score_min);
 
-        bbs_ori = bbs(sel_idx, :);
-        
-        %1215 show bbs before BF
-        bbs_ori_copy = bbs_ori(:,1:4); % remove BF scores
-        bbs_scores = rois(i).scores(sel_idx, :);
-        if show_image
-            if ~isempty(bbs_ori_copy)
-                figure(1); 
-                im(img);
-                bbs_ori_copy(:, 3) = bbs_ori_copy(:, 3) - bbs_ori_copy(:, 1) + 1;
-                bbs_ori_copy(:, 4) = bbs_ori_copy(:, 4) - bbs_ori_copy(:, 2) + 1;
-                %1215 added: display RPN boxes and RPN scores
-                bbs_ori_copy = [bbs_ori_copy bbs_scores];
-                bbApply('draw',bbs_ori_copy, 'g');% pause();
-            end
-            if ~isempty(bbs_easy_gt)
-                bbApply('draw',bbs_easy_gt,'r');
-            end
-        end
-        
-        
-        %1019 added: do nms here
-        bbs = pseudoNMS_v8(bbs_ori, nms_option);
-        if ~isempty(bbs)
-            bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
-        end
-        % print the bbox number
-        if write_bbox
-            fprintf(fid, '%d\n', size(bbs, 1));
-            if ~isempty(bbs)
-                for j = 1:size(bbs,1)
-                    %each row: [x1 y1 w h score]
-                    fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
-                end
-            end
-        end
-        
-        if show_image 
-            figure(2); %figure(2)
-            im(img);
-            if ~isempty(bbs)
-                %1209: filter low scoring bboxes
-                %mean_score = mean(bbs(:,5));
-                %bbs = bbs(bbs(:,5)>=10, :); 
-                bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-                bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-                %1209 added: display new score + old score
-                %bbs = [bbs scores(sel_idx,:)];
-                bbApply('draw',bbs);% pause();
-            end
-            if ~isempty(bbs_easy_gt)
-                bbApply('draw',round(bbs_easy_gt),'r');
-            end
-            if save_image
-                saveName = sprintf('%s%cres_%s',res_dir, filesep, sstr{2});
-                export_fig(saveName, '-png', '-a1', '-native');
-            end
+    % print the bbox number
+    fprintf(fid, '%d\n', size(bbs, 1));
+    if ~isempty(bbs)
+        for j = 1:size(bbs,1)
+            %each row: [x1 y1 w h score]
+            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), max(bbs(j, 5), bbs(j, 6)));
+            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + bbs(j, 6))/2);
         end
     end
-    if write_bbox
-        fclose(fid);
-        fprintf('Done with saving image %d bboxes.\n', i);
-    end
+
+    fclose(fid);
+    fprintf('Done with saving image %d bboxes.\n', i);
 end
 
 caffe.reset_all();
