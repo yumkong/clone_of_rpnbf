@@ -314,13 +314,12 @@ for i = 1:length(rois)
 end
 %normalize bf scores
 
-
 for i = 1:length(rois)
     sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
     event_name = sstr{1};
     event_dir = fullfile(SUBMIT_cachedir, event_name);
     mkdir_if_missing(event_dir);
-    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'w');
+    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
     fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
 
     bbs = bbs_repo{i};
