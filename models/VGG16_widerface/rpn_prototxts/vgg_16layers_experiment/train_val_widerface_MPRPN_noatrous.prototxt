@@ -8,74 +8,74 @@ input_dim: 224
 
 input: "labels_conv34"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 6            # 3 anchors
+input_dim: 3            # 3 anchors
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights_conv34"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 6            # 3 anchors
+input_dim: 3            # 3 anchors
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets_conv34"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 24  		# 4 (coords) * 3(anchors)
+input_dim: 12  		# 4 (coords) * 3(anchors)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights_conv34"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 24  		# 4 (coords) * 3(anchors)
+input_dim: 12  		# 4 (coords) * 3(anchors)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_conv5"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 12            # 6(anchors)        
+input_dim: 6            # 6(anchors)        
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights_conv5"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 12            # 6(anchors)        
+input_dim: 6            # 6(anchors)        
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets_conv5"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 48  		# 4 (coords) * 6(anchors) 
+input_dim: 24  		# 4 (coords) * 6(anchors) 
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights_conv5"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 48  		# 4 (coords) * 6(anchors) 
+input_dim: 24  		# 4 (coords) * 6(anchors) 
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 # 1121 newly added for conv6
 input: "labels_conv6"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 8            # 4(anchors)        
+input_dim: 4            # 4(anchors)        
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights_conv6"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 8            # 4(anchors)        
+input_dim: 4            # 4(anchors)        
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets_conv6"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 32  		# 4 (coords) * 4(anchors) 
+input_dim: 16  		# 4 (coords) * 4(anchors) 
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights_conv6"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 32  		# 4 (coords) * 4(anchors) 
+input_dim: 16  		# 4 (coords) * 4(anchors) 
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 7  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
@@ -533,7 +533,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 12   # 2(bg/fg) * 3(anchors) 
+	   num_output: 6   # 2(bg/fg) * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -560,7 +560,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 24	# 4 * 3(anchors) 
+	   num_output: 12	# 4 * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -728,7 +728,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 24   # 2(bg/fg) * 6(anchors) 
+	   num_output: 12   # 2(bg/fg) * 6(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -755,7 +755,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 48	# 4 * 6(anchors) 
+	   num_output: 24	# 4 * 6(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -898,7 +898,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 16   # 2(bg/fg) * 4(anchors) 
+	   num_output: 8   # 2(bg/fg) * 4(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -925,7 +925,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 32	# 4 * 4(anchors) 
+	   num_output: 16	# 4 * 4(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -1033,7 +1033,7 @@ layer {
    type: "RpnClsOHEM"
    rpn_cls_ohem_param {
         bg_per_img: 256  #256
-	anchor_num: 6
+	anchor_num: 3
 	random_shuffle_percent: 0.9
         ignore_label: -1
    }
@@ -1168,7 +1168,7 @@ layer {
    type: "RpnClsOHEM"
    rpn_cls_ohem_param {
         bg_per_img: 256  #256
-	anchor_num: 12
+	anchor_num: 6
 	random_shuffle_percent: 0.9
         ignore_label: -1
    }
@@ -1303,7 +1303,7 @@ layer {
    type: "RpnClsOHEM"
    rpn_cls_ohem_param {
         bg_per_img: 256  #256
-	anchor_num: 8
+	anchor_num: 4
 	random_shuffle_percent: 0.9
         ignore_label: -1
    }
