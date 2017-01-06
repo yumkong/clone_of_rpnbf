@@ -63,7 +63,7 @@ function [image_roidb, means_conv4, stds_conv4, means_conv5, stds_conv5, means_c
     %parfor i = 1:num_images
     for i = 1:num_images
         %1218 added to debug memory issue
-        fprintf('Getting anchors from image: %d / %d\n', i, num_images);
+        %fprintf('Getting anchors from image: %d / %d\n', i, num_images);
         % for fcn, anchors are concated as [channel, height, width], where channel is the fastest dimension.
        [anchors_conv4,anchors_conv5, anchors_conv6, im_scales] = proposal_locate_anchors_multibox_happy(conf, image_roidb_cell{i}.im_size);
         

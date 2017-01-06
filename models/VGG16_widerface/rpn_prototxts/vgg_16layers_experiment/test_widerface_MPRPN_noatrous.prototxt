@@ -460,7 +460,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 12   # 2(bg/fg) * 3(anchors) 
+	   num_output: 6   # 2(bg/fg) * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -487,7 +487,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 24	# 4 * 3(anchors) 
+	   num_output: 12	# 4 * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -655,7 +655,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 24   # 2(bg/fg) * 6(anchors) 
+	   num_output: 12   # 2(bg/fg) * 6(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -682,7 +682,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 48	# 4 * 6(anchors) 
+	   num_output: 24	# 4 * 6(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -825,7 +825,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 16   # 2(bg/fg) * 4(anchors) 
+	   num_output: 8   # 2(bg/fg) * 4(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -852,7 +852,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 32	# 4 * 4(anchors) 
+	   num_output: 16	# 4 * 4(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1

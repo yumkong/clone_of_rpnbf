@@ -65,6 +65,8 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_vn7(conf, model_
     
     % 1122 added to save combined results of conv4, conv5 and conv6
     aboxes = cell(length(aboxes_conv4), 1);  % conv5 and conv6 are also ok
+    aboxes_nms = cell(length(aboxes_conv4), 1);
+    nms_option = 3;
     % eval the gt recall
     gt_num = 0;
     gt_re_num_5 = 0;
@@ -73,9 +75,10 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_vn7(conf, model_
     gt_re_num_9 = 0;
     for i = 1:length(roidb.rois)
         %aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
-        aboxes{i} = cat(1, aboxes_conv4{i}(aboxes_conv4{i}(:, end) > score_thresh_conv4, :),...
-                           aboxes_conv5{i}(aboxes_conv5{i}(:, end) > score_thresh_conv5, :),...
-                           aboxes_conv6{i}(aboxes_conv6{i}(:, end) > score_thresh_conv6, :));
+        aboxes{i} = cat(1, aboxes_conv4{i}(aboxes_conv4{i}(:, end) > 0.7, :),...
+                           aboxes_conv5{i}(aboxes_conv5{i}(:, end) > 0.8, :),...
+                           aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.8, :));
+        aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
         %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
         gts = roidb.rois(i).boxes;
         if ~isempty(gts)
@@ -95,7 +98,9 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_vn7(conf, model_
     fprintf('gt recall rate (ol >0.8) = %.4f\n', gt_re_num_8 / gt_num);
     fprintf('gt recall rate (ol >0.9) = %.4f\n', gt_re_num_9 / gt_num);
 
-    roidb_regions.boxes = aboxes;
+    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.5, -1, conf.use_gpu);
+    %roidb_regions.boxes = aboxes;
+    roidb_regions.boxes = aboxes_nms;
     roidb_regions.images = imdb.image_ids;
     % concatenate gt boxes and high-scoring dt boxes
     roidb_BF                   = roidb_from_proposal_score(imdb, roidb, roidb_regions, ...
