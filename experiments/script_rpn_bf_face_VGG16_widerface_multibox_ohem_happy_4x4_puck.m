@@ -408,8 +408,7 @@ detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
 SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_cachedir');
 mkdir_if_missing(SUBMIT_cachedir);
 nms_option = 3; %1019 added
-show_image = false;
-
+show_image = true;
 rois = opts.roidb_test.rois;
 
 for i = 1:length(rois)
@@ -417,7 +416,7 @@ for i = 1:length(rois)
     event_name = sstr{1};
     event_dir = fullfile(SUBMIT_cachedir, event_name);
     mkdir_if_missing(event_dir);
-    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'w');
+    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
     fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
     if ~isempty(rois(i).boxes)
         img = imread(dataset.imdb_test.image_at(i));  
@@ -429,7 +428,14 @@ for i = 1:length(rois)
         sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
 
         bbs_ori = bbs(sel_idx, :);
-        
+        bbs_gt = rois(i).boxes(rois(i).gt,:);
+        bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+        bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+        bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+        % if a box has only 1 pixel in either size, remove it
+        invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+        bbs_gt(invalid_idx, :) = [];
+
         if show_image
             if ~isempty(bbs)
                 %1209: filter low scoring bboxes
@@ -449,10 +455,8 @@ for i = 1:length(rois)
             end
         end
         
-        
         %1019 added: do nms here
         bbs = pseudoNMS_v8(bbs_ori, nms_option);
-
         if ~isempty(bbs)
             bbs = bbs(bbs(:,5)>=10, :);  % filter low scoring bboxes
         end
@@ -469,6 +473,8 @@ for i = 1:length(rois)
             if ~isempty(bbs)
                 %1209: filter low scoring bboxes
                 %mean_score = mean(bbs(:,5));
+                bbs = bbs(bbs(:,5)>=10, :);
+
                 figure(2); 
                 im(img);
                 bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
