@@ -14,7 +14,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_rfcn_win_multibox_ohem'; %'caffe_faster_rcnn_win_cudnn'
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_final'; %'caffe_faster_rcnn_win_cudnn'
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
@@ -47,7 +47,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 %model_name_base = 'vgg16_multibox';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ohem_happy';
+exp_name = 'VGG16_widerface_multibox_ohem_happy_flip';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -85,8 +85,8 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
  conf_proposal.output_width_conv6, conf_proposal.output_height_conv6]...
                              = proposal_calc_output_size_multibox_happy(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
 % 1209: no need to change: same with all multibox
-[conf_proposal.anchors_conv34,conf_proposal.anchors_conv5, conf_proposal.anchors_conv6] = proposal_generate_anchors_multibox_final3(cache_data_this_model_dir, ...
-                                                            'ratios', [1], 'scales',  2.^[-1:5], 'add_size', [360 720 900]);  %[8 16 32 64 128 256 360 512 720 900]
+[conf_proposal.anchors_conv34,conf_proposal.anchors_conv5, conf_proposal.anchors_conv6] = proposal_generate_anchors_multibox_ohem_flip(cache_data_this_model_dir, ...
+                                                            'ratios', [1.25 0.8], 'scales',  2.^[-1:5], 'add_size', [360 720 900]);  %[8 16 32 64 128 256 360 512 720 900]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
 %conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);
@@ -107,42 +107,5 @@ method_name = 'RPN-ped';
 nms_option_test = 3;
 Faster_RCNN_Train.do_proposal_test_FDDB_multibox_ohem(conf_proposal, model.stage1_rpn, cache_name, method_name, nms_option_test);
 
-% %%  stage one fast rcnn
-% fprintf('\n***************\nstage one fast rcnn\n***************\n');
-% % train
-% model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
-% % test
-% opts.mAP                    = Faster_RCNN_Train.do_fast_rcnn_test_widerface(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
-%  
-% %%  stage two proposal
-% % net proposal
-% fprintf('\n***************\nstage two proposal\n***************\n');
-% % train
-% model.stage2_rpn.init_net_file = model.stage1_fast_rcnn.output_model_file;
-% model.stage2_rpn            = Faster_RCNN_Train.do_proposal_train_widerface(conf_proposal, dataset, model.stage2_rpn, opts.do_val);
-% % test
-% dataset.roidb_train        	= cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, x, y, nms_option_train), dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
-% dataset.roidb_test         	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-% 
-% %%  stage two fast rcnn
-% fprintf('\n***************\nstage two fast rcnn\n***************\n');
-% % train
-% model.stage2_fast_rcnn.init_net_file = model.stage1_fast_rcnn.output_model_file;
-% model.stage2_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface(conf_fast_rcnn, dataset, model.stage2_fast_rcnn, opts.do_val);
-% 
-% %% final test
-% fprintf('\n***************\nfinal test\n***************\n');
-%      
-% model.stage2_rpn.nms        = model.final_test.nms;
-% dataset.roidb_test       	= Faster_RCNN_Train.do_proposal_test_my(conf_proposal, model.stage2_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
-% opts.final_mAP              = Faster_RCNN_Train.do_fast_rcnn_test_widerface(conf_fast_rcnn, model.stage2_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
-
 
 end
-
-% function [anchors, output_width_map, output_height_map] = proposal_prepare_anchors(conf, cache_name, test_net_def_file)
-%     [output_width_map, output_height_map] ...                           
-%                                 = proposal_calc_output_size(conf, test_net_def_file);
-%     anchors                = proposal_generate_anchors(cache_name, ...
-%                                     'scales',  2.^[-1:5]);%0820:2.^[3:5] -->  2.^[-1:5]
-% end
