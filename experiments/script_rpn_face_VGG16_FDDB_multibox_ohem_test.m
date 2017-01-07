@@ -94,7 +94,7 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
 %model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_multibox_ohem_happy(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
-model.stage1_rpn.output_model_file = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', 'final');
+model.stage1_rpn.output_model_file = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train','final');
 
 %% test
 % get predicted rois (bboxes) to be used in later stages

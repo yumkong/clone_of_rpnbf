@@ -52,7 +52,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
     
     fprintf('score_threshold conv4 = %f, conv5 = %f, conv6 = %f\n', score_thresh_conv4, score_thresh_conv5, score_thresh_conv6);
     % drop the boxes which scores are lower than the threshold
-    show_image = true;
+    show_image = false;
     save_result = false;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
@@ -129,7 +129,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
         %1006 added to do NPD-style nms
         time = tic;
         aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
-        
+        bbs_all = aboxes_nms{i};
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         if show_image
             
