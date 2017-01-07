@@ -71,7 +71,7 @@ function do_proposal_test_widerface_multibox_realtest(conf, model_stage, imdb, c
     
     % 1121: add these 3 lines for drawing
     addpath(fullfile('external','export_fig'));
-    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic');
+    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic_realtest');
     mkdir_if_missing(res_dir);
     %1126 added to refresh figure
     close all;
@@ -83,9 +83,9 @@ function do_proposal_test_widerface_multibox_realtest(conf, model_stage, imdb, c
         
         %aboxes_nms{i} = cat(1, aboxes_conv4{i}(aboxes_conv4{i}(:, end) > score_thresh_conv4, :),...
         %                       aboxes_conv5{i}(aboxes_conv5{i}(:, end) > score_thresh_conv5, :));
-        aboxes_conv4{i} = aboxes_conv4{i}(aboxes_conv4{i}(:, end) > 0.7, :);  %score_thresh_conv4
-        aboxes_conv5{i} = aboxes_conv5{i}(aboxes_conv5{i}(:, end) > 0.8, :);%score_thresh_conv5
-        aboxes_conv6{i} = aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.8, :);%score_thresh_conv6
+        aboxes_conv4{i} = aboxes_conv4{i}(aboxes_conv4{i}(:, end) > 0.65, :);  %score_thresh_conv4, 0.7
+        aboxes_conv5{i} = aboxes_conv5{i}(aboxes_conv5{i}(:, end) > 0.7, :);%score_thresh_conv5, 0.8
+        aboxes_conv6{i} = aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.7, :);%score_thresh_conv6, 0.8
         aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
         % draw boxes after 'naive' thresholding
 %         sstr = strsplit(imdb.image_ids{i}, filesep);
