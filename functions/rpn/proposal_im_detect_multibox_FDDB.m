@@ -18,6 +18,7 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     %scaled_im_size = round(im_size * im_scales);
     %1216 added: to test FDDB only use the original scale, no scaling
     % but need to pad the image size to 8N x 8M
+	% no scaling, just padding to a size of 8x
     target_size = [size(im,1) size(im,2)];
     new_target_size = ceil(target_size / 8) * 8;
     botpad = new_target_size(1) - target_size(1);
@@ -80,9 +81,19 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     
     scores_conv4 = scores_conv4(:);
     
+     % 1025: decimate anchors by one half (only keep one boxes out of each anchor scale position)
+    anchor_num = size(conf.anchors_conv34, 1);  %14
+    half_anchor_num = anchor_num/2; %7
+    tmp_scores = reshape(scores_conv4, anchor_num, []); 
+    hw1_score = tmp_scores(1:half_anchor_num, :);
+    hw2_score = tmp_scores(1+half_anchor_num:end, :);
+    hw1_greater_mask = (hw1_score >= hw2_score);
+    greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
+    %1212 added: combine two masks
+    final_mask = greater_mask(:) & score_mask;
     %1205 added: keep only those local maximum scores
-    scores_conv4 = scores_conv4(score_mask,:);
-    pred_boxes_conv4 = pred_boxes_conv4(score_mask,:);  % new pred_boxes
+    scores_conv4 = scores_conv4(final_mask,:);
+    pred_boxes_conv4 = pred_boxes_conv4(final_mask,:);  % new pred_boxes
     
     if conf.test_drop_boxes_runoff_image
         contained_in_image = is_contain_in_image(anchors_conv4, round(size(im) * im_scales));
@@ -101,8 +112,8 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     pred_boxes_conv4 = pred_boxes_conv4(scores_ind, :);
     
     % 1216 added: get rid of too low scoring boxes to save space
-    scores_conv4 = scores_conv4(scores_conv4 >= 0.3,:);
-    pred_boxes_conv4 = pred_boxes_conv4(scores_conv4 >= 0.3,:);
+    %scores_conv4 = scores_conv4(scores_conv4 >= 0.3,:);
+    %pred_boxes_conv4 = pred_boxes_conv4(scores_conv4 >= 0.3,:);
     
     % ===================================================== for conv5
     % Apply bounding-box regression deltas
@@ -129,6 +140,18 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     
     scores_conv5 = scores_conv5(:);
     
+    % 1025: decimate anchors by one half (only keep one boxes out of each anchor scale position)
+    anchor_num = size(conf.anchors_conv5, 1);  %14
+    half_anchor_num = anchor_num/2; %7
+    tmp_scores = reshape(scores_conv5, anchor_num, []); 
+    hw1_score = tmp_scores(1:half_anchor_num, :);
+    hw2_score = tmp_scores(1+half_anchor_num:end, :);
+    hw1_greater_mask = (hw1_score >= hw2_score);
+    greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
+    scores_conv5 = scores_conv5(greater_mask(:),:);  %new scores
+    pred_boxes_conv5 = pred_boxes_conv5(greater_mask(:),:);  % new pred_boxes
+    %====== end of 1025
+    
     if conf.test_drop_boxes_runoff_image
         contained_in_image = is_contain_in_image(anchors_conv5, round(size(im) * im_scales));
         pred_boxes_conv5 = pred_boxes_conv5(contained_in_image, :);
@@ -144,8 +167,8 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     pred_boxes_conv5 = pred_boxes_conv5(scores_ind, :);
     
     % 1216 added: get rid of too low scoring boxes to save space
-    scores_conv5 = scores_conv5(scores_conv5 >= 0.3,:);
-    pred_boxes_conv5 = pred_boxes_conv5(scores_conv5 >= 0.3,:);
+    %scores_conv5 = scores_conv5(scores_conv5 >= 0.3,:);
+    %pred_boxes_conv5 = pred_boxes_conv5(scores_conv5 >= 0.3,:);
     
     %1114 sort conv4 and conv5 together
     %pred_boxes = cat(1, pred_boxes_conv4, pred_boxes_conv5);
@@ -179,6 +202,18 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     
     scores_conv6 = scores_conv6(:);
     
+    % 1025: decimate anchors by one half (only keep one boxes out of each anchor scale position)
+    anchor_num = size(conf.anchors_conv6, 1);  %14
+    half_anchor_num = anchor_num/2; %7
+    tmp_scores = reshape(scores_conv6, anchor_num, []); 
+    hw1_score = tmp_scores(1:half_anchor_num, :);
+    hw2_score = tmp_scores(1+half_anchor_num:end, :);
+    hw1_greater_mask = (hw1_score >= hw2_score);
+    greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
+    scores_conv6 = scores_conv6(greater_mask(:),:);  %new scores
+    pred_boxes_conv6 = pred_boxes_conv6(greater_mask(:),:);  % new pred_boxes
+    %====== end of 1025
+    
     if conf.test_drop_boxes_runoff_image
         contained_in_image = is_contain_in_image(anchors_conv6, round(size(im) * im_scales));
         pred_boxes_conv6 = pred_boxes_conv6(contained_in_image, :);
@@ -194,8 +229,8 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     pred_boxes_conv6 = pred_boxes_conv6(scores_ind, :);
  
     % 1216 added: get rid of too low scoring boxes to save space
-    scores_conv6 = scores_conv6(scores_conv6 >= 0.3,:);
-    pred_boxes_conv6 = pred_boxes_conv6(scores_conv6 >= 0.3,:);
+    %scores_conv6 = scores_conv6(scores_conv6 >= 0.3,:);
+    %pred_boxes_conv6 = pred_boxes_conv6(scores_conv6 >= 0.3,:);
 end
 
 function [data_blob, rois_blob, im_scale_factors] = get_blobs(conf, im, rois)
