@@ -14,7 +14,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_rfcn_win_multibox_ohem'; %'caffe_faster_rcnn_win_cudnn'
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_final'; %'caffe_faster_rcnn_win_cudnn'
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
@@ -52,9 +52,47 @@ exp_name = 'VGG16_widerface_multibox_ohem_happy_flip';
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = true;  %true --> false
-event_num                   = 11; %-1
+event_num                   = -1; %11
 dataset                     = Dataset.widerface_all_flip(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
+%dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
+%0106 added all test images
 dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
+
+train_sel_idx_name = fullfile(cache_data_this_model_dir, 'sel_idx.mat');
+try
+    %load('output\train_roidb_event123.mat');
+    load(train_sel_idx_name);
+catch
+    example_num = length(dataset.imdb_train.image_ids);
+    half_example_num = example_num/2; %12880
+    % only select half of the flipped image for memory efficiency
+    %tmp_idx = round(rand([half_example_num,1]));
+    tmp_idx = (rand([half_example_num,1])>=0.8);  %1/3 are 1, 2/3 are 0
+    sel_idx = ones(example_num, 1); % all original images are set as 1
+    sel_idx(2:2:end) = tmp_idx;  % flipped images are randomly set
+    
+    test_num = length(dataset.imdb_test.image_ids);
+    if test_num > 500
+        sel_val_idx = randperm(test_num, 500);
+    else
+        sel_val_idx = 1:test_num;
+    end
+    sel_val_idx = sel_val_idx';
+    save(train_sel_idx_name, 'sel_idx', 'sel_val_idx');
+end
+fprintf('Total training image is %d\n', sum(sel_idx));
+fprintf('Total test image is %d\n', length(sel_val_idx));
+% randomly select flipped train
+sel_idx = logical(sel_idx);
+dataset.imdb_train.image_ids = dataset.imdb_train.image_ids(sel_idx,:);
+dataset.imdb_train.flip_from = dataset.imdb_train.flip_from(sel_idx,:);
+dataset.imdb_train.sizes = dataset.imdb_train.sizes(sel_idx,:);
+dataset.roidb_train.rois = dataset.roidb_train.rois(:, sel_idx);
+% randomly select test 
+dataset.imdb_test.image_ids = dataset.imdb_test.image_ids(sel_val_idx,:);
+%dataset.imdb_test.flip_from = dataset.imdb_test.flip_from(sel_val_idx,:);
+dataset.imdb_test.sizes = dataset.imdb_test.sizes(sel_val_idx,:);
+dataset.roidb_test.rois = dataset.roidb_test.rois(:, sel_val_idx);
 
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
@@ -104,6 +142,11 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_mult
 cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
-Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem_happy_flip(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+%0101: use all validation set instead of 500
+%dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
+%0106 use all test set for final evaluation: dataset.imdb_realtest
+dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
+%Faster_RCNN_Train.do_proposal_test_widerface_multibox_ohem_happy_flip(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, cache_name, method_name, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_multibox_realtest(conf_proposal, model.stage1_rpn, dataset.imdb_realtest, cache_name, method_name, nms_option_test);
 
 end

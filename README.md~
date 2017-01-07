@@ -370,3 +370,126 @@ all of which are around 35)
 1212
 ohem_happy (e1_e11) is done!
 score_threshold conv4 = 0.862857, conv5 = 0.828735, conv6 = 0.924826
+gt recall rate = 0.6291
+gt recall rate after nms-3 = 0.6018
+
+1215
+ohem_happy_flip (e1_e11) is done!
+score_threshold conv4 = 0.891689, conv5 = 0.828444, conv6 = 0.910268
+gt recall rate = 0.6289
+gt recall rate after nms-3 = 0.6002  (similar to ohem_happy)
+
+1216
+CMS (keep average 200 proposal per image)
+gt recall rate = 0.5485
+gt recall rate after nms-3 = 0.5015
+
+
+===========
+1217
+training BF error:
+Training AdaBoost: nWeak=1536 nFtrs=38400 pos=159424 neg=200000
+Out of memory. Type HELP MEMORY for your options.
+==> so set the upper limit to pos=160000 neg=160000
+
+multibox_CRV
+gt recall rate = 0.6186
+gt recall rate after nms-3 = 0.5820
+==> not so good as conv4single, why?
+
+===========
+1218
+finally choose ohem_happy_flip as CRV submission version
+
+for i = 1:length(image_roidb_train)
+  aa = strfind(image_roidb_train(i).image_path, '/');
+  image_roidb_train(i).image_path = [image_roidb_train(i).image_path(1:aa(end-1)) image_roidb_train(i).image_id];
+end
+
+for i = 1:length(image_roidb_val)
+  aa = strfind(image_roidb_val(i).image_path, '/');
+  image_roidb_val(i).image_path = [image_roidb_val(i).image_path(1:aa(end-1)) image_roidb_val(i).image_id];
+end
+
+=============
+1227
+(1)
+ohem_happy_flip training done, result is very good!
+after nms: conv34:50, conv5:100, conv6=10
+score_threshold conv4 = 0.936758, conv5 = 0.870751, conv6 = 0.924484
+(2)
+ohem_happy_flip bf, data preparation has some problem, debug:
+===
+i = 1;
+img = imread(dataset.imdb_train{1}.image_at(i));
+im(img);
+bbs = [roidb_train_BF.rois(i).boxes roidb_train_BF.rois(i).scores];
+bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+bbApply('draw',bbs, 'g');
+===
+==> fix the bug, so 
+score_threshold conv4 = 0.630544, conv5 = 0.583918, conv6 = 0.386236
+gt recall rate (ol >0.5) = 0.7473
+gt recall rate (ol >0.7) = 0.5190
+gt recall rate (ol >0.8) = 0.2950
+gt recall rate (ol >0.9) = 0.0502
+gt_num: 188676
+
+=============
+0103
+Ablation experiment finally use this
+nms = 0.8
+model.stage1_rpn.nms.after_nms_topN_conv34      = 150;  %50
+model.stage1_rpn.nms.after_nms_topN_conv5      	= 40;  %100
+model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %1000
+32-500
+For det-4:
+All scales: gt recall rate = 0.6067
+8-32: gt recall rate = 0.7471
+33-360: gt recall rate = 0.3369
+361-900: gt recall rate = 0.0000
+For det-16:
+All scales: gt recall rate = 0.4747
+8-32: gt recall rate = 0.2579
+33-360: gt recall rate = 0.8957
+361-900: gt recall rate = 0.9839
+For det-32:
+All scales: gt recall rate = 0.0200
+8-32: gt recall rate = 0.0000
+33-360: gt recall rate = 0.0495
+361-900: gt recall rate = 0.9919
+For det-all:
+All scales: gt recall rate = 0.8083
+8-32: gt recall rate = 0.7524
+33-360: gt recall rate = 0.9164
+361-900: gt recall rate = 0.9919
+
+
+==============
+0105 happy [noflip] [no atrous] [ohem] train for 20k30k
+score_threshold conv4 = 0.551139, conv5 = 0.479938, conv6 = 0.000000
+For det-4:
+All scales: gt recall rate = 0.6285
+8-32: gt recall rate = 0.7697
+33-360: gt recall rate = 0.3572
+361-900: gt recall rate = 0.0000
+For det-16:
+All scales: gt recall rate = 0.4953
+8-32: gt recall rate = 0.2915
+33-360: gt recall rate = 0.8911
+361-900: gt recall rate = 0.9919
+For det-32:
+All scales: gt recall rate = 0.0210
+8-32: gt recall rate = 0.0000
+33-360: gt recall rate = 0.0524
+361-900: gt recall rate = 0.9919
+For det-all:
+All scales: gt recall rate = 0.8239
+8-32: gt recall rate = 0.7813
+33-360: gt recall rate = 0.9059
+361-900: gt recall rate = 0.9919
+
+===========
+0106 happy [noflip] [atrous] [no ohem] train for 20k30k
+

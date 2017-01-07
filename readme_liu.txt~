@@ -92,7 +92,7 @@ bbApply('draw',bbs(11775:11781,:), 'g');
 anchor_pos = [0.5*(anchors(:,1)+anchors(:,3)) 0.5*(anchors(:,2)+anchors(:,4))];
 anchor_pos = anchor_pos(1:14:end,:);
 re_im = imresize(im, im_scales);
-figure, imshow(re_im/256);
+figure, imshow(re_im/255);
 hold on
 plot(anchor_pos(:,1), anchor_pos(:,2),'g.','MarkerSize',5)
 hold off
@@ -155,6 +155,6 @@ I1102 18:40:11.553016 31440 common.cpp:187] Number of multiprocessors:     24
 I1102 18:40:11.553021 31440 common.cpp:188] Kernel execution timeout:      Yes
 
 
-1103 res50 conv4==================
-gt recall rate = 0.7381
-gt recall rate after nms-3 = 0.5875
+137
+
+

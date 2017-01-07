@@ -90,7 +90,8 @@ function [pred_boxes_conv4, scores_conv4, pred_boxes_conv5, scores_conv5, pred_b
     end
     
     % drop too small boxes
-    [pred_boxes_conv4, scores_conv4] = filter_boxes(conf.test_min_box_size-2, pred_boxes_conv4, scores_conv4);
+    %0101: conf.test_min_box_size-2 ==> conf.test_min_box_size-3
+    [pred_boxes_conv4, scores_conv4] = filter_boxes(conf.test_min_box_size-3, pred_boxes_conv4, scores_conv4);
     
     % sort
     [scores_conv4, scores_ind] = sort(scores_conv4, 'descend');

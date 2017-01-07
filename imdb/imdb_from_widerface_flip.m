@@ -90,8 +90,8 @@ catch
     imdb.flip = flip;
     %(6)  1020
     if flip
-        image_at = @(i) sprintf('%s/%s.%s', imdb.image_dir, imdb.image_ids{i}, imdb.extension);
-        flip_image_at = @(i) sprintf('%s/%s_flip.%s', imdb.image_dir, imdb.image_ids{i}, imdb.extension);
+        image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
+        flip_image_at = @(i) sprintf('%s%c%s_flip.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
         % 1: fliplr, 2: flipud, 3: rot90 (counterclock-90), 4: rot90-lr (clockwise-90)
         if 1  %fix randi seed to make result repeatable
             rng_seed = 6;
@@ -106,7 +106,7 @@ catch
         for i = 1:length(imdb.image_ids)
             % no matter the flipped image exists or not, always regenerate
             % it.
-          %if ~exist(flip_image_at(i), 'file')
+          if ~exist(flip_image_at(i), 'file')
              im = imread(image_at(i));
              switch flip_type_pool(i)
                  case 1
@@ -120,7 +120,7 @@ catch
                  otherwise
                      disp('Unknown flip type.')
              end
-          %end
+          end
         end
         img_num = length(imdb.image_ids)*2;
         image_ids = imdb.image_ids;
@@ -144,7 +144,7 @@ catch
     %(13)
     imdb.roidb_func = @roidb_from_wider;
     %(14)
-    imdb.image_at = @(i) sprintf('%s/%s.%s', imdb.image_dir, imdb.image_ids{i}, imdb.extension);
+    imdb.image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
 
     %(15) height, width
     sizes = zeros(length(imdb.image_ids), 2);

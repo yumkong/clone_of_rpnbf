@@ -23,8 +23,12 @@ switch usage
         %dataset.imdb_test     = imdb_from_widerface(devkit, 'test', use_flip) ;
         %dataset.roidb_test    = dataset.imdb_test.roidb_func(dataset.imdb_test);
         [dataset.imdb_test, dataset.roidb_test] = imdb_from_widerface(devkit, 'test', false, cache_dir, model_name_base, event_num);
+    case {'realtest'}
+        %dataset.imdb_test     = imdb_from_widerface(devkit, 'test', use_flip) ;
+        %dataset.roidb_test    = dataset.imdb_test.roidb_func(dataset.imdb_test);
+        [dataset.imdb_realtest] = imdb_from_widerface_realtest(devkit, 'realtest', false, cache_dir, model_name_base, event_num);
     otherwise
-        error('usage = ''train'' or ''test''');
+        error('usage = ''train'' or ''test'' or ''realtest''');
 end
 
 end

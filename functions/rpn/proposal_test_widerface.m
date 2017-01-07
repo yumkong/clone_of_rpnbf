@@ -83,7 +83,10 @@ function aboxes = proposal_test_widerface(conf, imdb, varargin)
             [boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th));  
-
+            % to save memory, only score >= 0.1 is kept
+            scores = scores(scores >= 0.1);
+            boxes = boxes(scores >= 0.1, :);
+            
             aboxes{i} = [boxes, scores];
             
             if 0

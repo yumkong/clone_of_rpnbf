@@ -2,9 +2,9 @@ function rects = pseudoNMS_v8(candi_rects, nms_option, img)
 
 % overlapping threshold for grouping nearby detections
 overlappingThreshold = 0.9; %0.7:0.5233, 0.8:0.5218, 0.6:0.5233 %1012 0.7-->0.75
-overlappingThreshold2 = 0.8; %0.5: 0.5233, 0.6: 0.5420   %1012: 0.6 --> 0.7
+overlappingThreshold2 = 0.5; %0.5: 0.5233, 0.6: 0.5420   %0.8
 overlappingThreshold3 = 0.2;
-embeddingThreshold = 0.55; %0.5: 0.5279  0.55: 0.5337 
+embeddingThreshold = 0.8; %0.55
 large_small_ratio = 0.2; %0.1: 0.5271  %0.2: 0.5279
 % candi_rects: N x 5 matrix, each row: [x1 y1 x2 y2 score]
 
@@ -58,7 +58,7 @@ for i = 1 : numCandidates
     % now a row vector
     %weight = candi_rects(index, 5)';
     weight = candi_rects(index, 5);
-    rects(i,5) = sum( weight );  %1202: max --> sum
+    rects(i,5) = max( weight );  %1202: max --> sum
     % 1024 masked
     %weight = weight.^ 3; %make big score bigger and small score smaller
     
@@ -154,11 +154,17 @@ if nms_option >=2
                     nearby_idx = s ./ (local_area_all(ii) + local_area_all - s) >= 0.7;
                     combined_flag(nearby_idx) = true;
                     % use ii to represent all nearby boxes
+                    % 0105 changed
+                    %tmp_rect = [new_rects(nearby_idx, 5)' * new_rects(nearby_idx, 1:4)/numel(nearby_idx) new_rects(ii, 5)];
+                    %rects = cat(1, rects, tmp_rect);
                     rects = cat(1, rects, new_rects(ii, :));
                     cnt = cnt+1;
                     combined_flag(ii) = true;
                 end
-                if cnt>=2
+                %if cnt>=2
+                %if ~any(new_rects(~combined_flag, 5)>=0.9)
+                % at most given out 3 boxes
+                if (cnt>=2) && any(new_rects(~combined_flag, 5)<0.8)
                    break; %only keep two bboxes 
                 end
             end
@@ -236,9 +242,9 @@ if nms_option >=3
                continue; 
             end
             s = max(h,0) * max(w,0);
-
+            %0.55
             if s / area_rect(i) >= embeddingThreshold || s / area_rect(j) >= embeddingThreshold
-                % the larger box should less or equal to 3 times of the size of
+                % the larger box should less or equal to 5 times of the size of
                 % the smaller one
                 if area_rect(i) / area_rect(j) >= large_small_ratio && area_rect(j) / area_rect(i) >= large_small_ratio
                     predicate(i,j) = true;

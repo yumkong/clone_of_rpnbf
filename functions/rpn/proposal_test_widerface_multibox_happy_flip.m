@@ -88,7 +88,14 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_widerface_mu
             [boxes_conv4, scores_conv4, boxes_conv5, scores_conv5, boxes_conv6, scores_conv6] = proposal_im_detect_multibox_happy_flip(conf, caffe_net, im);
             %[boxes, scores] = proposal_im_detect_multibox(conf, caffe_net, im);
             
-            fprintf(' time: %.3fs\n', toc(th));  
+            fprintf(' time: %.3fs\n', toc(th)); 
+            %1230 added
+            scores_conv4 = scores_conv4(scores_conv4 >= 0.55,:);  %0101:0.1-->0.55
+            boxes_conv4 = boxes_conv4(scores_conv4 >= 0.55,:);
+            scores_conv5 = scores_conv5(scores_conv5 >= 0.55,:);
+            boxes_conv5 = boxes_conv5(scores_conv5 >= 0.55,:);
+            scores_conv6 = scores_conv6(scores_conv6 >= 0.55,:);
+            boxes_conv6 = boxes_conv6(scores_conv6 >= 0.55,:);
 
             aboxes_conv4{i} = [boxes_conv4, scores_conv4];
             aboxes_conv5{i} = [boxes_conv5, scores_conv5];
