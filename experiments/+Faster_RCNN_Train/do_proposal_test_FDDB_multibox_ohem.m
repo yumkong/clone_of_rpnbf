@@ -52,7 +52,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
     
     fprintf('score_threshold conv4 = %f, conv5 = %f, conv6 = %f\n', score_thresh_conv4, score_thresh_conv5, score_thresh_conv6);
     % drop the boxes which scores are lower than the threshold
-    show_image = false;
+    show_image = true;
     save_result = false;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
@@ -84,9 +84,10 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
     % read all image names
     [~, fileList] = FDDB_ReadList(listFile);
     % in window system, replace '/' with '\'
-    if ispc
-        fileList = strrep(fileList, '/', '\');
-    end
+    % 0107: always make it '/' even for windows system
+    %if ispc
+    %    fileList = strrep(fileList, '/', '\');
+    %end
     for i = 1:length(aboxes_conv4)
         
         %aboxes_nms{i} = cat(1, aboxes_conv4{i}(aboxes_conv4{i}(:, end) > score_thresh_conv4, :),...
@@ -96,7 +97,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
         aboxes_conv6{i} = aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.7, :);%score_thresh_conv6, 0.8
         aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
         % draw boxes after 'naive' thresholding
-        if show_image
+        if 0
             %1216 changed
             imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
             img = imread(imgFile);
@@ -131,10 +132,8 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
         aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
         bbs_all = aboxes_nms{i};
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
-        if show_image
-            
+        if 0         
             %1121 also draw gt boxes
-            
             figure(2); 
             imshow(img);  %im(img)
             hold on
@@ -174,6 +173,20 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
         end
         
         fprintf('Done with saving image %d bboxes.\n', i);
+        if show_image         
+            %1121 also draw gt boxes
+            figure(3); 
+            imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
+            img = imread(imgFile);
+            imshow(img);  %im(img)
+            hold on
+            if ~isempty(bbs_all)
+                  bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
+                  bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
+                  bbApply('draw',bbs_all,'g');
+            end
+            hold off
+        end
     end
 	fclose(fout);
 
