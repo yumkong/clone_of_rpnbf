@@ -151,7 +151,7 @@ if nms_option >=2
                     w = min(rects_one(3), new_rects(:,3)) - max(rects_one(1), new_rects(:,1)) + 1;
                     s = max(h,0) .* max(w,0);
                     % 1006 changed to make it more strict
-                    nearby_idx = s ./ (local_area_all(ii) + local_area_all - s) >= 0.7;
+                    nearby_idx = s ./ (local_area_all(ii) + local_area_all - s) >= 0.6;
                     combined_flag(nearby_idx) = true;
                     % use ii to represent all nearby boxes
                     % 0105 changed
@@ -164,7 +164,7 @@ if nms_option >=2
                 %if cnt>=2
                 %if ~any(new_rects(~combined_flag, 5)>=0.9)
                 % at most given out 3 boxes
-                if (cnt>=2) && any(new_rects(~combined_flag, 5)<0.8)
+                if (cnt>=2) && all(new_rects(~combined_flag, 5)<0.95)
                    break; %only keep two bboxes 
                 end
             end

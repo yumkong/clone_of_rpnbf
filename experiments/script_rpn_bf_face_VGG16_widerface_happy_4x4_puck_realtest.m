@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_multibox_ohem_happy_4x4_puck()
+function script_rpn_bf_face_VGG16_widerface_happy_4x4_puck_realtest()
 
 clc;
 clear mex;
@@ -148,7 +148,9 @@ model.stage1_rpn.nms.after_nms_topN_conv4      	= 100;  %50
 model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %3
 is_test = true;
-roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
+dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
+dataset.roidb_realtest = struct('name','WIDERFACE_realtest', 'rois', repmat(struct('boxes',[],'scores', []), 1, length(dataset.imdb_realtest.image_ids)));
+roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_realtest(conf_proposal, model.stage1_rpn, dataset.imdb_realtest, dataset.roidb_realtest, is_test);
 %model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
 model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
 model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
@@ -217,13 +219,13 @@ for kk = 1:length(roidb_train_BF.rois)
 end
 opts.roidb_train = roidb_train_BF;
 % 1001: add 'ignores' field to roidb
-[roidb_test_BF.rois(:).ignores] = deal([]);
-for kk = 1:length(roidb_test_BF.rois)
-    tm_gt = roidb_test_BF.rois(kk).gt;
-    tm_gt = tm_gt(tm_gt > 0);
-    %all gts are not ignored in widerface
-    roidb_test_BF.rois(kk).ignores = zeros(size(tm_gt));
-end
+% [roidb_test_BF.rois(:).ignores] = deal([]);
+% for kk = 1:length(roidb_test_BF.rois)
+%     tm_gt = roidb_test_BF.rois(kk).gt;
+%     tm_gt = tm_gt(tm_gt > 0);
+%     %all gts are not ignored in widerface
+%     roidb_test_BF.rois(kk).ignores = zeros(size(tm_gt));
+% end
 opts.roidb_test = roidb_test_BF;
 opts.imdb_train = dataset.imdb_train{1};
 opts.imdb_test = dataset.imdb_test;
@@ -288,12 +290,12 @@ opts.train_gts = train_gts;
 % train BF detector
 detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
 
-show_image = false;
-SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_val');
+show_image = true;
+SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_realtest');
 mkdir_if_missing(SUBMIT_cachedir);
-final_score_path = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
+final_score_path = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_realtest.name);
 mkdir_if_missing(final_score_path);
-final_score_file = fullfile(final_score_path, 'val_box_score.mat');
+final_score_file = fullfile(final_score_path, 'realtest_box_score.mat');
 try
     % try to load cache
     ld = load(final_score_file);
@@ -306,24 +308,23 @@ catch
     bf_score_min = 0;
     bf_score_max = 0;
     bbs_repo = cell(length(rois), 1);
-    num_val = length(rois);
-    for i = 1:num_val
-        fprintf('Processing image %d / %d\n', i, num_val);
+    num_realtest = length(rois);
+    for i = 1:num_realtest
+        fprintf('Processing image %d / %d\n', i, num_realtest);
         if ~isempty(rois(i).boxes)
-            img = imread(dataset.imdb_test.image_at(i));  
+            img = imread(dataset.imdb_realtest.image_at(i));  
             feat = rois_get_features_ratio_4x4_context(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
             bf_scores = adaBoostApply(feat, detector.clf);
-            
+            bf_score_min = min(bf_score_min, min(bf_scores));
+            bf_score_max = max(bf_score_max, max(bf_scores));
             mprpn_scores = rois(i).scores;
             bbs_all = [rois(i).boxes bf_scores mprpn_scores];
 
-            sel_idx = (1:size(bbs_all,1))'; %'
-            sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+            %sel_idx = (1:size(bbs_all,1))'; %'
+            %sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
 
-            bbs = bbs_all(sel_idx, :);
-			bf_score_min = min(bf_score_min, min(bbs(:,5)));
-            bf_score_max = max(bf_score_max, max(bbs(:,5)));
-            bbs_repo{i} = bbs;
+            %bbs = bbs_all(sel_idx, :);
+            bbs_repo{i} = bbs_all;
         end
     end
     save(final_score_file, 'bbs_repo','bf_score_min','bf_score_max');
@@ -331,12 +332,12 @@ end
 %normalize bf scores
 
 for i = 1:length(bbs_repo)
-    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
+    sstr = strsplit(dataset.imdb_realtest.image_ids{i}, filesep);
     event_name = sstr{1};
     event_dir = fullfile(SUBMIT_cachedir, event_name);
     mkdir_if_missing(event_dir);
     fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
-    fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
+    fprintf(fid, '%s\n', [dataset.imdb_realtest.image_ids{i} '.jpg']);
 
     bbs = bbs_repo{i};
     % 0107 fixed a bug here: empty bbs
@@ -345,7 +346,7 @@ for i = 1:length(bbs_repo)
     end
     % 0107: add visualization here!!!
     if show_image
-        img = imread(dataset.imdb_test.image_at(i));
+        img = imread(dataset.imdb_realtest.image_at(i));
         bbs_show = [bbs(:,1:4) (bbs(:,5)+bbs(:,6))/2];
         figure(1), clf;
         imshow(img);

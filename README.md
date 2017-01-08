@@ -496,4 +496,27 @@ All scales: gt recall rate = 0.8239
 
 ===========
 0106 happy [noflip] [atrous] [no ohem] train for 20k30k
+score_threshold conv4 = 0.728043, conv5 = 0.795226, conv6 = 0.268397
+For det-4:
+All scales: gt recall rate = 0.6686
+8-32: gt recall rate = 0.7990
+33-360: gt recall rate = 0.4189
+361-900: gt recall rate = 0.0000
+For det-16:
+All scales: gt recall rate = 0.4851
+8-32: gt recall rate = 0.2723
+33-360: gt recall rate = 0.8987
+361-900: gt recall rate = 0.9839
+For det-32:
+All scales: gt recall rate = 0.0199
+8-32: gt recall rate = 0.0000
+33-360: gt recall rate = 0.0493
+361-900: gt recall rate = 0.9758
+For det-all:
+All scales: gt recall rate = 0.8435
+8-32: gt recall rate = 0.8031
+33-360: gt recall rate = 0.9214
+361-900: gt recall rate = 0.9919
 
+===================
+0106 happy [noflip] [noatrous] [no ohem] train for 20k30k

@@ -51,7 +51,7 @@ function do_proposal_test_widerface_multibox_ohem_happy_flip(conf, model_stage, 
     
     fprintf('score_threshold conv4 = %f, conv5 = %f, conv6 = %f\n', score_thresh_conv4, score_thresh_conv5, score_thresh_conv6);
     % drop the boxes which scores are lower than the threshold
-    show_image = false;
+    show_image = true;
     save_result = false;
     % path to save file
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
@@ -95,7 +95,7 @@ function do_proposal_test_widerface_multibox_ohem_happy_flip(conf, model_stage, 
 %         fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'w');
 %         fprintf(fid, '%s\n', [imdb.image_ids{i} '.jpg']);
         
-        if show_image
+        if 0
             img = imread(imdb.image_at(i));  
             %draw before NMS
             bbs_conv4 = aboxes_conv4{i};
@@ -139,7 +139,7 @@ function do_proposal_test_widerface_multibox_ohem_happy_flip(conf, model_stage, 
 %         end
 %         fclose(fid);
 %         fprintf('Done with saving image %d bboxes.\n', i);
-        if show_image      
+        if 0      
             %1121 also draw gt boxes
             bbs_gt = roidb.rois(i).boxes;
             bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
@@ -171,7 +171,7 @@ function do_proposal_test_widerface_multibox_ohem_happy_flip(conf, model_stage, 
             end
         end
     end
-    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.5, -1, conf.use_gpu);
+    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.33, -1, conf.use_gpu); %0.5
     for i = 1:length(aboxes_conv4)
         % draw boxes after 'naive' thresholding
         sstr = strsplit(imdb.image_ids{i}, filesep);
@@ -191,6 +191,39 @@ function do_proposal_test_widerface_multibox_ohem_happy_flip(conf, model_stage, 
         end
         fclose(fid);
         fprintf('Done with saving image %d bboxes.\n', i);
+        
+        if show_image      
+            %1121 also draw gt boxes
+            img = imread(imdb.image_at(i));  
+            bbs_gt = roidb.rois(i).boxes;
+            bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+            bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+            bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+            % if a box has only 1 pixel in either size, remove it
+            invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+            bbs_gt(invalid_idx, :) = [];
+            
+            figure(2); 
+            imshow(img);  %im(img)
+            hold on
+
+            if ~isempty(bbs_all)
+                  bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
+                  bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
+                  bbApply('draw',bbs_all,'g');
+            end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
+            hold off
+            % 1121: save result
+            if save_result
+                strs = strsplit(imdb.image_at(i), '/');
+                saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
+                export_fig(saveName, '-png', '-a1', '-native');
+                fprintf('image %d saved.\n', i);
+            end
+        end
     end
 	
 
