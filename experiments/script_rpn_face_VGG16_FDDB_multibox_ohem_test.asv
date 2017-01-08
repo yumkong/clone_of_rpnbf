@@ -106,23 +106,9 @@ cache_name = 'widerface';
 method_name = 'RPN-ped';
 nms_option_test = 3;
 
-% 0108 added: load BF detector
-BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context_4x4_context_puck');  %puck
-mkdir_if_missing(BF_cachedir);
-prefix_name = fullfile(BF_cachedir, 'DeepCaltech_otf');
-bf_detector_name = [prefix_name 'Detector.mat']; 
-t = load(bf_detector_name); 
+t = load(nm); 
 detector = t.detector; 
-%0108 load caffe_net for feature extraction
-BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem.prototxt');
-log_dir = fullfile(BF_cachedir, 'log');
-mkdir_if_missing(log_dir);
-caffe_log_file_base = fullfile(log_dir, 'caffe_log');
-caffe.init_log(caffe_log_file_base);
-caffe_net = caffe.Net(BF_prototxt_path, 'test');  % error here
-caffe_net.copy_from(final_model_path);
-
-Faster_RCNN_Train.do_proposal_test_FDDB_multibox_ohem(conf_proposal, model.stage1_rpn, cache_name, method_name, nms_option_test, detector, caffe_net);
+Faster_RCNN_Train.do_proposal_test_FDDB_multibox_ohem(conf_proposal, model.stage1_rpn, cache_name, method_name, nms_option_test);
 
 
 end

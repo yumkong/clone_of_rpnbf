@@ -161,22 +161,24 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
     for i = 1:length(aboxes_conv4)
         % draw boxes after 'naive' thresholding
         
-        bbs = aboxes_nms{i};
+        bbs_all = aboxes_nms{i};
         %do bf here
         imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
         img = imread(imgFile);
-        feat = rois_get_features_ratio_4x4_context_FDDB(conf, caffe_net, img, bbs, 3000, 2);   
+        feat = rois_get_features_ratio_4x4_context_FDDB(conf, caffe_net, img, bbs_all, 3000, 2);   
         bf_scores = adaBoostApply(feat, detector.clf);
-        mprpn_scores = bbs(:,5);
-        bbs_all = [bbs(:,1:4) bf_scores mprpn_scores];
-        bbs_repo{i} = bbs_all;
+        mprpn_scores = bbs_all();
+            bbs_all = [rois(i).boxes bf_scores mprpn_scores];
+
+            sel_idx = (1:size(bbs_all,1))'; %'
+            sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
+
+            bbs = bbs_all(sel_idx, :);
+			bf_score_min = min(bf_score_min, min(bbs(:,5)));
+            bf_score_max = max(bf_score_max, max(bbs(:,5)));
+            bbs_repo{i} = bbs;
     end
-    bbs_tmp = cell2mat(bbs_repo);
-    bf_score_min = min(bbs_tmp(:,5));
-    bf_score_max = max(bbs_tmp(:,5));
     save(final_score_file, 'bbs_repo','bf_score_min','bf_score_max');
-    
-    for i = 1:length(aboxes_conv4)
 		numFaces = size(bbs_all, 1);
         fprintf(fout, '%s\n%d\n', fileList{i}, numFaces);
 
