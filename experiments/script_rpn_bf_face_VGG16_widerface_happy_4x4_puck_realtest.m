@@ -290,7 +290,7 @@ opts.train_gts = train_gts;
 % train BF detector
 detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
 
-show_image = true;
+show_image = false;
 SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_realtest');
 mkdir_if_missing(SUBMIT_cachedir);
 final_score_path = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_realtest.name);
@@ -305,8 +305,8 @@ try
     clear ld;
 catch   
     rois = opts.roidb_test.rois;
-    bf_score_min = 0;
-    bf_score_max = 0;
+    %bf_score_min = 0;
+    %bf_score_max = 0;
     bbs_repo = cell(length(rois), 1);
     num_realtest = length(rois);
     for i = 1:num_realtest
@@ -315,8 +315,7 @@ catch
             img = imread(dataset.imdb_realtest.image_at(i));  
             feat = rois_get_features_ratio_4x4_context(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
             bf_scores = adaBoostApply(feat, detector.clf);
-            bf_score_min = min(bf_score_min, min(bf_scores));
-            bf_score_max = max(bf_score_max, max(bf_scores));
+            
             mprpn_scores = rois(i).scores;
             bbs_all = [rois(i).boxes bf_scores mprpn_scores];
 
@@ -327,9 +326,17 @@ catch
             bbs_repo{i} = bbs_all;
         end
     end
+    %get min/max bf scores and save them
+    bbs_tmp = cell2mat(bbs_repo);
+    bf_score_min = min(bbs_tmp(:,5));
+    bf_score_max = max(bbs_tmp(:,5));
     save(final_score_file, 'bbs_repo','bf_score_min','bf_score_max');
+    clear bbs_tmp;
 end
-%normalize bf scores
+
+% optional: cubic root of bf scores
+bf_score_min = nthroot(bf_score_min, 3);
+bf_score_max = nthroot(bf_score_max, 3);
 
 for i = 1:length(bbs_repo)
     sstr = strsplit(dataset.imdb_realtest.image_ids{i}, filesep);
@@ -342,6 +349,8 @@ for i = 1:length(bbs_repo)
     bbs = bbs_repo{i};
     % 0107 fixed a bug here: empty bbs
     if ~isempty(bbs)
+        % optinal: cubic root of bf scores
+        bbs(:,5) = nthroot(bbs(:,5), 3);
         bbs(:,5) = (bbs(:,5) - bf_score_min) / (bf_score_max - bf_score_min);
     end
     % 0107: add visualization here!!!
@@ -366,7 +375,7 @@ for i = 1:length(bbs_repo)
             %each row: [x1 y1 w h score]
             %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
             %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), max(bbs(j, 5), bbs(j, 6)));
-            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + bbs(j, 6))/2);
+            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + 2*bbs(j, 6))/3);
         end
     end
 

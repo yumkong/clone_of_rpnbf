@@ -79,6 +79,7 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_vn7(conf, model_
                            aboxes_conv5{i}(aboxes_conv5{i}(:, end) > 0.7, :),...
                            aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.7, :));
         aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
+        fprintf('PseudoNms for image %d / %d', i, length(roidb.rois));
         %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
         gts = roidb.rois(i).boxes;
         if ~isempty(gts)
@@ -98,7 +99,7 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_vn7(conf, model_
     fprintf('gt recall rate (ol >0.8) = %.4f\n', gt_re_num_8 / gt_num);
     fprintf('gt recall rate (ol >0.9) = %.4f\n', gt_re_num_9 / gt_num);
 
-    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.5, -1, conf.use_gpu);
+    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.33, -1, conf.use_gpu); %0.5
     %roidb_regions.boxes = aboxes;
     roidb_regions.boxes = aboxes_nms;
     roidb_regions.images = imdb.image_ids;

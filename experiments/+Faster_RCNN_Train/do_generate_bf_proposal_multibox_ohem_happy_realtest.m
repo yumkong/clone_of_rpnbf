@@ -77,7 +77,7 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_realtest(conf, m
         aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
     end
 
-    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.5, -1, conf.use_gpu);
+    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.33, -1, conf.use_gpu); %0.5
     %roidb_regions.boxes = aboxes;
     roidb_regions.boxes = aboxes_nms;
     roidb_regions.images = imdb.image_ids;

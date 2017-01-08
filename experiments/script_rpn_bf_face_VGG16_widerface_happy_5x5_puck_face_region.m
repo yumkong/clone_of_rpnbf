@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_multibox_ohem_happy_4x4_puck()
+function script_rpn_bf_face_VGG16_widerface_happy_5x5_puck_face_region()
 
 clc;
 clear mex;
@@ -148,6 +148,8 @@ model.stage1_rpn.nms.after_nms_topN_conv4      	= 100;  %50
 model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %3
 is_test = true;
+% 0101: reget all val images
+%dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num_test, cache_data_this_model_dir, model_name_base);
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
 %model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
 model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
@@ -160,14 +162,14 @@ model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %3
 roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
-BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context_4x4_context_puck');  %puck
+BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_face_region_5x5_puck');  %puck
 mkdir_if_missing(BF_cachedir);
 dataDir = fullfile('datasets','caltech');                % Caltech ==> to be replaced?
 %posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
 addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
 %addpath(fullfile('..','external', 'toolbox'));
-BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem.prototxt'); %test_feat_conv34atrous_multibox_ohem_5x5
+BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem_5x5.prototxt'); %test_feat_conv34atrous_multibox_ohem_5x5
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
 conf.test_max_size = conf_proposal.max_size;
@@ -199,9 +201,9 @@ opts.bg_hard_min_ratio = [1 1 1 1 1 1 1];
 opts.pBoost.pTree.maxDepth = 5; 
 opts.pBoost.discrete = 0;  %?
 opts.pBoost.pTree.fracFtrs = 1/4;  %? 
-opts.first_nNeg = 140000;  %1227: 150000 --> 120000
+opts.first_nNeg = 100000;  %1227: 150000 --> 120000
 opts.nNeg = 30000;  % #neg needed by every stage 5000--> 300000
-opts.nAccNeg = 190000;  % #1227: 200000 --> 180000 --> 160000
+opts.nAccNeg = 160000;  % #1227: 200000 --> 180000 --> 160000
 % 1203 added
 opts.nPerNeg = 10;
 pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
@@ -263,7 +265,7 @@ end
 tmp_box = roidb_test_BF.rois(1).boxes(sel_idx, :);
 % liu@1001: extract deep features from tmp_box
 % opts.max_rois_num_in_gpu = 3000, opts.ratio = 1
-feat = rois_get_features_ratio_4x4_context(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
+feat = rois_get_features_ratio_5x5_face_region(conf, caffe_net, img, tmp_box, opts.max_rois_num_in_gpu, opts.ratio);
 toc;
 opts.feat_len = size(feat,2); %1203 changed: length(feat)
 
@@ -286,102 +288,7 @@ end
 opts.train_gts = train_gts;
 
 % train BF detector
-detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
-
-show_image = false;
-SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_val');
-mkdir_if_missing(SUBMIT_cachedir);
-final_score_path = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
-mkdir_if_missing(final_score_path);
-final_score_file = fullfile(final_score_path, 'val_box_score.mat');
-try
-    % try to load cache
-    ld = load(final_score_file);
-    bbs_repo = ld.bbs_repo;
-    bf_score_min = ld.bf_score_min;
-    bf_score_max = ld.bf_score_max;
-    clear ld;
-catch   
-    rois = opts.roidb_test.rois;
-    %bf_score_min = 0;
-    %bf_score_max = 0;
-    bbs_repo = cell(length(rois), 1);
-    num_val = length(rois);
-    for i = 1:num_val
-        fprintf('Processing image %d / %d\n', i, num_val);
-        if ~isempty(rois(i).boxes)
-            img = imread(dataset.imdb_test.image_at(i));  
-            feat = rois_get_features_ratio_4x4_context(conf, caffe_net, img, rois(i).boxes, opts.max_rois_num_in_gpu, opts.ratio);   
-            bf_scores = adaBoostApply(feat, detector.clf);
-            
-            mprpn_scores = rois(i).scores;
-            bbs_all = [rois(i).boxes bf_scores mprpn_scores];
-
-            sel_idx = (1:size(bbs_all,1))'; %'
-            sel_idx = intersect(sel_idx, find(~rois(i).gt)); % exclude gt
-
-            bbs = bbs_all(sel_idx, :);
-			%bf_score_min = min(bf_score_min, min(bbs(:,5)));
-            %bf_score_max = max(bf_score_max, max(bbs(:,5)));
-            bbs_repo{i} = bbs;
-        end
-    end
-    %get min/max bf scores and save them
-    bbs_tmp = cell2mat(bbs_repo);
-    bf_score_min = min(bbs_tmp(:,5));
-    bf_score_max = max(bbs_tmp(:,5));
-    save(final_score_file, 'bbs_repo','bf_score_min','bf_score_max');
-    clear bbs_tmp;
-end
-
-% optional: cubic root of bf scores
-bf_score_min = nthroot(bf_score_min, 3);
-bf_score_max = nthroot(bf_score_max, 3);
-
-for i = 1:length(bbs_repo)
-    sstr = strsplit(dataset.imdb_test.image_ids{i}, filesep);
-    event_name = sstr{1};
-    event_dir = fullfile(SUBMIT_cachedir, event_name);
-    mkdir_if_missing(event_dir);
-    fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'a');
-    fprintf(fid, '%s\n', [dataset.imdb_test.image_ids{i} '.jpg']);
-
-    bbs = bbs_repo{i};
-    % 0107 fixed a bug here: empty bbs
-    if ~isempty(bbs)
-        % optinal: cubic root of bf scores
-        bbs(:,5) = nthroot(bbs(:,5), 3);
-        bbs(:,5) = (bbs(:,5) - bf_score_min) / (bf_score_max - bf_score_min);
-    end
-    % 0107: add visualization here!!!
-    if show_image
-        img = imread(dataset.imdb_test.image_at(i));
-        bbs_show = [bbs(:,1:4) (bbs(:,5)+bbs(:,6))/2];
-        figure(1), clf;
-        imshow(img);
-        hold on
-        if ~isempty(bbs_show)
-            bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
-            bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
-            bbApply('draw',bbs_show,'m');
-        end
-        hold off
-    end
-    
-    % print the bbox number
-    fprintf(fid, '%d\n', size(bbs, 1));
-    if ~isempty(bbs)
-        for j = 1:size(bbs,1)
-            %each row: [x1 y1 w h score]
-            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
-            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), max(bbs(j, 5), bbs(j, 6)));
-            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + 2*bbs(j, 6))/3);
-        end
-    end
-
-    fclose(fid);
-    fprintf('Done with saving image %d bboxes.\n', i);
-end
+detector = DeepTrain_otf_trans_ratio_5x5_face_region( opts );
 
 caffe.reset_all();
 end
