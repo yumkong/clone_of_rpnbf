@@ -303,13 +303,13 @@ end
 if(m==4)
 	return;
 end 
-hs = [hs zeros(1,n)];
-bb = double(bb);
-for b = 1:n
-    %1209 changed
-	hs(b+n)=text(bb(b,1),bb(b,2),num2str(bb(b,5),4),tProp{:}); 
-    %hs(b+n)=text(bb(b,1),bb(b,2),[num2str(bb(b,5),2) '+' num2str(bb(b,6),2)],tProp{:}); 
-end
+% hs = [hs zeros(1,n)];
+% bb = double(bb);
+% for b = 1:n
+%     %1209 changed
+% 	hs(b+n)=text(bb(b,1),bb(b,2),num2str(bb(b,5),4),tProp{:}); 
+%     %hs(b+n)=text(bb(b,1),bb(b,2),[num2str(bb(b,5),2) '+' num2str(bb(b,6),2)],tProp{:}); 
+% end
 end
 
 function I = embed( I, bb, varargin )
