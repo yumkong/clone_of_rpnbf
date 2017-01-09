@@ -326,6 +326,7 @@ catch
             bbs_repo{i} = bbs_all;
         end
     end
+    save('bbs_repo.mat', 'bbs_repo');
     %get min/max bf scores and save them
     bbs_tmp = cell2mat(bbs_repo);
     bf_score_min = min(bbs_tmp(:,5));
