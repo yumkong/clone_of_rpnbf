@@ -156,49 +156,79 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
 	% 0106 write results according to FDDB format
 	SUBMIT_cachedir = fullfile(pwd, 'output', conf.exp_name, 'submit_bf_FDDB_cachedir');  %submit_mprpn_FDDB_cachedir
     mkdir_if_missing(SUBMIT_cachedir);
+    final_score_path = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, 'FDDB_test');
+    mkdir_if_missing(final_score_path);
+    final_score_file = fullfile(final_score_path, 'FDDB_box_score.mat');
 	resultFile = fullfile(SUBMIT_cachedir,'results.txt');
 	fout = fopen(resultFile, 'wt');
-    for i = 1:length(aboxes_conv4)
-        % draw boxes after 'naive' thresholding
-        
-        bbs = aboxes_nms{i};
-        %do bf here
-        imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
-        img = imread(imgFile);
-        feat = rois_get_features_ratio_4x4_context_FDDB(conf, caffe_net, img, bbs, 3000, 2);   
-        bf_scores = adaBoostApply(feat, detector.clf);
-        mprpn_scores = bbs(:,5);
-        bbs_all = [bbs(:,1:4) bf_scores mprpn_scores];
-        bbs_repo{i} = bbs_all;
+    try
+        % try to load cache
+        ld = load(final_score_file);
+        bbs_repo = ld.bbs_repo;
+        bf_score_min = ld.bf_score_min;
+        bf_score_max = ld.bf_score_max;
+        clear ld;
+    catch   
+        for i = 1:length(aboxes_conv4)
+            % draw boxes after 'naive' thresholding
+            fprintf('Computing BF scores for image %d / %d\n', i, length(aboxes_conv4));
+            bbs = aboxes_nms{i};
+            %do bf here
+            if ~isempty(bbs)
+                imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
+                img = imread(imgFile);
+                feat = rois_get_features_ratio_4x4_context_FDDB(conf, caffe_net, img, bbs, 3000, 2);   
+                bf_scores = adaBoostApply(feat, detector.clf);
+                mprpn_scores = bbs(:,5);
+                bbs_all = [bbs(:,1:4) bf_scores mprpn_scores];
+            else
+                bbs_all = [];
+            end
+            bbs_repo{i} = bbs_all;
+        end
+        for i = 1:length(bbs_repo)
+           if ~isa(bbs_repo{i}, 'single')
+               bbs_repo{i} = single(bbs_repo{i});
+           end
+        end
+        bbs_repo = bbs_repo';
+        bbs_tmp = cell2mat(bbs_repo);
+        bf_score_min = min(bbs_tmp(:,5));
+        bf_score_max = max(bbs_tmp(:,5));
+        save(final_score_file, 'bbs_repo','bf_score_min','bf_score_max');
+        clear bbs_tmp;
     end
-    bbs_tmp = cell2mat(bbs_repo);
-    bf_score_min = min(bbs_tmp(:,5));
-    bf_score_max = max(bbs_tmp(:,5));
-    save(final_score_file, 'bbs_repo','bf_score_min','bf_score_max');
-    
+    % optional: cubic root of bf scores
+    bf_score_min = nthroot(bf_score_min, 3);
+    bf_score_max = nthroot(bf_score_max, 3);
     for i = 1:length(aboxes_conv4)
-		numFaces = size(bbs_all, 1);
+        bbs = bbs_repo{i};
+		numFaces = size(bbs, 1);
         fprintf(fout, '%s\n%d\n', fileList{i}, numFaces);
 
-        if ~isempty(bbs_all)
+        if ~isempty(bbs)
+            % optinal: cubic root of bf scores
+            bbs(:,5) = nthroot(bbs(:,5), 3);
+            bbs(:,5) = (bbs(:,5) - bf_score_min) / (bf_score_max - bf_score_min);
             for j = 1:numFaces
                 %each row: [x1 y1 w h score]
-                fprintf(fout, '%d %d %d %d %f\n', round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
+                %fprintf(fout, '%d %d %d %d %f\n', round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
+                fprintf(fout, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + 2*bbs(j, 6))/3);
             end
         end
         
         fprintf('Done with saving image %d bboxes.\n', i);
-        if show_image         
+        if 0         
             %1121 also draw gt boxes
             figure(3); 
             imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
             img = imread(imgFile);
             imshow(img);  %im(img)
             hold on
-            if ~isempty(bbs_all)
-                  bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
-                  bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
-                  bbApply('draw',bbs_all,'g');
+            if ~isempty(bbs)
+                  bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+                  bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+                  bbApply('draw',bbs,'g');
             end
             hold off
         end

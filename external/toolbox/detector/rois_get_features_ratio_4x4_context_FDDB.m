@@ -33,8 +33,9 @@ function [feats] = rois_get_features_ratio_4x4_context_FDDB(conf, caffe_net, im,
     
     %0108 changed specially for FDDB
     %[im_blob, rois_blob, ~] = get_blobs(conf, im, boxes_full);
-    im_blob = bsxfun(@minus, im, conf.image_means);
-    rois_blob = boxes_full;
+    im_blob = bsxfun(@minus, single(im), conf.image_means);
+    levels = ones(size(boxes_full, 1), 1);
+    rois_blob = single([levels, boxes_full]);
     % When mapping from image ROIs to feature map ROIs, there's some aliasing
     % (some distinct image ROIs get mapped to the same feature ROI).
     % Here, we identify duplicate feature ROIs, so we only compute features

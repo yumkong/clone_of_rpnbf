@@ -120,7 +120,7 @@ mkdir_if_missing(log_dir);
 caffe_log_file_base = fullfile(log_dir, 'caffe_log');
 caffe.init_log(caffe_log_file_base);
 caffe_net = caffe.Net(BF_prototxt_path, 'test');  % error here
-caffe_net.copy_from(final_model_path);
+caffe_net.copy_from(model.stage1_rpn.output_model_file);
 
 Faster_RCNN_Train.do_proposal_test_FDDB_multibox_ohem(conf_proposal, model.stage1_rpn, cache_name, method_name, nms_option_test, detector, caffe_net);
 
