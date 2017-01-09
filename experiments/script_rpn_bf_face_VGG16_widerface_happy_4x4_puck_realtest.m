@@ -326,8 +326,13 @@ catch
             bbs_repo{i} = bbs_all;
         end
     end
-    save('bbs_repo.mat', 'bbs_repo');
+    %save('bbs_repo.mat', 'bbs_repo');
     %get min/max bf scores and save them
+    for i = 1:length(bbs_repo)
+       if ~isa(bbs_repo{i}, 'single')
+           bbs_repo{i} = single(bbs_repo{i});
+       end
+    end
     bbs_tmp = cell2mat(bbs_repo);
     bf_score_min = min(bbs_tmp(:,5));
     bf_score_max = max(bbs_tmp(:,5));
@@ -355,16 +360,21 @@ for i = 1:length(bbs_repo)
         bbs(:,5) = (bbs(:,5) - bf_score_min) / (bf_score_max - bf_score_min);
     end
     % 0107: add visualization here!!!
+    if 1
+        im_name = dataset.imdb_realtest.image_at(i);
+        sstr2 = strsplit(im_name, filesep);
+        assert(strcmp(sstr2{end}, [sstr{2} '.jpg']));
+    end
     if show_image
         img = imread(dataset.imdb_realtest.image_at(i));
-        bbs_show = [bbs(:,1:4) (bbs(:,5)+bbs(:,6))/2];
+        bbs_show = [bbs(:,1:4) (bbs(:, 5) + 2*bbs(:, 6))/3];
         figure(1), clf;
         imshow(img);
         hold on
         if ~isempty(bbs_show)
             bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
             bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
-            bbApply('draw',bbs_show,'m');
+            bbApply('draw',bbs_show,'g');
         end
         hold off
     end
