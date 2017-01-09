@@ -218,7 +218,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
         end
         
         fprintf('Done with saving image %d bboxes.\n', i);
-        if 0         
+        if 1        
             %1121 also draw gt boxes
             figure(3); 
             imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
@@ -228,6 +228,10 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
             if ~isempty(bbs)
                   bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
                   bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+                  bbs(:, 5) = (bbs(:, 5) + 2*bbs(:, 6))/3;
+                  % only show boxes with a score >= 0.8
+                  sel_idx = bbs(:, 5) >= 0.8;
+                  bbs = bbs(sel_idx, :);
                   bbApply('draw',bbs,'g');
             end
             hold off
