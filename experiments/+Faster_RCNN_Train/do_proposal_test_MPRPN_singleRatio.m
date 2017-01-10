@@ -72,9 +72,9 @@ function do_proposal_test_MPRPN_singleRatio(conf, model_stage, imdb, roidb, cach
         
         %aboxes_nms{i} = cat(1, aboxes_conv4{i}(aboxes_conv4{i}(:, end) > score_thresh_conv4, :),...
         %                       aboxes_conv5{i}(aboxes_conv5{i}(:, end) > score_thresh_conv5, :));
-        aboxes_conv4{i} = aboxes_conv4{i}(aboxes_conv4{i}(:, end) > score_thresh_conv4, :);
-        aboxes_conv5{i} = aboxes_conv5{i}(aboxes_conv5{i}(:, end) > score_thresh_conv5, :);
-        aboxes_conv6{i} = aboxes_conv6{i}(aboxes_conv6{i}(:, end) > score_thresh_conv6, :);
+        aboxes_conv4{i} = aboxes_conv4{i}(aboxes_conv4{i}(:, end) > 0.65, :);  %score_thresh_conv4
+        aboxes_conv5{i} = aboxes_conv5{i}(aboxes_conv5{i}(:, end) > 0.7, :);  %score_thresh_conv5
+        aboxes_conv6{i} = aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.7, :);  %score_thresh_conv6
         aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
     end
 
@@ -159,6 +159,11 @@ function Get_Detector_Recall(roidb, aboxes, thr1, thr2)
     gt_recall_num_det2 = 0;
     gt_num_det3 = 0;  % 361 ~ 900
     gt_recall_num_det3 = 0;
+    %0110 added
+    gt_num_total = 0;
+    gt_num_det1_total = 0;
+    gt_num_det2_total = 0;
+    gt_num_det3_total = 0;
     for i = 1:length(roidb.rois)
         gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
         face_height = gts(:,4) - gts(:,2) + 1;
@@ -177,6 +182,8 @@ function Get_Detector_Recall(roidb, aboxes, thr1, thr2)
             gt_num = gt_num + size(gts_all, 1);
             if ~isempty(max_ols)
                 gt_recall_num = gt_recall_num + sum(max_ols >= 0.5);
+                %0110 added
+                gt_num_total = gt_num_total + size(rois, 1);
             end
         end
         if ~isempty(gts_det1)
@@ -184,6 +191,9 @@ function Get_Detector_Recall(roidb, aboxes, thr1, thr2)
             gt_num_det1 = gt_num_det1 + size(gts_det1, 1);
             if ~isempty(max_ols)
                 gt_recall_num_det1 = gt_recall_num_det1 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) >=8 & (rois(:,4) - rois(:,2)) <= thr1;
+                gt_num_det1_total = gt_num_det1_total + sum(tmp_idx);
             end
         end
         if ~isempty(gts_det2)
@@ -191,6 +201,9 @@ function Get_Detector_Recall(roidb, aboxes, thr1, thr2)
             gt_num_det2 = gt_num_det2 + size(gts_det2, 1);
             if ~isempty(max_ols)
                 gt_recall_num_det2 = gt_recall_num_det2 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr1 & (rois(:,4) - rois(:,2)) <= thr2;
+                gt_num_det2_total = gt_num_det2_total + sum(tmp_idx);
             end
         end
         if ~isempty(gts_det3)
@@ -198,13 +211,16 @@ function Get_Detector_Recall(roidb, aboxes, thr1, thr2)
             gt_num_det3 = gt_num_det3 + size(gts_det3, 1);
             if ~isempty(max_ols)
                 gt_recall_num_det3 = gt_recall_num_det3 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr2 & (rois(:,4) - rois(:,2)) <= 900;
+                gt_num_det3_total = gt_num_det3_total + sum(tmp_idx);
             end
         end
     end
-    fprintf('All scales: gt recall rate = %.4f\n', gt_recall_num / gt_num);
-    fprintf('8-32: gt recall rate = %.4f\n', gt_recall_num_det1 / gt_num_det1);
-    fprintf('33-360: gt recall rate = %.4f\n', gt_recall_num_det2 / gt_num_det2);
-    fprintf('361-900: gt recall rate = %.4f\n', gt_recall_num_det3 / gt_num_det3);
+    fprintf('All scales: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num, gt_num, gt_num_total);
+    fprintf('8-32: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det1, gt_num_det1, gt_num_det1_total);
+    fprintf('33-360: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det2, gt_num_det2, gt_num_det2_total);
+    fprintf('361-900: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det3, gt_num_det3, gt_num_det3_total);
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)

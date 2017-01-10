@@ -542,3 +542,85 @@ All scales: gt recall rate = 0.8454
 33-360: gt recall rate = 0.9263
 361-900: gt recall rate = 0.9919
 
+
+===========new experiments==================
+0110 noboth
+Doing nms ... aver_boxes_num = 622, select top -1
+aver_boxes_num = 405, select top -1
+aver_boxes_num = 202, select top -1
+ Done.
+score_threshold conv4 = 0.806755, conv5 = 0.997507, conv6 = 0.966116
+For det-4:
+All scales: gt recall num = 24574, gt_num = 36177, total num = 666348
+8-32: gt recall num = 19351, gt_num = 23901, total num = 399538
+33-360: gt recall num = 5223, gt_num = 12152, total num = 75642
+361-900: gt recall num = 0, gt_num = 124, total num = 0
+For det-16:
+All scales: gt recall num = 18109, gt_num = 36177, total num = 569743
+8-32: gt recall num = 6911, gt_num = 23901, total num = 30708
+33-360: gt recall num = 11075, gt_num = 12152, total num = 424849
+361-900: gt recall num = 123, gt_num = 124, total num = 60829
+For det-32:
+All scales: gt recall num = 648, gt_num = 36177, total num = 52493
+8-32: gt recall num = 0, gt_num = 23901, total num = 0
+33-360: gt recall num = 527, gt_num = 12152, total num = 24522
+361-900: gt recall num = 121, gt_num = 124, total num = 19487
+For det-all:
+All scales: gt recall num = 30868, gt_num = 36177, total num = 1288584
+8-32: gt recall num = 19434, gt_num = 23901, total num = 430246
+33-360: gt recall num = 11311, gt_num = 12152, total num = 525013
+361-900: gt recall num = 123, gt_num = 124, total num = 80316
+
+0110 noatrous
+Doing nms ... aver_boxes_num = 3120, select top -1
+aver_boxes_num = 538, select top -1
+aver_boxes_num = 31, select top -1
+ Done.
+score_threshold conv4 = 0.568685, conv5 = 0.992591, conv6 = 0.958331
+For det-4:
+All scales: gt recall num = 21066, gt_num = 36177, total num = 264739
+8-32: gt recall num = 16764, gt_num = 23901, total num = 185504
+33-360: gt recall num = 4302, gt_num = 12152, total num = 29901
+361-900: gt recall num = 0, gt_num = 124, total num = 0
+For det-16:
+All scales: gt recall num = 15276, gt_num = 36177, total num = 341833
+8-32: gt recall num = 4875, gt_num = 23901, total num = 9750
+33-360: gt recall num = 10279, gt_num = 12152, total num = 263733
+361-900: gt recall num = 122, gt_num = 124, total num = 45397
+For det-32:
+All scales: gt recall num = 655, gt_num = 36177, total num = 48258
+8-32: gt recall num = 0, gt_num = 23901, total num = 0
+33-360: gt recall num = 535, gt_num = 12152, total num = 23545
+361-900: gt recall num = 120, gt_num = 124, total num = 17892
+For det-all:
+All scales: gt recall num = 27626, gt_num = 36177, total num = 654830
+8-32: gt recall num = 16807, gt_num = 23901, total num = 195254
+33-360: gt recall num = 10697, gt_num = 12152, total num = 317179
+361-900: gt recall num = 122, gt_num = 124, total num = 63289
+
+0110 have both
+Doing nms ... aver_boxes_num = 6193, select top -1
+aver_boxes_num = 24102, select top -1
+aver_boxes_num = 852, select top -1
+ Done.
+score_threshold conv4 = 0.614484, conv5 = 0.985956, conv6 = 0.948157
+For det-4:
+All scales: gt recall num = 20447, gt_num = 36177, total num = 262243
+8-32: gt recall num = 16440, gt_num = 23901, total num = 178951
+33-360: gt recall num = 4007, gt_num = 12152, total num = 29125
+361-900: gt recall num = 0, gt_num = 124, total num = 0
+For det-16:
+All scales: gt recall num = 15714, gt_num = 36177, total num = 366951
+8-32: gt recall num = 5172, gt_num = 23901, total num = 10746
+33-360: gt recall num = 10421, gt_num = 12152, total num = 294411
+361-900: gt recall num = 121, gt_num = 124, total num = 39954
+For det-32:
+All scales: gt recall num = 669, gt_num = 36177, total num = 60303
+8-32: gt recall num = 0, gt_num = 23901, total num = 0
+33-360: gt recall num = 551, gt_num = 12152, total num = 28025
+361-900: gt recall num = 118, gt_num = 124, total num = 19728
+For det-all:
+All scales: gt recall num = 27388, gt_num = 36177, total num = 689497
+8-32: gt recall num = 16494, gt_num = 23901, total num = 189697
+33-360: gt recall num = 10773, gt_num = 12152, total num = 351561
+361-900: gt recall num = 121, gt_num = 124, total num = 59682
