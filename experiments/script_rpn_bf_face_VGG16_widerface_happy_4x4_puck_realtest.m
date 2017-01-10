@@ -365,20 +365,6 @@ for i = 1:length(bbs_repo)
         sstr2 = strsplit(im_name, filesep);
         assert(strcmp(sstr2{end}, [sstr{2} '.jpg']));
     end
-    if show_image
-        img = imread(dataset.imdb_realtest.image_at(i));
-        bbs_show = [bbs(:,1:4) (bbs(:, 5) + 2*bbs(:, 6))/3];
-        figure(1), clf;
-        imshow(img);
-        hold on
-        if ~isempty(bbs_show)
-            bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
-            bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
-            bbApply('draw',bbs_show,'g');
-        end
-        hold off
-    end
-    
     % print the bbox number
     fprintf(fid, '%d\n', size(bbs, 1));
     if ~isempty(bbs)
@@ -392,6 +378,24 @@ for i = 1:length(bbs_repo)
 
     fclose(fid);
     fprintf('Done with saving image %d bboxes.\n', i);
+    
+    if 1        
+        %1121 also draw gt boxes
+        img = imread(dataset.imdb_realtest.image_at(i));
+        bbs_show = [bbs(:,1:4) (bbs(:, 5) + 2*bbs(:, 6))/3];
+        % only show boxes with a score >= 0.8
+        sel_idx = bbs_show(:, 5) >= 0.8;
+        bbs_show = bbs_show(sel_idx, :);
+        figure(1), clf;
+        imshow(img);
+        hold on
+        if ~isempty(bbs_show)
+            bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
+            bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
+            bbApply('draw',bbs_show,'g');
+        end
+        hold off
+    end
 end
 
 caffe.reset_all();
