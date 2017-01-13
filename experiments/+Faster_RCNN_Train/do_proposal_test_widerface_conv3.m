@@ -22,125 +22,126 @@ function aboxes = do_proposal_test_widerface_conv3(conf, model_stage, imdb, roid
     score_thresh = scores(end);
     fprintf('score_threshold = %f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
-    show_image = true;
-    save_result = true;
-    % path to save file
-    cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', cache_name, method_name);
-    mkdir_if_missing(cache_dir);
-    
-    %1007 tempararily use another cell to save bbox after nms
-    aboxes_nms = cell(length(aboxes), 1);
-    %nms_option = 3; %1, 2, 3
-    %aboxes_nms2 = cell(length(aboxes), 1);
-    %nms_option2 = 2; %1, 2, 3
-    
-    % 1121: add these 3 lines for drawing
-    addpath(fullfile('external','export_fig'));
-    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic');
-    mkdir_if_missing(res_dir);
-	%1126 added to refresh figure
-    close all;
-    
     for i = 1:length(aboxes)
-        
-        aboxes{i} = aboxes{i}(aboxes{i}(:, end) > score_thresh, :);
-        
-        % draw boxes after 'naive' thresholding
-        if show_image
-            img = imread(imdb.image_at(i));  
-            %draw before NMS
-            bbs = aboxes{i};
-            if ~isempty(bbs)
-              bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-              bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-              %I=imread(imgNms{i});
-              figure(1); 
-              imshow(img);  %im(img)
-              bbApply('draw',bbs);
-            end
-        end
-        
-        %1006 added to do NPD-style nms
-        time = tic;
-        aboxes_nms{i} = pseudoNMS_v6(aboxes{i}, nms_option);
-        
-        fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
-        if show_image
-            %draw boxes after 'smart' NMS
-            bbs = aboxes_nms{i};
-            
-            %1121 also draw gt boxes
-            bbs_gt = roidb.rois(i).boxes;
-            bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
-            bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
-            bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
-            % if a box has only 1 pixel in either size, remove it
-            invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
-            bbs_gt(invalid_idx, :) = [];
-            
-            figure(2); 
-            imshow(img);  %im(img)
-            hold on
-            if ~isempty(bbs)
-              bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
-              bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
-              %I=imread(imgNms{i});
-              bbApply('draw',bbs, 'g');
-            end
-            if ~isempty(bbs_gt)
-              bbApply('draw',bbs_gt,'r');
-            end
-            hold off
-            % 1121: save result
-            if save_result
-                strs = strsplit(imdb.image_at(i), '/');
-                saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
-                export_fig(saveName, '-png', '-a1', '-native');
-                fprintf('image %d saved.\n', i);
-            end
-        end
+        aboxes{i} = aboxes{i}(aboxes{i}(:, end) >= 0.7, :);  %score_thresh_conv4
     end
-    
-    % save bbox before nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_all-ave-%d.txt', ave_per_image_topN));
-    save_bbox_to_txt(aboxes, imdb.image_ids, bbox_save_name);
-    % save bbox after nms
-    bbox_save_name = fullfile(cache_dir, sprintf('VGG16_all-ave-%d-nms-op%d.txt', ave_per_image_topN, nms_option));
-    save_bbox_to_txt(aboxes_nms, imdb.image_ids, bbox_save_name);
-	
-    % eval the gt recall
+
+    % 0103 added
+    thr1 = 32;
+    thr2 = 100;
+    thr3 = 300;
+    thr4 = 500;
+    %thr5 = 900;
+    fprintf('For det-conv3:\n');
+    Get_Detector_Recall(roidb, aboxes, thr1, thr2, thr3, thr4);
+  
+end
+
+function Get_Detector_Recall(roidb, aboxes, thr1, thr2, thr3, thr4)
     gt_num = 0;
-    gt_re_num = 0;
-    %1007 added
-    gt_num_nms = 0;
-    gt_re_num_nms = 0;
+    gt_recall_num = 0;
+    % 1229 added
+    gt_num_det1 = 0;  % 6 ~ 32
+    gt_recall_num_det1 = 0;  
+    gt_num_det2 = 0;  % 33 ~ 100
+    gt_recall_num_det2 = 0;
+    gt_num_det3 = 0;  % 101 ~ 300
+    gt_recall_num_det3 = 0;
+    gt_num_det4 = 0;  % 301 ~ 500
+    gt_recall_num_det4 = 0;  
+    gt_num_det5 = 0;  % 501 ~ inf
+    gt_recall_num_det5 = 0;
+
+    %0110 added
+    gt_num_detall_total = 0;
+    gt_num_det1_total = 0;
+    gt_num_det2_total = 0;
+    gt_num_det3_total = 0;
+    gt_num_det4_total = 0;
+    gt_num_det5_total = 0;
     for i = 1:length(roidb.rois)
-        %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
-        %if i == 245
-        %disp(i);
-        %end
         gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
-        if ~isempty(gts)
-            rois = aboxes{i}(:, 1:4);
-            max_ols = max(boxoverlap(rois, gts));
-            gt_num = gt_num + size(gts, 1);
+        face_height = gts(:,4) - gts(:,2) + 1;
+        idx_all = (face_height>= 6);  % all: 6-inf
+        idx_det1 = (face_height>= 6) & (face_height <= thr1); % 6-32
+        idx_det2 = (face_height> thr1) & (face_height <= thr2);%33-100
+        idx_det3 = (face_height> thr2) & (face_height <= thr3);%101-300
+        idx_det4 = (face_height> thr3) & (face_height <= thr4);%301-500
+        idx_det5 = (face_height> thr4); %500- inf
+        gts_all = gts(idx_all, :);
+        gts_det1 = gts(idx_det1, :);
+        gts_det2 = gts(idx_det2, :);
+        gts_det3 = gts(idx_det3, :);
+        gts_det4 = gts(idx_det4, :);
+        gts_det5 = gts(idx_det5, :);
+        
+        rois = aboxes{i}(:, 1:4);
+        if ~isempty(gts_all)
+            max_ols = max(boxoverlap(rois, gts_all));
+            gt_num = gt_num + size(gts_all, 1);
             if ~isempty(max_ols)
-                gt_re_num = gt_re_num + sum(max_ols >= 0.5);
+                gt_recall_num = gt_recall_num + sum(max_ols >= 0.5);
+                %0110 added
+                gt_num_detall_total = gt_num_detall_total + size(rois, 1);
             end
-            %1007 added
-            if ~isempty(aboxes_nms{i})
-                rois_nms = aboxes_nms{i}(:, 1:4);
-                max_ols_nms = max(boxoverlap(rois_nms, gts));
-                gt_num_nms = gt_num_nms + size(gts, 1);
-                if ~isempty(max_ols_nms)
-                    gt_re_num_nms = gt_re_num_nms + sum(max_ols_nms >= 0.5);
-                end
+        end
+        if ~isempty(gts_det1)
+            max_ols = max(boxoverlap(rois, gts_det1));
+            gt_num_det1 = gt_num_det1 + size(gts_det1, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det1 = gt_recall_num_det1 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) >=6 & (rois(:,4) - rois(:,2)) <= thr1;
+                gt_num_det1_total = gt_num_det1_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det2)
+            max_ols = max(boxoverlap(rois, gts_det2));
+            gt_num_det2 = gt_num_det2 + size(gts_det2, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det2 = gt_recall_num_det2 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr1 & (rois(:,4) - rois(:,2)) <= thr2;
+                gt_num_det2_total = gt_num_det2_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det3)
+            max_ols = max(boxoverlap(rois, gts_det3));
+            gt_num_det3 = gt_num_det3 + size(gts_det3, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det3 = gt_recall_num_det3 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr2 & (rois(:,4) - rois(:,2)) <= thr3;
+                gt_num_det3_total = gt_num_det3_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det4)
+            max_ols = max(boxoverlap(rois, gts_det4));
+            gt_num_det4 = gt_num_det4 + size(gts_det4, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det4 = gt_recall_num_det4 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr3 & (rois(:,4) - rois(:,2)) <= thr4;
+                gt_num_det4_total = gt_num_det4_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det5)
+            max_ols = max(boxoverlap(rois, gts_det5));
+            gt_num_det5 = gt_num_det5 + size(gts_det5, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det5 = gt_recall_num_det5 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr4;
+                gt_num_det5_total = gt_num_det5_total + sum(tmp_idx);
             end
         end
     end
-    fprintf('gt recall rate = %.4f\n', gt_re_num / gt_num);
-    % 1007 added
-    fprintf('gt recall rate after nms-%d = %.4f\n', nms_option, gt_re_num_nms / gt_num_nms);
+    fprintf('All scales: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num, gt_num, gt_num_detall_total);
+    fprintf('6-32: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det1, gt_num_det1, gt_num_det1_total);
+    fprintf('33-100: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det2, gt_num_det2, gt_num_det2_total);
+    fprintf('101-300: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det3, gt_num_det3, gt_num_det3_total);
+    fprintf('301-500: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det4, gt_num_det4, gt_num_det4_total);
+    fprintf('501-inf: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det5, gt_num_det5, gt_num_det5_total);
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)

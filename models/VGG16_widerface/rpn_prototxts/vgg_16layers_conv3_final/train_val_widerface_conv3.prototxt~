@@ -8,27 +8,27 @@ input_dim: 224
 
 input: "labels"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 10           # 3(anchors): [8 16 32]--> 10 anchors
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 10           # 3(anchors): [8 16 32] --> 10 anchors [8 16 32 64 128 256 360 512 720 900]    
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 10           # 3(anchors): [8 16 32]     
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 10           # 3(anchors): [8 16 32] --> 10 anchors [8 16 32 64 128 256 360 512 720 900]    
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 40  		# 4 (coords) * 3(anchors): [8 16 32] 
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 40  		# 4 (coords) * 3(anchors): [8 16 32] --> 4 x 10
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 40  		# 4 (coords) * 3(anchors): [8 16 32] 
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 40  		# 4 (coords) * 3(anchors): [8 16 32] --> 4 x 10
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 
 layer {
@@ -230,101 +230,12 @@ layer {
 	type: "ReLU"
 }
 
-# 1205: re-add conv4_1~conv4_3 to improve resolution
-
-layer {
-	bottom: "conv3_3"
-	top: "pool3"
-	name: "pool3"
-	type: "Pooling"
-	pooling_param {
-		pool: MAX
-		kernel_size: 2
-		stride: 2
-	}
-}
-
-layer {
-	bottom: "pool3"
-	top: "conv4_1"
-	name: "conv4_1"
-	param {
-		lr_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 512
-		pad: 1
-		kernel_size: 3
-	}
-}
-
-layer {
-	bottom: "conv4_1"
-	top: "conv4_1"
-	name: "relu4_1"
-	type: "ReLU"
-}
-
-layer {
-	bottom: "conv4_1"
-	top: "conv4_2"
-	name: "conv4_2"
-	param {
-		lr_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 512
-		pad: 1
-		kernel_size: 3
-	}
-}
-
-layer {
-	bottom: "conv4_2"
-	top: "conv4_2"
-	name: "relu4_2"
-	type: "ReLU"
-}
-
-layer {
-	bottom: "conv4_2"
-	top: "conv4_3"
-	name: "conv4_3"
-	param {
-		lr_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 512
-		pad: 1
-		kernel_size: 3
-	}
-}
-
-layer {
-	bottom: "conv4_3"
-	top: "conv4_3"
-	name: "relu4_3"
-	type: "ReLU"
-}
-
 #1113 added norm layer
 layer {
-  name: "conv4_3_norm"
+  name: "conv3_3_norm"
   type: "Normalize"
-  bottom: "conv4_3"
-  top: "conv4_3_norm"
+  bottom: "conv3_3"
+  top: "conv3_3_norm"
   norm_param {
     across_spatial: false
     scale_filler {
@@ -335,11 +246,13 @@ layer {
   }
 }
 
+# 1204: deleted conv4_1~conv4_3 to improve resolution
+
 #-----------------------layer +-------------------------
 layer {
    name: "conv_proposal1"
    type: "Convolution"
-   bottom: "conv4_3_norm"
+   bottom: "conv3_3_norm"
    top: "conv_proposal1"
 	param {
 		lr_mult: 1.0
@@ -382,7 +295,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 20   # 2(bg/fg) * 3(anchors) -->2*10
+	   num_output: 6   # 2(bg/fg) * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -409,7 +322,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 40	# 4 * 3(anchors) 
+	   num_output: 12	# 4 * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1

@@ -406,35 +406,6 @@ layer {
 	   }
    }
 }
-# ===============end conv4 buffering===========================
-
-#-----------------------layer +-------------------------
-#layer {
-#   name: "conv_proposal1"
-#   type: "Convolution"
-#   bottom: "conv4_3_norm"
-#   top: "conv_proposal1"
-#	param {
-#		lr_mult: 1.0
-#	}
-#	param {
-#		lr_mult: 2.0
-#	}
-#   convolution_param{
-#	   num_output: 512
-#	   kernel_size: 3
-#	   pad: 1
-#	   stride: 1
-#	   weight_filler {
-#		 type: "gaussian"
-#		 std: 0.01
-#	   }
-#	   bias_filler {
-#		 type: "constant"
-#		 value: 0
-#	   }
-#  }
-#}
 
 layer {
     bottom: "conv3_buffer"
@@ -466,7 +437,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 6   # 2(bg/fg) * 3(anchors) 
+	   num_output: 20   # 2(bg/fg) * 10(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -493,7 +464,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 12	# 4 * 3(anchors) 
+	   num_output: 40	# 4 * 10(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1

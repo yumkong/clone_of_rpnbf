@@ -83,7 +83,9 @@ function aboxes = proposal_test_widerface_conv3plus4(conf, imdb, varargin)
             [boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_conv3plus4(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th));  
-
+            %0112 added to save space
+            scores = scores(scores >= 0.3, :);
+            boxes = boxes(scores >= 0.3, :);
             aboxes{i} = [boxes, scores];
             
             if 0

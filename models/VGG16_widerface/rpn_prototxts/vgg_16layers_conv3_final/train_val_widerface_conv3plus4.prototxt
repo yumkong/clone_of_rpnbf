@@ -8,25 +8,25 @@ input_dim: 224
 
 input: "labels"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 3        # 3(anchors): [8 16 32]        
+input_dim: 10           # 3(anchors): [8 16 32] --> 10 anchors [8 16 32 64 128 256 360 512 720 900]    
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 3        # 3(anchors): [8 16 32]     
+input_dim: 10           # 3(anchors): [8 16 32] --> 10 anchors [8 16 32 64 128 256 360 512 720 900]    
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 12  		# 4 (coords) * 3(anchors): [8 16 32] 
+input_dim: 40  		# 4 (coords) * 3(anchors): [8 16 32] --> 4 x 10
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 12  		# 4 (coords) * 3(anchors): [8 16 32] 
+input_dim: 40  		# 4 (coords) * 3(anchors): [8 16 32] --> 4 x 10
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
@@ -429,35 +429,6 @@ layer {
 	   }
    }
 }
-# ===============end conv4 buffering===========================
-
-#-----------------------layer +-------------------------
-#layer {
-#   name: "conv_proposal1"
-#   type: "Convolution"
-#   bottom: "conv4_3_norm"
-#   top: "conv_proposal1"
-#	param {
-#		lr_mult: 1.0
-#	}
-#	param {
-#		lr_mult: 2.0
-#	}
-#   convolution_param{
-#	   num_output: 512
-#	   kernel_size: 3
-#	   pad: 1
-#	   stride: 1
-#	   weight_filler {
-#		 type: "gaussian"
-#		 std: 0.01
-#	   }
-#	   bias_filler {
-#		 type: "constant"
-#		 value: 0
-#	   }
-#  }
-#}
 
 layer {
     bottom: "conv3_buffer"
@@ -489,7 +460,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 6   # 2(bg/fg) * 3(anchors) 
+	   num_output: 20   # 2(bg/fg) * 10(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -516,7 +487,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 12	# 4 * 3(anchors) 
+	   num_output: 40	# 4 * 10(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -604,5 +575,5 @@ layer {
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 5  #1017: 10-->5
+  loss_weight: 80  #1017: 10-->5 --> 80
 }

@@ -14,6 +14,6 @@ model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 % rpn test setting
 model.stage1_rpn.nms.per_nms_topN               = -1; %20000
 model.stage1_rpn.nms.nms_overlap_thres       	= 1;%0.7
-model.stage1_rpn.nms.after_nms_topN         	= 100;  %1204:800--100
+model.stage1_rpn.nms.after_nms_topN         	= 200;  %1204:800--100
 
 end
