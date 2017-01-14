@@ -69,9 +69,9 @@ function aboxes = proposal_test_widerface_conv3plus4(conf, imdb, varargin)
         %    all_boxes[image] = N x 5 array of detections in
         %    (x1, y1, x2, y2, score)
         aboxes = cell(num_images, 1);
-        abox_deltas = cell(num_images, 1);
-        aanchors = cell(num_images, 1);
-        ascores = cell(num_images, 1);
+        %abox_deltas = cell(num_images, 1);
+        %aanchors = cell(num_images, 1);
+        %ascores = cell(num_images, 1);
         
         count = 0;
         for i = 1:num_images
@@ -80,7 +80,10 @@ function aboxes = proposal_test_widerface_conv3plus4(conf, imdb, varargin)
             th = tic;
             im = imread(imdb.image_at(i));
 
-            [boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_conv3plus4(conf, caffe_net, im);
+            %[boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_conv3plus4(conf, caffe_net, im);
+            % 0114 get rid of abox_deltas{i}, aanchors{i}, ascores{i}, they
+            % are of no use, but takes up too much cpu memory
+            [boxes, scores] = proposal_im_detect_conv3plus4(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th));  
             %0112 added to save space

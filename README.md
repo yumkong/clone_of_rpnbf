@@ -645,6 +645,13 @@ All scales: gt recall num = 29305, gt_num = 38642, total num = 5670437
 301-500: gt recall num = 302, gt_num = 304, total num = 531237
 501-inf: gt recall num = 130, gt_num = 131, total num = 597243
 
-conv3plus4:
-
+conv3plus4 (0114):
+score_threshold = 0.985161
+For det-conv3plus4:
+All scales: gt recall num = 30916, gt_num = 38642, total num = 4625697
+6-32: gt recall num = 19253, gt_num = 26359, total num = 457917
+33-100: gt recall num = 9032, gt_num = 9612, total num = 428737
+101-300: gt recall num = 2199, gt_num = 2236, total num = 651401
+301-500: gt recall num = 302, gt_num = 304, total num = 312464
+501-inf: gt recall num = 130, gt_num = 131, total num = 340403
 

@@ -636,7 +636,7 @@ All scales: gt recall num = 31052, gt_num = 38642, total num = 11400733
 301-500: gt recall num = 302, gt_num = 304, total num = 596455
 501-inf: gt recall num = 130, gt_num = 131, total num = 459916
 
-conv4 (0113)
+conv4 (aka conv3_4) (0113)
 For det-conv4:
 All scales: gt recall num = 29305, gt_num = 38642, total num = 5670437
 6-32: gt recall num = 17624, gt_num = 26359, total num = 374979
@@ -644,4 +644,7 @@ All scales: gt recall num = 29305, gt_num = 38642, total num = 5670437
 101-300: gt recall num = 2192, gt_num = 2236, total num = 981793
 301-500: gt recall num = 302, gt_num = 304, total num = 531237
 501-inf: gt recall num = 130, gt_num = 131, total num = 597243
+
+conv3plus4:
+
 
