@@ -655,6 +655,16 @@ All scales: gt recall num = 30916, gt_num = 38642, total num = 4625697
 301-500: gt recall num = 302, gt_num = 304, total num = 312464
 501-inf: gt recall num = 130, gt_num = 131, total num = 340403
 
+conv5 (conv3_5) (0115)
+score_threshold = 0.818033
+For det-conv5:
+All scales: gt recall num = 19776, gt_num = 38642, total num = 801541
+6-32: gt recall num = 8589, gt_num = 26359, total num = 50775
+33-100: gt recall num = 8631, gt_num = 9612, total num = 117342
+101-300: gt recall num = 2128, gt_num = 2236, total num = 170989
+301-500: gt recall num = 298, gt_num = 304, total num = 125411
+501-inf: gt recall num = 130, gt_num = 131, total num = 124952
+
 conv6 (conv3_6) (0115)
 score_threshold = 0.000000
 For det-conv6:
