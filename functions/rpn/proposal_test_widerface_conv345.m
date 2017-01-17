@@ -1,4 +1,4 @@
-function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
+function aboxes = proposal_test_widerface_conv345(conf, imdb, varargin)
 % aboxes = proposal_test_caltech(conf, imdb, varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -80,11 +80,11 @@ function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
             th = tic;
             im = imread(imdb.image_at(i));
 
-            %[boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_conv3_4(conf, caffe_net, im);
+            %[boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_conv3plus4(conf, caffe_net, im);
             % 0114 get rid of abox_deltas{i}, aanchors{i}, ascores{i}, they
             % are of no use, but takes up too much cpu memory
-            [boxes, scores] = proposal_im_detect_conv3_4(conf, caffe_net, im);
-
+            [boxes, scores] = proposal_im_detect_conv345(conf, caffe_net, im);
+            
             fprintf(' time: %.3fs\n', toc(th));  
             %0112 added to save space
             scores = scores(scores >= 0.3, :);

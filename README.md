@@ -674,3 +674,47 @@ All scales: gt recall num = 11337, gt_num = 38642, total num = 143983
 101-300: gt recall num = 2071, gt_num = 2236, total num = 35046
 301-500: gt recall num = 296, gt_num = 304, total num = 28731
 501-inf: gt recall num = 129, gt_num = 131, total num = 28042
+
+conv6_ohem (conv3_6_ohem) (0115)  ==> not a single scale range is better than conv3_6, so should NOT use ohem at all!
+###Setting 1
+bg_per_img: 256  #256
+anchor_num: 10
+random_shuffle_percent: 0.9
+ignore_label: -1
+===
+score_threshold = 0.369868
+For det-conv6:
+All scales: gt recall num = 9159, gt_num = 38642, total num = 100191
+6-32: gt recall num = 939, gt_num = 26359, total num = 1432
+33-100: gt recall num = 5811, gt_num = 9612, total num = 14225
+101-300: gt recall num = 1992, gt_num = 2236, total num = 26521
+301-500: gt recall num = 288, gt_num = 304, total num = 20710
+501-inf: gt recall num = 129, gt_num = 131, total num = 21320
+
+###Setting 2
+bg_per_img: 256  #256
+anchor_num: 10
+random_shuffle_percent: 0.2
+ignore_label: -1
+===
+score_threshold = 0.368712
+For det-conv6:
+All scales: gt recall num = 9058, gt_num = 38642, total num = 94824
+6-32: gt recall num = 950, gt_num = 26359, total num = 1410
+33-100: gt recall num = 5702, gt_num = 9612, total num = 13404
+101-300: gt recall num = 1992, gt_num = 2236, total num = 25531
+301-500: gt recall num = 286, gt_num = 304, total num = 20046
+501-inf: gt recall num = 128, gt_num = 131, total num = 21087
+
+
+0117
+conv3_345
+score_threshold = 0.990981
+For det-conv3:
+All scales: gt recall num = 30905, gt_num = 38642, total num = 2376117
+6-32: gt recall num = 19420, gt_num = 26359, total num = 420886
+33-100: gt recall num = 8902, gt_num = 9612, total num = 286202
+101-300: gt recall num = 2153, gt_num = 2236, total num = 310344
+301-500: gt recall num = 299, gt_num = 304, total num = 259186
+501-inf: gt recall num = 131, gt_num = 131, total num = 320273
+
