@@ -21,9 +21,59 @@ function aboxes = do_proposal_test_widerface_conv345(conf, model_stage, imdb, ro
     end
     score_thresh = scores(end);
     fprintf('score_threshold = %f\n', score_thresh);
+    show_image = true;
+    save_result = false;
+    addpath(fullfile('external','export_fig'));
+    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic');
+    mkdir_if_missing(res_dir);
     % drop the boxes which scores are lower than the threshold
     for i = 1:length(aboxes)
-        aboxes{i} = aboxes{i}(aboxes{i}(:, end) >= 0.7, :);  %score_thresh_conv4
+        aboxes{i} = aboxes{i}(aboxes{i}(:, end) >= score_thresh, :);  %0.7
+        if show_image
+            img = imread(imdb.image_at(i));  
+            %draw before NMS
+            bbs = aboxes{i};
+            figure(1); 
+            imshow(img);  %im(img)
+            hold on
+            if ~isempty(bbs)
+              bbs(:, 3) = bbs(:, 3) - bbs(:, 1) + 1;
+              bbs(:, 4) = bbs(:, 4) - bbs(:, 2) + 1;
+              bbApply('draw',bbs,'g');
+            end
+            hold off
+        end
+        % doing NMS
+        bbs_all = pseudoNMS_v8(aboxes{i}, nms_option);
+        if show_image     
+            %1121 also draw gt boxes
+            bbs_gt = roidb.rois(i).boxes;
+            bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+            bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+            bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+            % if a box has only 1 pixel in either size, remove it
+            invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+            bbs_gt(invalid_idx, :) = [];
+            figure(2); 
+            imshow(img);  %im(img)
+            hold on
+            if ~isempty(bbs_all)
+                  bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
+                  bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
+                  bbApply('draw',bbs_all,'g');
+            end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
+            hold off
+            % 1121: save result
+            if save_result
+                strs = strsplit(imdb.image_at(i), '/');
+                saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
+                export_fig(saveName, '-png', '-a1', '-native');
+                fprintf('image %d saved.\n', i);
+            end
+        end
     end
 
     % 0103 added
