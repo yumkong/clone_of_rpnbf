@@ -23,18 +23,181 @@ function aboxes = do_proposal_test_widerface_conv345(conf, model_stage, imdb, ro
     fprintf('score_threshold = %f\n', score_thresh);
     % drop the boxes which scores are lower than the threshold
     for i = 1:length(aboxes)
-        aboxes{i} = aboxes{i}(aboxes{i}(:, end) >= 0.7, :);  %score_thresh_conv4
+        aboxes{i} = aboxes{i}(aboxes{i}(:, end) >= score_thresh, :);  %0.7
     end
 
     % 0103 added
-    thr1 = 32;
-    thr2 = 100;
-    thr3 = 300;
-    thr4 = 500;
+%     thr1 = 32;
+%     thr2 = 100;
+%     thr3 = 300;
+%     thr4 = 500;
+%     Get_Detector_Recall(roidb, aboxes, thr1, thr2, thr3, thr4);
     %thr5 = 900;
-    fprintf('For det-conv3:\n');
-    Get_Detector_Recall(roidb, aboxes, thr1, thr2, thr3, thr4);
+    fprintf('For det-conv345:\n');
+    thr0 = 16;
+    thr1 = 32;
+    thr2 = 64;
+    thr3 = 100;
+    thr4 = 200;
+    thr5 = 300;
+    thr6 = 400;
+    Get_Detector_Recall_finegrained(roidb, aboxes, thr0, thr1, thr2, thr3, thr4, thr5, thr6);
   
+end
+
+function Get_Detector_Recall_finegrained(roidb, aboxes, thr0, thr1, thr2, thr3, thr4, thr5, thr6)
+    gt_num = 0;
+    gt_recall_num = 0;
+    % 1229 added
+    gt_num_det0 = 0;  % 5 ~ 16
+    gt_recall_num_det0 = 0;
+    gt_num_det1 = 0;  % 17 ~ 32
+    gt_recall_num_det1 = 0;  
+    gt_num_det2 = 0;  % 33 ~ 64
+    gt_recall_num_det2 = 0;
+    gt_num_det3 = 0;  % 65 ~ 100
+    gt_recall_num_det3 = 0;
+    gt_num_det4 = 0;  % 101 ~ 200
+    gt_recall_num_det4 = 0;  
+    gt_num_det5 = 0;  % 201 ~ 300
+    gt_recall_num_det5 = 0;
+    gt_num_det6 = 0;  % 301 ~ 400
+    gt_recall_num_det6 = 0;
+    gt_num_det7 = 0;  % 401 ~ inf
+    gt_recall_num_det7 = 0;
+
+    %0110 added
+    gt_num_detall_total = 0;
+    gt_num_det0_total = 0;
+    gt_num_det1_total = 0;
+    gt_num_det2_total = 0;
+    gt_num_det3_total = 0;
+    gt_num_det4_total = 0;
+    gt_num_det5_total = 0;
+    gt_num_det6_total = 0;
+    gt_num_det7_total = 0;
+    for i = 1:length(roidb.rois)
+        gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
+        face_height = gts(:,4) - gts(:,2) + 1;
+        idx_all = (face_height>= 5);  % all: 6-inf
+        idx_det0 = (face_height>= 5) & (face_height <= thr0); % 5-16
+        idx_det1 = (face_height> thr0) & (face_height <= thr1); % 17-32
+        idx_det2 = (face_height> thr1) & (face_height <= thr2);%33-64
+        idx_det3 = (face_height> thr2) & (face_height <= thr3);%65-100
+        idx_det4 = (face_height> thr3) & (face_height <= thr4);%101-200
+        idx_det5 = (face_height> thr4) & (face_height <= thr5);%201-300
+        idx_det6 = (face_height> thr5) & (face_height <= thr6);%301-400
+        idx_det7 = (face_height> thr6); %400-inf
+        gts_all = gts(idx_all, :);
+        gts_det0 = gts(idx_det0, :);
+        gts_det1 = gts(idx_det1, :);
+        gts_det2 = gts(idx_det2, :);
+        gts_det3 = gts(idx_det3, :);
+        gts_det4 = gts(idx_det4, :);
+        gts_det5 = gts(idx_det5, :);
+        gts_det6 = gts(idx_det6, :);
+        gts_det7 = gts(idx_det7, :);
+        
+        rois = aboxes{i}(:, 1:4);
+        if ~isempty(gts_all)
+            max_ols = max(boxoverlap(rois, gts_all));
+            gt_num = gt_num + size(gts_all, 1);
+            if ~isempty(max_ols)
+                gt_recall_num = gt_recall_num + sum(max_ols >= 0.5);
+                %0110 added
+                gt_num_detall_total = gt_num_detall_total + size(rois, 1);
+            end
+        end
+        if ~isempty(gts_det0)
+            max_ols = max(boxoverlap(rois, gts_det0));
+            gt_num_det0 = gt_num_det0 + size(gts_det0, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det0 = gt_recall_num_det0 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) >=5 & (rois(:,4) - rois(:,2)) <= thr0;
+                gt_num_det0_total = gt_num_det0_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det1)
+            max_ols = max(boxoverlap(rois, gts_det1));
+            gt_num_det1 = gt_num_det1 + size(gts_det1, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det1 = gt_recall_num_det1 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr0 & (rois(:,4) - rois(:,2)) <= thr1;
+                gt_num_det1_total = gt_num_det1_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det2)
+            max_ols = max(boxoverlap(rois, gts_det2));
+            gt_num_det2 = gt_num_det2 + size(gts_det2, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det2 = gt_recall_num_det2 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr1 & (rois(:,4) - rois(:,2)) <= thr2;
+                gt_num_det2_total = gt_num_det2_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det3)
+            max_ols = max(boxoverlap(rois, gts_det3));
+            gt_num_det3 = gt_num_det3 + size(gts_det3, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det3 = gt_recall_num_det3 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr2 & (rois(:,4) - rois(:,2)) <= thr3;
+                gt_num_det3_total = gt_num_det3_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det4)
+            max_ols = max(boxoverlap(rois, gts_det4));
+            gt_num_det4 = gt_num_det4 + size(gts_det4, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det4 = gt_recall_num_det4 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr3 & (rois(:,4) - rois(:,2)) <= thr4;
+                gt_num_det4_total = gt_num_det4_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det5)
+            max_ols = max(boxoverlap(rois, gts_det5));
+            gt_num_det5 = gt_num_det5 + size(gts_det5, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det5 = gt_recall_num_det5 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr4 & (rois(:,4) - rois(:,2)) <= thr5;
+                gt_num_det5_total = gt_num_det5_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det6)
+            max_ols = max(boxoverlap(rois, gts_det6));
+            gt_num_det6 = gt_num_det6 + size(gts_det6, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det6 = gt_recall_num_det6 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr5 & (rois(:,4) - rois(:,2)) <= thr6;
+                gt_num_det6_total = gt_num_det6_total + sum(tmp_idx);
+            end
+        end
+        if ~isempty(gts_det7)
+            max_ols = max(boxoverlap(rois, gts_det7));
+            gt_num_det7 = gt_num_det7 + size(gts_det7, 1);
+            if ~isempty(max_ols)
+                gt_recall_num_det7 = gt_recall_num_det7 + sum(max_ols >= 0.5);
+                %0110 added
+                tmp_idx = (rois(:,4) - rois(:,2)) > thr6;
+                gt_num_det7_total = gt_num_det7_total + sum(tmp_idx);
+            end
+        end
+    end
+    fprintf('All scales: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num, gt_num, gt_num_detall_total);
+    fprintf('5-16: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det0, gt_num_det0, gt_num_det0_total);
+    fprintf('17-32: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det1, gt_num_det1, gt_num_det1_total);
+    fprintf('33-64: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det2, gt_num_det2, gt_num_det2_total);
+    fprintf('65-100: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det3, gt_num_det3, gt_num_det3_total);
+    fprintf('101-200: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det4, gt_num_det4, gt_num_det4_total);
+    fprintf('201-300: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det5, gt_num_det5, gt_num_det5_total);
+    fprintf('301-400: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det6, gt_num_det6, gt_num_det6_total);
+    fprintf('401-inf: gt recall num = %d, gt_num = %d, total num = %d\n', gt_recall_num_det7, gt_num_det7, gt_num_det7_total);
 end
 
 function Get_Detector_Recall(roidb, aboxes, thr1, thr2, thr3, thr4)
