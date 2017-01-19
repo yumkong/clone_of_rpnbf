@@ -1,14 +1,14 @@
-function model = VGG16_for_rpn_widerface_conv3_6(exp_name, model)
+function model = VGG16_for_rpn_widerface_conv3_5_atrous(exp_name, model)
 
 
 model.mean_image                                = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'mean_image');
 model.pre_trained_net_file                      = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'vgg16.caffemodel');
 % Stride in input image pixels at the last conv layer
-model.feat_stride                               = 32; %conv3:4, conv4:8, conv5:16, conv6:32
+model.feat_stride                               = 16; %conv3:4, conv4:8
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_conv3_final', 'solver_60k80k_widerface_conv3_6.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_conv3_final', 'test_widerface_conv3_6.prototxt');
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_conv3_final', 'solver_60k80k_widerface_conv3_5_atrous.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_conv3_final', 'test_widerface_conv3_5_atrous.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting

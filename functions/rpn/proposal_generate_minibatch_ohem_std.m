@@ -1,10 +1,11 @@
-function [input_blobs, random_scale_inds] = proposal_generate_minibatch(conf, image_roidb)
+function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ohem_std(conf, image_roidb, ohem_opt)
 % [input_blobs, random_scale_inds] = proposal_generate_minibatch(conf, image_roidb)
 % --------------------------------------------------------
 % Faster R-CNN
 % Copyright (c) 2015, Shaoqing Ren
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------
+    debug_flag = true;
     % ========add random seed=======
 %     if debug_flag
 %         rng_seed = 6;
@@ -29,7 +30,7 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch(conf, im
     
     for i = 1:num_images
         [labels, label_weights, bbox_targets, bbox_loss] = ...
-            sample_rois(conf, image_roidb(i), fg_rois_per_image, rois_per_image, im_scales(i), random_scale_inds(i));
+            sample_rois(conf, image_roidb(i), fg_rois_per_image, rois_per_image, im_scales(i), random_scale_inds(i), ohem_opt);
         
         % get fcn output size
         img_size = round(image_roidb(i).im_size * im_scales(i));
@@ -96,7 +97,7 @@ end
 
 %% Generate a random sample of ROIs comprising foreground and background examples.
 function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
-    sample_rois(conf, image_roidb, fg_rois_per_image, rois_per_image, im_scale, im_scale_ind)
+    sample_rois(conf, image_roidb, fg_rois_per_image, rois_per_image, im_scale, im_scale_ind, ohem_opt)
 
     bbox_targets = image_roidb.bbox_targets{im_scale_ind};
     ex_asign_labels = bbox_targets(:, 1);
@@ -108,17 +109,24 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
     bg_inds = find(bbox_targets(:, 1) < 0);
     
     % select foreground when no_ohem
+    if ~ohem_opt
+        fg_num = min(fg_rois_per_image, length(fg_inds));
+        fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
+        bg_num = min(rois_per_image - fg_num, length(bg_inds));
+        bg_inds = bg_inds(randperm(length(bg_inds), bg_num));
+    end
 
-    fg_num = min(fg_rois_per_image, length(fg_inds));
-    fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
-    bg_num = min(rois_per_image - fg_num, length(bg_inds));
-    bg_inds = bg_inds(randperm(length(bg_inds), bg_num));
-
-    labels = zeros(size(bbox_targets, 1), 1);
-    % set foreground labels
-    labels(fg_inds) = ex_asign_labels(fg_inds);
-    assert(all(ex_asign_labels(fg_inds) > 0));
- 
+    if ohem_opt
+        labels = -1*ones(size(bbox_targets, 1), 1);  % init all to ignore
+        labels(fg_inds) = ex_asign_labels(fg_inds); % fg = 1
+        assert(all(ex_asign_labels(fg_inds) > 0));
+        labels(bg_inds) = 0; % bg = 0
+    else
+        labels = zeros(size(bbox_targets, 1), 1);
+        % set foreground labels
+        labels(fg_inds) = ex_asign_labels(fg_inds);
+        assert(all(ex_asign_labels(fg_inds) > 0));
+    end
     
     label_weights = zeros(size(bbox_targets, 1), 1);
     % set foreground labels weights

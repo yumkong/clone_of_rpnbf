@@ -1,4 +1,4 @@
-function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect_conv3(conf, caffe_net, im, im_idx)
+function [pred_boxes, scores] = proposal_im_detect_conv3(conf, caffe_net, im, im_idx)
 % [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect(conf, im, net_idx)
 % --------------------------------------------------------
 % Faster R-CNN
@@ -69,9 +69,9 @@ function [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_dete
     scores = scores(score_mask,:);
     pred_boxes = pred_boxes(score_mask,:);  % new pred_boxes
     
-    box_deltas_ = box_deltas;
-    anchors_ = anchors;
-    scores_ = scores;
+    %box_deltas_ = box_deltas;
+    %anchors_ = anchors;
+    %scores_ = scores;
     
     if conf.test_drop_boxes_runoff_image
         contained_in_image = is_contain_in_image(anchors, round(size(im) * im_scales));

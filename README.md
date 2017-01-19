@@ -718,3 +718,15 @@ All scales: gt recall num = 30905, gt_num = 38642, total num = 2376117
 301-500: gt recall num = 299, gt_num = 304, total num = 259186
 501-inf: gt recall num = 131, gt_num = 131, total num = 320273
 
+0118
+conv3_345_v2 (use a 3x3 sliding window after concat_345)
+score_threshold = 0.993317
+For det-conv3:
+All scales: gt recall num = 31483, gt_num = 38642, total num = 2364412
+6-32: gt recall num = 19944, gt_num = 26359, total num = 423613
+33-100: gt recall num = 8950, gt_num = 9612, total num = 312142
+101-300: gt recall num = 2159, gt_num = 2236, total num = 364874
+301-500: gt recall num = 299, gt_num = 304, total num = 278233
+501-inf: gt recall num = 131, gt_num = 131, total num = 341875
+
+
