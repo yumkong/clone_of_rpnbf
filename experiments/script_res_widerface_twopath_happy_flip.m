@@ -20,7 +20,7 @@ elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_dilate_ohem'; %'caffe_faster_rcnn_rfcn_ohem_final_noprint';
+    opts.caffe_version          ='caffe_faster_rcnn_bn'; %'caffe_faster_rcnn_dilate_ohem';
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -107,7 +107,7 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal               = proposal_config_widerface_multibox_ohem_happy('image_means', model.mean_image, ...
+conf_proposal               = proposal_config_widerface_twopath_happy('image_means', model.mean_image, ...
                                                     'feat_stride_res23', model.feat_stride_res23, ...
                                                     'feat_stride_res45', model.feat_stride_res45);
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
@@ -125,14 +125,14 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
                              = proposal_calc_output_size_twopath_happy(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
 % 1209: no need to change: same with all multibox
 [conf_proposal.anchors_res23,conf_proposal.anchors_res45] = proposal_generate_anchors_twopath_flip(cache_data_this_model_dir, ...
-                                                            'ratios', [1.25 0.8], 'scales',  2.^[-1:4], 'add_size', [480]);  %[8 16 32 64 128 256 360 512 720 900]
+                                                            'ratios', [1.25 0.8], 'scales',  2.^[-1:4], 'add_size', [432]);  %[8 16 32 64 128 256 360 512 720 900]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
 %conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_multibox_ohem_happy(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_twopath_happy(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 % 1020: currently do not consider test
 % cache_name = 'widerface';

@@ -1,4 +1,4 @@
-function conf = proposal_config_widerface_multibox_ohem_happy(varargin)
+function conf = proposal_config_widerface_twopath_happy(varargin)
 % conf = proposal_config_caltech(varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -20,9 +20,9 @@ function conf = proposal_config_widerface_multibox_ohem_happy(varargin)
 %                                         true,           @islogical);
     
     % Image scales -- the short edge of input image                                                                                                
-    ip.addParamValue('scales',          900,            @ismatrix); %720
+    ip.addParamValue('scales',          512,            @ismatrix); %900
     % Max pixel size of a scaled input image
-    ip.addParamValue('max_size',        1500,           @isscalar); %960
+    ip.addParamValue('max_size',        512,           @isscalar); %1500
     % Images per batch, only supports ims_per_batch = 1 currently
     ip.addParamValue('ims_per_batch',   1,              @isscalar);
     % Minibatch size
@@ -56,8 +56,8 @@ function conf = proposal_config_widerface_multibox_ohem_happy(varargin)
 
     
     %% testing
-    ip.addParamValue('test_scales',     900,            @isscalar); %720
-    ip.addParamValue('test_max_size',   1500,            @isscalar); % 960
+    ip.addParamValue('test_scales',     512,            @isscalar); %900
+    ip.addParamValue('test_max_size',   512,            @isscalar); % 1500
     ip.addParamValue('test_nms',        0.5,            @isscalar);
     ip.addParamValue('test_binary',     false,          @islogical);
     ip.addParamValue('test_min_box_size',8,            @isscalar); %16
