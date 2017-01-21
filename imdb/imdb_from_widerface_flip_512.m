@@ -394,19 +394,25 @@ function roidb = roidb_from_wider(imdb, tmpboxdb)
         box_ = tmpboxdb.image_boxes_x05{i};
         % round is because the widerfaces gt boxes are real numbers
         if ~isempty(box_)
-        box_st_x05 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+            box_st_x05 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+        else
+            box_st_x05 = [];
         end
         %bboxes [col(x1) row(y1) width(x2-x1+1) height(y2-y1+1)] -->  [x1 y1 x2 y2]
         box_ = tmpboxdb.image_boxes_x1{i};
         % round is because the widerfaces gt boxes are real numbers
         if ~isempty(box_)
-        box_st_x1 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+            box_st_x1 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+        else
+            box_st_x1 = [];
         end
         %bboxes [col(x1) row(y1) width(x2-x1+1) height(y2-y1+1)] -->  [x1 y1 x2 y2]
         box_ = tmpboxdb.image_boxes_x2{i};
         % round is because the widerfaces gt boxes are real numbers
         if ~isempty(box_)
-        box_st_x2 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+            box_st_x2 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+        else
+            box_st_x2 = [];
         end
         %bboxes [col(x1) row(y1) width(x2-x1+1) height(y2-y1+1)] -->  [x1 y1 x2 y2]
         box_ = tmpboxdb.image_boxes_flip{i};
