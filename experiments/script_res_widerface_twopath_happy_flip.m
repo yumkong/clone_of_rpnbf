@@ -56,7 +56,7 @@ cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = true;  %true --> false
 event_num                   = -1; %11
-dataset                     = Dataset.widerface_all_flip_512(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
+%dataset                     = Dataset.widerface_all_flip_512(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 %0106 added all test images
 dataset                     = Dataset.widerface_all_512(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);

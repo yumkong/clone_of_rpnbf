@@ -1,4 +1,4 @@
-function dataset = widerface_all(dataset, usage, use_flip, event_num, cache_dir, model_name_base)
+function dataset = widerface_all_512(dataset, usage, use_flip, event_num, cache_dir, model_name_base)
 % Pascal voc 2007 trainval set
 % set opts.imdb_train opts.roidb_train 
 % or set opts.imdb_test opts.roidb_train
@@ -22,7 +22,7 @@ switch usage
     case {'test'}
         %dataset.imdb_test     = imdb_from_widerface(devkit, 'test', use_flip) ;
         %dataset.roidb_test    = dataset.imdb_test.roidb_func(dataset.imdb_test);
-        [dataset.imdb_test, dataset.roidb_test] = imdb_from_widerface(devkit, 'test', false, cache_dir, model_name_base, event_num);
+        [dataset.imdb_test, dataset.roidb_test] = imdb_from_widerface_512(devkit, 'test', false, cache_dir, model_name_base, event_num);
     case {'realtest'}
         %dataset.imdb_test     = imdb_from_widerface(devkit, 'test', use_flip) ;
         %dataset.roidb_test    = dataset.imdb_test.roidb_func(dataset.imdb_test);
