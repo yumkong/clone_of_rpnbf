@@ -312,8 +312,8 @@ function rst = check_error(rst, caffe_solver)
     accuracy_fg_res45 = sum(accurate_fg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 1)) + eps);
     accuracy_bg_res45 = sum(accurate_bg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 0)) + eps);
     
-    rst(end+1) = struct('blob_name', 'accuracy_fg_conv4', 'data', accuracy_fg_res23);
-    rst(end+1) = struct('blob_name', 'accuracy_bg_conv4', 'data', accuracy_bg_res23);
+    rst(end+1) = struct('blob_name', 'accuracy_fg_res23', 'data', accuracy_fg_res23);
+    rst(end+1) = struct('blob_name', 'accuracy_bg_res23', 'data', accuracy_bg_res23);
     
     rst(end+1) = struct('blob_name', 'accuracy_fg_res45', 'data', accuracy_fg_res45);
     rst(end+1) = struct('blob_name', 'accuracy_bg_res45', 'data', accuracy_bg_res45);
@@ -374,7 +374,7 @@ function model_path = snapshot(conf, caffe_solver, bbox_means_res23, bbox_stds_r
     bbox_means_flatten = repmat(reshape(bbox_means_res23', [], 1), anchor_size_res23, 1);
     
     % merge bbox_means, bbox_stds into the model
-    bbox_pred_layer_name_res23 = 'proposal_bbox_pred_conv34';
+    bbox_pred_layer_name_res23 = 'proposal_bbox_pred_res23';
     weights = caffe_solver.net.params(bbox_pred_layer_name_res23, 1).get_data();
     biase = caffe_solver.net.params(bbox_pred_layer_name_res23, 2).get_data();
     weights_back_res23 = weights;
@@ -395,7 +395,7 @@ function model_path = snapshot(conf, caffe_solver, bbox_means_res23, bbox_stds_r
     bbox_means_flatten = repmat(reshape(bbox_means_res45', [], 1), anchor_size_res45, 1);
     
     % merge bbox_means, bbox_stds into the model
-    bbox_pred_layer_name_res45 = 'proposal_bbox_pred_conv5';
+    bbox_pred_layer_name_res45 = 'proposal_bbox_pred_res45';
     weights = caffe_solver.net.params(bbox_pred_layer_name_res45, 1).get_data();
     biase = caffe_solver.net.params(bbox_pred_layer_name_res45, 2).get_data();
     weights_back_res45 = weights;
@@ -422,44 +422,44 @@ function model_path = snapshot(conf, caffe_solver, bbox_means_res23, bbox_stds_r
 end
 
 %1224 added: recover to training-time weights
-function recover_weights(conf, caffe_solver, bbox_means_conv4, bbox_stds_conv4, bbox_means_conv5, bbox_stds_conv5,bbox_means_conv6, bbox_stds_conv6)
+function recover_weights(conf, caffe_solver, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox_stds_res45)
     % conv4
     % ================================
-    anchor_size_conv4 = size(conf.anchors_conv34, 1);
-    bbox_stds_flatten = repmat(reshape(bbox_stds_conv4', [], 1), anchor_size_conv4, 1);
-    bbox_means_flatten = repmat(reshape(bbox_means_conv4', [], 1), anchor_size_conv4, 1);
+    anchor_size_res23 = size(conf.anchors_res23, 1);
+    bbox_stds_flatten = repmat(reshape(bbox_stds_res23', [], 1), anchor_size_res23, 1);
+    bbox_means_flatten = repmat(reshape(bbox_means_res23', [], 1), anchor_size_res23, 1);
     
     % merge bbox_means, bbox_stds into the model
-    bbox_pred_layer_name_conv4 = 'proposal_bbox_pred_conv34';
-    weights = caffe_solver.net.params(bbox_pred_layer_name_conv4, 1).get_data();
-    biase = caffe_solver.net.params(bbox_pred_layer_name_conv4, 2).get_data();
+    bbox_pred_layer_name_res23 = 'proposal_bbox_pred_res23';
+    weights = caffe_solver.net.params(bbox_pred_layer_name_res23, 1).get_data();
+    biase = caffe_solver.net.params(bbox_pred_layer_name_res23, 2).get_data();
     
     weights = ...
         bsxfun(@rdivide, weights, permute(bbox_stds_flatten, [2, 3, 4, 1])); % weights = weights * stds (@times)==> weights = weights / stds (@rdivide)
     biase = ...
         (biase - bbox_means_flatten) ./ bbox_stds_flatten; % bias = bias * stds + means ==> bias = (bias - means) / stds
     
-    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv4, 1, weights);
-    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv4, 2, biase);
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_res23, 1, weights);
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_res23, 2, biase);
     
     % conv5
     % ================================
-    anchor_size_conv5 = size(conf.anchors_conv5, 1);
-    bbox_stds_flatten = repmat(reshape(bbox_stds_conv5', [], 1), anchor_size_conv5, 1);
-    bbox_means_flatten = repmat(reshape(bbox_means_conv5', [], 1), anchor_size_conv5, 1);
+    anchor_size_res45 = size(conf.anchors_res45, 1);
+    bbox_stds_flatten = repmat(reshape(bbox_stds_res45', [], 1), anchor_size_res45, 1);
+    bbox_means_flatten = repmat(reshape(bbox_means_res45', [], 1), anchor_size_res45, 1);
     
     % merge bbox_means, bbox_stds into the model
-    bbox_pred_layer_name_conv5 = 'proposal_bbox_pred_conv5';
-    weights = caffe_solver.net.params(bbox_pred_layer_name_conv5, 1).get_data();
-    biase = caffe_solver.net.params(bbox_pred_layer_name_conv5, 2).get_data();
+    bbox_pred_layer_name_res45 = 'proposal_bbox_pred_res45';
+    weights = caffe_solver.net.params(bbox_pred_layer_name_res45, 1).get_data();
+    biase = caffe_solver.net.params(bbox_pred_layer_name_res45, 2).get_data();
     
     weights = ...
         bsxfun(@rdivide, weights, permute(bbox_stds_flatten, [2, 3, 4, 1])); % weights = weights * stds (@times)==> weights = weights / stds (@rdivide)
     biase = ...
         (biase - bbox_means_flatten) ./ bbox_stds_flatten; % bias = bias * stds + means ==> bias = (bias - means) / stds
     
-    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv5, 1, weights);
-    caffe_solver.net.set_params_data(bbox_pred_layer_name_conv5, 2, biase);
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_res45, 1, weights);
+    caffe_solver.net.set_params_data(bbox_pred_layer_name_res45, 2, biase);
 end
 
 %function show_state(iter, train_results, val_results)
