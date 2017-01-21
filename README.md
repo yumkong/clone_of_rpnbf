@@ -730,3 +730,16 @@ All scales: gt recall num = 31483, gt_num = 38642, total num = 2364412
 501-inf: gt recall num = 131, gt_num = 131, total num = 341875
 
 
+0119
+conv5_atrous
+All scales: gt recall num = 20291, gt_num = 39294, total num = 967550
+5-16: gt recall num = 1898, gt_num = 16594, total num = 23987
+17-32: gt recall num = 7077, gt_num = 10417, total num = 43440
+33-64: gt recall num = 6561, gt_num = 7275, total num = 74026
+65-100: gt recall num = 2180, gt_num = 2337, total num = 55535
+101-200: gt recall num = 1693, gt_num = 1765, total num = 97349
+201-300: gt recall num = 453, gt_num = 471, total num = 69779
+301-400: gt recall num = 191, gt_num = 194, total num = 47476
+401-inf: gt recall num = 238, gt_num = 241, total num = 273523
+
+
