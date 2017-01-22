@@ -111,21 +111,24 @@ end
 
 function scaled_rois = scale_rois(rois, im_size, im_scale)
     % make
-    rois_tmp = max(1, rois);
-    %0805 added check invalid ground-truth rois: any of the [x1 y1 x2 y2]
-    %is <= zero
-    invalid_idx = (rois_tmp(:,3) <= rois_tmp(:,1)) | (rois_tmp(:,4) <= rois_tmp(:,2));
-    if sum(invalid_idx) ~= 0
-        fprintf('Error: invalid coordinates appear.\n'); 
-    end
-    
+    %0122 added in case of no bboxes
+    if ~isempty(rois)
+        rois_tmp = max(1, rois);
+        %0805 added check invalid ground-truth rois: any of the [x1 y1 x2 y2]
+        %is <= zero
+        invalid_idx = (rois_tmp(:,3) <= rois_tmp(:,1)) | (rois_tmp(:,4) <= rois_tmp(:,2));
+        if sum(invalid_idx) ~= 0
+            fprintf('Error: invalid coordinates appear.\n'); 
+        end
+        im_size_scaled = round(im_size * im_scale);
+        scale = (im_size_scaled - 1) ./ (im_size - 1);
+        scaled_rois = bsxfun(@times, rois_tmp-1, [scale(2), scale(1), scale(2), scale(1)]) + 1;
 
-    im_size_scaled = round(im_size * im_scale);
-    scale = (im_size_scaled - 1) ./ (im_size - 1);
-    scaled_rois = bsxfun(@times, rois_tmp-1, [scale(2), scale(1), scale(2), scale(1)]) + 1;
-    
-    % get rid of them
-    scaled_rois(invalid_idx,:) = [];
+        % get rid of them
+        scaled_rois(invalid_idx,:) = [];
+    else
+        scaled_rois = [];
+    end
 %     tmpRowSum = sum(double(scaled_rois < 0), 2);
 %     allnegIdx = find(tmpRowSum == 4);
 %     if ~isempty(allnegIdx)

@@ -107,7 +107,7 @@ catch
             %end
             
             % generate cropped image from x1
-            if ~exist(x1_image_at(i), 'file')
+            %if ~exist(x1_image_at(i), 'file')
                 im = imread(image_at(i));
                 box_ = tmpboxdb.image_boxes{i};
                 [im_crop_x1, final_bbox_x1] = cropImg_getNewbox(im, box_);
@@ -129,7 +129,7 @@ catch
                 tmpboxdb.image_boxes_x1{i} = final_bbox_x1;
                 imwrite(im_crop_x1, x1_image_at(i));
                 end
-            end
+            %end
         end
         %0121: completely changed the name to '_x1'
         img_num = length(imdb.image_ids);
