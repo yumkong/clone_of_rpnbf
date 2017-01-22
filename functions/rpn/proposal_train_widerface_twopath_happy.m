@@ -187,7 +187,7 @@ function save_model_path = proposal_train_widerface_twopath_happy(conf, imdb_tra
         for kkk = [1 3 5 7 8]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
-        fprintf('\n\t\t\t    ');
+        fprintf('\n\t\t\t     ');
         for kkk = [2 4 6 9 10]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
@@ -293,9 +293,9 @@ end
 function rst = check_error(rst, caffe_solver)
 
     % for res23 ===============================
-    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_res23').get_data();
-    labels = caffe_solver.net.blobs('labels_res23').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_res23').get_data();
+    cls_score = caffe_solver.net.blobs('proposal_cls_score_res23_reshape').get_data();
+    labels = caffe_solver.net.blobs('labels_res23_reshape').get_data();
+    labels_weights = caffe_solver.net.blobs('labels_weights_res23_reshape').get_data();
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
@@ -303,9 +303,9 @@ function rst = check_error(rst, caffe_solver)
     accuracy_bg_res23 = sum(accurate_bg(:) .* labels_weights(:)) / (sum(labels_weights(labels == 0)) + eps);
     
     % for res45 ===============================
-    cls_score = caffe_solver.net.blobs('proposal_cls_score_reshape_res45').get_data();
-    labels = caffe_solver.net.blobs('labels_res45').get_data();
-    labels_weights = caffe_solver.net.blobs('labels_weights_res45').get_data();
+    cls_score = caffe_solver.net.blobs('proposal_cls_score_res45_reshape').get_data();
+    labels = caffe_solver.net.blobs('labels_res45_reshape').get_data();
+    labels_weights = caffe_solver.net.blobs('labels_weights_res45_reshape').get_data();
     
     accurate_fg = (cls_score(:, :, 2, :) > cls_score(:, :, 1, :)) & (labels == 1);
     accurate_bg = (cls_score(:, :, 2, :) <= cls_score(:, :, 1, :)) & (labels == 0);
