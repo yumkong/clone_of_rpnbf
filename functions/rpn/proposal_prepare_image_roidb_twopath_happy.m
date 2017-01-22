@@ -15,9 +15,10 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
         bbox_stds_res45 = [];
     end
     
-    try
-        load('tmp_train_roidb.mat'); %image_roidb
-    catch
+    
+    %try
+    %    load('tmp_train_roidb.mat'); %image_roidb
+    %catch
         if ~iscell(imdbs)
             imdbs = {imdbs};
             roidbs = {roidbs};
@@ -45,8 +46,8 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
         end
 
         image_roidb = cat(1, image_roidb{:});
-        save('tmp_train_roidb.mat', 'image_roidb');
-    end
+    %    save('tmp_train_roidb.mat', 'image_roidb');
+    %end
     
     % enhance roidb to contain bounding-box regression targets
     [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox_stds_res45] = append_bbox_regression_targets(conf, ...
