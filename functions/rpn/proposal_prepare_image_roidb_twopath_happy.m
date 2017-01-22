@@ -15,33 +15,38 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
         bbox_stds_res45 = [];
     end
     
-    if ~iscell(imdbs)
-        imdbs = {imdbs};
-        roidbs = {roidbs};
-    end
+    try
+        load('tmp_train_roidb.mat'); %image_roidb
+    catch
+        if ~iscell(imdbs)
+            imdbs = {imdbs};
+            roidbs = {roidbs};
+        end
 
-    imdbs = imdbs(:);
-    roidbs = roidbs(:);
-    
-    if conf.target_only_gt
-        image_roidb = ...
-            cellfun(@(x, y) ... // @(imdbs, roidbs)
-                arrayfun(@(z) ... //@([1:length(x.image_ids)])
-                    struct('image_path', x.image_at(z), 'image_id', x.image_ids{z}, 'im_size', x.sizes(z, :), 'imdb_name', x.name, 'num_classes', x.num_classes, ...
-                    'boxes', y.rois(z).boxes(y.rois(z).gt, :), 'class', y.rois(z).class(y.rois(z).gt, :), 'image', [], 'bbox_targets_res23', [], 'bbox_targets_res45', []), ...
-                [1:length(x.image_ids)]', 'UniformOutput', true),...
-            imdbs, roidbs, 'UniformOutput', false);
-    else
-        image_roidb = ...
-            cellfun(@(x, y) ... // @(imdbs, roidbs)
-                arrayfun(@(z) ... //@([1:length(x.image_ids)])
-                    struct('image_path', x.image_at(z), 'image_id', x.image_ids{z}, 'im_size', x.sizes(z, :), 'imdb_name', x.name, ...
-                    'boxes', y.rois(z).boxes, 'class', y.rois(z).class, 'image', [], 'bbox_targets_res23', [], 'bbox_targets_res45', []), ...
-                [1:length(x.image_ids)]', 'UniformOutput', true),...
-            imdbs, roidbs, 'UniformOutput', false);
+        imdbs = imdbs(:);
+        roidbs = roidbs(:);
+
+        if conf.target_only_gt
+            image_roidb = ...
+                cellfun(@(x, y) ... // @(imdbs, roidbs)
+                    arrayfun(@(z) ... //@([1:length(x.image_ids)])
+                        struct('image_path', x.image_at(z), 'image_id', x.image_ids{z}, 'im_size', x.sizes(z, :), 'imdb_name', x.name, 'num_classes', x.num_classes, ...
+                        'boxes', y.rois(z).boxes(y.rois(z).gt, :), 'class', y.rois(z).class(y.rois(z).gt, :), 'image', [], 'bbox_targets_res23', [], 'bbox_targets_res45', []), ...
+                    [1:length(x.image_ids)]', 'UniformOutput', true),...
+                imdbs, roidbs, 'UniformOutput', false);
+        else
+            image_roidb = ...
+                cellfun(@(x, y) ... // @(imdbs, roidbs)
+                    arrayfun(@(z) ... //@([1:length(x.image_ids)])
+                        struct('image_path', x.image_at(z), 'image_id', x.image_ids{z}, 'im_size', x.sizes(z, :), 'imdb_name', x.name, ...
+                        'boxes', y.rois(z).boxes, 'class', y.rois(z).class, 'image', [], 'bbox_targets_res23', [], 'bbox_targets_res45', []), ...
+                    [1:length(x.image_ids)]', 'UniformOutput', true),...
+                imdbs, roidbs, 'UniformOutput', false);
+        end
+
+        image_roidb = cat(1, image_roidb{:});
+        save('tmp_train_roidb.mat', 'image_roidb');
     end
-   
-    image_roidb = cat(1, image_roidb{:});
     
     % enhance roidb to contain bounding-box regression targets
     [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox_stds_res45] = append_bbox_regression_targets(conf, ...
@@ -81,13 +86,14 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
     end
     clear bbox_targets_res23 bbox_targets_res45;
     
-    if ~(exist('means_res23', 'var') && ~isempty(means_res23) && exist('stds_res23', 'var') && ~isempty(stds_res23))
+    if ~(exist('bbox_means_res23', 'var') && ~isempty(bbox_means_res23) && exist('bbox_stds_res23', 'var') && ~isempty(bbox_stds_res23))
         % Compute values needed for means and stds
         % var(x) = E(x^2) - E(x)^2
         class_counts = zeros(1, 1) + eps;
         sums = zeros(1, 4);
         squared_sums = zeros(1, 4);
         for i = 1:num_images
+            fprintf('Res23: Compute means of image %d ###\n', i);
            for j = 1:length(conf.scales)
                 targets = image_roidb(i).bbox_targets_res23{j};
                 gt_inds = find(targets(:, 1) > 0);
@@ -103,8 +109,8 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
            end
         end
 
-        means_res23 = bsxfun(@rdivide, sums, class_counts);
-        stds_res23 = (bsxfun(@minus, bsxfun(@rdivide, squared_sums, class_counts), means_res23.^2)).^0.5;
+        bbox_means_res23 = bsxfun(@rdivide, sums, class_counts);
+        bbox_stds_res23 = (bsxfun(@minus, bsxfun(@rdivide, squared_sums, class_counts), bbox_means_res23.^2)).^0.5;
     end
     
     % Normalize targets
@@ -114,20 +120,21 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
             gt_inds = find(targets(:, 1) > 0);
             if ~isempty(gt_inds)
                 image_roidb(i).bbox_targets_res23{j}(gt_inds, 2:end) = ...
-                    bsxfun(@minus, image_roidb(i).bbox_targets_res23{j}(gt_inds, 2:end), means_res23);
+                    bsxfun(@minus, image_roidb(i).bbox_targets_res23{j}(gt_inds, 2:end), bbox_means_res23);
                 image_roidb(i).bbox_targets_res23{j}(gt_inds, 2:end) = ...
-                    bsxfun(@rdivide, image_roidb(i).bbox_targets_res23{j}(gt_inds, 2:end), stds_res23);
+                    bsxfun(@rdivide, image_roidb(i).bbox_targets_res23{j}(gt_inds, 2:end), bbox_stds_res23);
             end
         end
     end
     
-    if ~(exist('means_res45', 'var') && ~isempty(means_res45) && exist('stds_res45', 'var') && ~isempty(stds_res45))
+    if ~(exist('bbox_means_res45', 'var') && ~isempty(bbox_means_res45) && exist('bbox_stds_res45', 'var') && ~isempty(bbox_stds_res45))
         % Compute values needed for means and stds
         % var(x) = E(x^2) - E(x)^2
         class_counts = zeros(1, 1) + eps;
         sums = zeros(1, 4);
         squared_sums = zeros(1, 4);
         for i = 1:num_images
+           fprintf('Res45: Compute means of image %d ###\n', i);
            for j = 1:length(conf.scales)
                 targets = image_roidb(i).bbox_targets_res45{j};
                 gt_inds = find(targets(:, 1) > 0);
@@ -143,8 +150,8 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
            end
         end
 
-        means_res45 = bsxfun(@rdivide, sums, class_counts);
-        stds_res45 = (bsxfun(@minus, bsxfun(@rdivide, squared_sums, class_counts), means_res45.^2)).^0.5;
+        bbox_means_res45 = bsxfun(@rdivide, sums, class_counts);
+        bbox_stds_res45 = (bsxfun(@minus, bsxfun(@rdivide, squared_sums, class_counts), bbox_means_res45.^2)).^0.5;
     end
     
     % Normalize targets
@@ -154,9 +161,9 @@ function [image_roidb, bbox_means_res23, bbox_stds_res23, bbox_means_res45, bbox
             gt_inds = find(targets(:, 1) > 0);
             if ~isempty(gt_inds)
                 image_roidb(i).bbox_targets_res45{j}(gt_inds, 2:end) = ...
-                    bsxfun(@minus, image_roidb(i).bbox_targets_res45{j}(gt_inds, 2:end), means_res45);
+                    bsxfun(@minus, image_roidb(i).bbox_targets_res45{j}(gt_inds, 2:end), bbox_means_res45);
                 image_roidb(i).bbox_targets_res45{j}(gt_inds, 2:end) = ...
-                    bsxfun(@rdivide, image_roidb(i).bbox_targets_res45{j}(gt_inds, 2:end), stds_res45);
+                    bsxfun(@rdivide, image_roidb(i).bbox_targets_res45{j}(gt_inds, 2:end), bbox_stds_res45);
             end
         end
     end
@@ -164,28 +171,32 @@ end
 
 function scaled_rois = scale_rois(rois, im_size, im_scale)
     % make
-    rois_tmp = max(1, rois);
-    %0805 added check invalid ground-truth rois: any of the [x1 y1 x2 y2]
-    %is <= zero
-    invalid_idx = (rois_tmp(:,3) <= rois_tmp(:,1)) | (rois_tmp(:,4) <= rois_tmp(:,2));
-    if sum(invalid_idx) ~= 0
-        fprintf('Error: invalid coordinates appear.\n'); 
-    end
-    
+    if ~isempty(rois)
+        rois_tmp = max(1, rois);
+        %0805 added check invalid ground-truth rois: any of the [x1 y1 x2 y2]
+        %is <= zero
+        invalid_idx = (rois_tmp(:,3) <= rois_tmp(:,1)) | (rois_tmp(:,4) <= rois_tmp(:,2));
+        if sum(invalid_idx) ~= 0
+            fprintf('Error: invalid coordinates appear.\n'); 
+        end
 
-    im_size_scaled = round(im_size * im_scale);
-    scale = (im_size_scaled - 1) ./ (im_size - 1);
-    scaled_rois = bsxfun(@times, rois_tmp-1, [scale(2), scale(1), scale(2), scale(1)]) + 1;
-    
-    % get rid of them
-    scaled_rois(invalid_idx,:) = [];
-%     tmpRowSum = sum(double(scaled_rois < 0), 2);
-%     allnegIdx = find(tmpRowSum == 4);
-%     if ~isempty(allnegIdx)
-%        fprintf('Error: all coordinates are neg.\n'); 
-%     end
-%     tmpRowProd = prod(double(scaled_rois > 0), 2);
-%     scaled_rois = scaled_rois(tmpRowProd > 0,:);
+
+        im_size_scaled = round(im_size * im_scale);
+        scale = (im_size_scaled - 1) ./ (im_size - 1);
+        scaled_rois = bsxfun(@times, rois_tmp-1, [scale(2), scale(1), scale(2), scale(1)]) + 1;
+
+        % get rid of them
+        scaled_rois(invalid_idx,:) = [];
+    %     tmpRowSum = sum(double(scaled_rois < 0), 2);
+    %     allnegIdx = find(tmpRowSum == 4);
+    %     if ~isempty(allnegIdx)
+    %        fprintf('Error: all coordinates are neg.\n'); 
+    %     end
+    %     tmpRowProd = prod(double(scaled_rois > 0), 2);
+    %     scaled_rois = scaled_rois(tmpRowProd > 0,:);
+    else
+        scaled_rois = [];
+    end
 
 end
 
