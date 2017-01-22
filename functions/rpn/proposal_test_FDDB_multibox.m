@@ -86,6 +86,8 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_FDDB_multibo
         aboxes_conv4 = cell(num_images, 1);
         aboxes_conv5 = cell(num_images, 1);
         aboxes_conv6 = cell(num_images, 1);
+        %0121 added
+        featmaps = cell(num_images, 1);
         
         count = 0;
         for i = 1:num_images
@@ -97,9 +99,9 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_FDDB_multibo
             imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
             im = imread(imgFile);
 
-            %[boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_multibox(conf, caffe_net, im);
-            [boxes_conv4, scores_conv4, boxes_conv5, scores_conv5, boxes_conv6, scores_conv6] = proposal_im_detect_multibox_FDDB(conf, caffe_net, im);
-            %[boxes, scores] = proposal_im_detect_multibox(conf, caffe_net, im);
+            % 0121: add a feature map for new try
+            %[boxes_conv4, scores_conv4, boxes_conv5, scores_conv5, boxes_conv6, scores_conv6] = proposal_im_detect_multibox_FDDB(conf, caffe_net, im);
+            [boxes_conv4, scores_conv4, boxes_conv5, scores_conv5, boxes_conv6, scores_conv6, feat] = proposal_im_detect_multibox_FDDB_feat(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th)); 
             %1230 added
@@ -113,6 +115,8 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_FDDB_multibo
             aboxes_conv4{i} = [boxes_conv4, scores_conv4];
             aboxes_conv5{i} = [boxes_conv5, scores_conv5];
             aboxes_conv6{i} = [boxes_conv6, scores_conv6];
+            % 0121 added
+            featmaps{i} = feat; 
             
         end    
         save(fullfile(cache_dir, ['proposal_boxes_FDDB' opts.suffix]), 'aboxes_conv4', 'aboxes_conv5','aboxes_conv6', '-v7.3');

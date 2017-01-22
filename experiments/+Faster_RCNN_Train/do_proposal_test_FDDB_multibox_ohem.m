@@ -97,7 +97,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
         aboxes_conv6{i} = aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.7, :);%score_thresh_conv6, 0.8
         aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
         % draw boxes after 'naive' thresholding
-        if 0
+        if 1
             %1216 changed
             imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
             img = imread(imgFile);
@@ -132,7 +132,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
         aboxes_nms{i} = pseudoNMS_v8_FDDB(aboxes{i}, nms_option);
         bbs_all = aboxes_nms{i};
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
-        if 0         
+        if 1         
             %1121 also draw gt boxes
             figure(2); 
             imshow(img);  %im(img)
@@ -159,7 +159,7 @@ function do_proposal_test_FDDB_multibox_ohem(conf, model_stage, cache_name, meth
     final_score_path = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, 'FDDB_test');
     mkdir_if_missing(final_score_path);
     final_score_file = fullfile(final_score_path, 'FDDB_box_score.mat');
-	resultFile = fullfile(SUBMIT_cachedir,'results.txt');
+	resultFile = fullfile(SUBMIT_cachedir,'results_tmp.txt');
 	fout = fopen(resultFile, 'wt');
     try
         % try to load cache

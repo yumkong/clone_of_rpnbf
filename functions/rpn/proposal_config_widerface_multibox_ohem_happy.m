@@ -45,8 +45,9 @@ function conf = proposal_config_widerface_multibox_ohem_happy(varargin)
     % Stride in input image pixels at ROI pooling level (network specific)
     % 16 is true for {Alex,Caffe}Net, VGG_CNN_M_1024, and VGG16
     %ip.addParamValue('feat_stride',     16,             @isscalar);
-    ip.addParamValue('feat_stride_res23',     4,             @isscalar);
-    ip.addParamValue('feat_stride_res45',     16,             @isscalar);
+    ip.addParamValue('feat_stride_conv34',     4,             @isscalar);
+    ip.addParamValue('feat_stride_conv5',     16,             @isscalar);
+    ip.addParamValue('feat_stride_conv6',     32,             @isscalar);
     % train proposal target only to labled ground-truths or also include
     % other proposal results (selective search, etc.)
     ip.addParamValue('target_only_gt',  true,           @islogical);
