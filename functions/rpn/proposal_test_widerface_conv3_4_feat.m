@@ -1,4 +1,4 @@
-function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
+function [aboxes, score_feat_maps] = proposal_test_widerface_conv3_4_feat(conf, imdb, varargin)
 % aboxes = proposal_test_caltech(conf, imdb, varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -71,6 +71,7 @@ function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
         %    all_boxes[image] = N x 5 array of detections in
         %    (x1, y1, x2, y2, score)
         aboxes = cell(num_images, 1);
+        score_feat_maps = cell(num_images, 1);
         %abox_deltas = cell(num_images, 1);
         %aanchors = cell(num_images, 1);
         %ascores = cell(num_images, 1);
@@ -117,12 +118,14 @@ function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
                     end
                 end
             else
-                [boxes, scores] = proposal_im_detect_conv3_4(conf, caffe_net, im);
+                [boxes, scores, feat] = proposal_im_detect_conv3_4_feat(conf, caffe_net, im);
                 fprintf(' time: %.3fs\n', toc(th));  
                 %0112 added to save space
                 scores = scores(scores >= 0.3, :);
                 boxes = boxes(scores >= 0.3, :);
                 aboxes{i} = [boxes, scores];
+                %0125 added
+                score_feat_maps{i} = feat;
                 if 0
                     % debugging visualizations
                     im = imread(imdb.image_at(i));
@@ -137,7 +140,7 @@ function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
                 end
             end
         end    
-        save(fullfile(cache_dir, ['proposal_boxes_' imdb.name opts.suffix]), 'aboxes', '-v7.3');
+        save(fullfile(cache_dir, ['proposal_boxes_' imdb.name opts.suffix]), 'aboxes', 'score_feat_maps', '-v7.3');
         
         diary off;
         caffe.reset_all(); 

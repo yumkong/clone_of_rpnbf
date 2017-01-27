@@ -1,4 +1,4 @@
-function [pred_boxes, scores] = proposal_im_detect_conv3_4(conf, caffe_net, im, im_idx)
+function [pred_boxes, scores, feat] = proposal_im_detect_conv3_4_feat(conf, caffe_net, im, im_idx)
 % [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect(conf, im, net_idx)
 % --------------------------------------------------------
 % Faster R-CNN
@@ -45,7 +45,9 @@ function [pred_boxes, scores] = proposal_im_detect_conv3_4(conf, caffe_net, im, 
     % permute from [width, height, channel] to [channel, height, width], where channel is the
         % fastest dimension
     scores = permute(scores, [3, 2, 1]);
-    
+    %0125 added
+    feat = permute(scores, [2, 3, 1]); % [height width channel]
+    feat = imresize(feat, [im_size(1)/4 im_size(2)/4]);
     % 1204: spatially decimate anchors by one half (only keep highest scoring boxes out of eight spatial neighbors)
     % in this way the output boxes should be similar with that of conv4_3
     % in vertical direction

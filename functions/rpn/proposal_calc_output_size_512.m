@@ -27,15 +27,17 @@ function [output_width_map, output_height_map] = proposal_calc_output_size_512(c
         end
         %input = 100:conf.max_size;
         %input = 100:conf.max_size+10;
-        input = 512;
+        %input = 512;
+        input = conf.min_test_length:conf.max_test_length;
         output_w = nan(size(input));
         output_h = nan(size(input));
         for i = 1:length(input)
             fprintf('calulating input size %d / %d\n',i,conf.max_size);
             s = input(i);
             %liu@0926 changed,because when s>= 1000, s x s is too big to feed to a net
-            im_blob = single(zeros(s, s, 3, 1));
+            %im_blob = single(zeros(s, s, 3, 1));
             %im_blob = single(zeros(s, 500, 3, 1));
+            im_blob = single(zeros(s, conf.min_test_length, 3, 1));
             net_inputs = {im_blob};
 
             % Reshape net's input blobs

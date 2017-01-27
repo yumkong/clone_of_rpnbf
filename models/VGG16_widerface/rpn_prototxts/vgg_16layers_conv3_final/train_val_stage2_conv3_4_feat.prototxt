@@ -6,6 +6,12 @@ input_dim: 3
 input_dim: 224
 input_dim: 224
 
+input: "score_feat_map"
+input_dim: 1
+input_dim: 7  #num of anchors
+input_dim: 56  #224(image size)/4(conv3 stride)
+input_dim: 56  #224(image size)/4(conv3 stride)
+
 input: "rois"
 input_dim: 1 # to be changed on-the-fly to num ROIs
 input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
@@ -163,10 +169,10 @@ layer {
 	top: "conv3_1"
 	name: "conv3_1"
 	param {
-		lr_mult: 0.0
+		lr_mult: 1.0
 	}
 	param {
-		lr_mult: 0.0
+		lr_mult: 2.0
 	}
 	type: "Convolution"
 	convolution_param {
@@ -189,10 +195,10 @@ layer {
 	top: "conv3_2"
 	name: "conv3_2"
 	param {
-		lr_mult: 0.0
+		lr_mult: 1.0
 	}
 	param {
-		lr_mult: 0.0
+		lr_mult: 2.0
 	}
 	type: "Convolution"
 	convolution_param {
@@ -215,10 +221,10 @@ layer {
 	top: "conv3_3"
 	name: "conv3_3"
 	param {
-		lr_mult: 0.0
+		lr_mult: 1.0
 	}
 	param {
-		lr_mult: 0.0
+		lr_mult: 2.0
 	}
 	type: "Convolution"
 	convolution_param {
@@ -253,10 +259,10 @@ layer {
 	top: "conv4_1"
 	name: "conv4_1"
 	param {
-		lr_mult: 0.0
+		lr_mult: 1.0
 	}
 	param {
-		lr_mult: 0.0
+		lr_mult: 2.0
 	}
 	type: "Convolution"
 	convolution_param {
@@ -280,10 +286,10 @@ layer {
 	top: "conv4_2"
 	name: "conv4_2"
 	param {
-		lr_mult: 0.0
+		lr_mult: 1.0
 	}
 	param {
-		lr_mult: 0.0
+		lr_mult: 2.0
 	}
 	type: "Convolution"
 	convolution_param {
@@ -307,10 +313,10 @@ layer {
 	top: "conv4_3"
 	name: "conv4_3"
 	param {
-		lr_mult: 0.0
+		lr_mult: 1.0
 	}
 	param {
-		lr_mult: 0.0
+		lr_mult: 2.0
 	}
 	type: "Convolution"
 	convolution_param {
@@ -341,7 +347,7 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 66.84  #1120: 20-->40, since its channel is only 256, so need 80?
+      value: 1  #66.84 40
     }
     channel_shared: false
   }
@@ -350,13 +356,13 @@ layer {
 layer {
 	bottom: "conv3_3_norm"
 	bottom: "rois"
-	top: "roi_pool3"
-	name: "roi_pool3"
+	top: "roi_pool3_3"
+	name: "roi_pool3_3"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 4 #3  1021: 4-->5
-		pooled_h: 4 #3 1021: 4-->5
-		spatial_scale: 0.25  # (1/4)
+		pooled_w: 4
+		pooled_h: 4
+		spatial_scale: 0.25  #stride 4
 	}
 }
 
@@ -370,7 +376,7 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 94.52
+      value: 1.4 #94.52  40
     }
     channel_shared: false
   }
@@ -383,15 +389,15 @@ layer {
 	name: "roi_pool4_3"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 4 #3 1021: 4-->5
-		pooled_h: 4 #3 1021: 4-->5
-		spatial_scale: 0.25  # (1/4)
+		pooled_w: 4
+		pooled_h: 4
+		spatial_scale: 0.25  #stride 4
 	}
 }
 
 layer {
-    bottom: "roi_pool3"  #"roi_pool3_flat"
-	bottom: "roi_pool4_3" #"roi_pool4_3_flat"
+    bottom: "roi_pool3_3"
+	bottom: "roi_pool4_3"
 	top: "concat_roi_feat"
 	name: "concat_roi_feat"
 	type: "Concat"
@@ -417,6 +423,14 @@ layer {
   }
   inner_product_param {
     num_output: 4096
+	weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
@@ -450,7 +464,15 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
+    num_output: 1024  #1209: 4096-->1024
+	weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
@@ -469,10 +491,107 @@ layer {
   }
 }
 
+#1209: newly added
+layer {
+  name: "fc8"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "fc8"
+  param {
+    name: "fc8_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc8_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 256  
+	weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+# 0125 added innerproduct for score feat map
+layer {
+	bottom: "score_feat_map"
+	bottom: "rois"
+	top: "roi_score_feat"
+	name: "roi_score_feat"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 4
+		pooled_h: 4
+		spatial_scale: 0.25  #stride 4
+	}
+}
+# output is a n x ch x 1 x 1 (n: batchsize, ch: num_output)
+layer {
+  name: "fc8_feat"
+  type: "InnerProduct"
+  bottom: "roi_score_feat"  #"pool5"
+  top: "fc8_feat"
+  param {
+    name: "fc8_feat_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc8_feat_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 64
+	weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+    bottom: "fc8"
+	bottom: "fc8_feat"
+	top: "fc8_full"
+	name: "fc8_full"
+	type: "Concat"
+	concat_param {
+		axis: 1  #concat along channels: 256+64 = 320
+	}
+}
+
+layer {
+  name: "relu8"
+  type: "ReLU"
+  bottom: "fc8_full"
+  top: "fc8_full"
+}
+layer {
+  name: "drop8"
+  type: "Dropout"
+  bottom: "fc8_full"
+  top: "fc8_full"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
 layer {
   name: "cls_score"
   type: "InnerProduct"
-  bottom: "fc7"
+  bottom: "fc8_full"
   top: "cls_score"
   param {
     name: "cls_score_w"
@@ -500,7 +619,7 @@ layer {
 layer {
   name: "bbox_pred"
   type: "InnerProduct"
-  bottom: "fc7"
+  bottom: "fc8_full"
   top: "bbox_pred"
   param {
     name: "bbox_pred_w"
@@ -525,119 +644,37 @@ layer {
   }
 }
 
-#-------------- begin online hard example mining--------------
+#0124 use the same output as faster rcnn does
 layer {
-   name: "per_roi_loss_cls"
-   type: "SoftmaxWithLoss"
-   bottom: "cls_score"
-   bottom: "labels"
-   top: "temp_loss_cls"
-   top: "temp_prob_cls"
-   top: "per_roi_loss_cls"
-   loss_weight: 0
-   loss_weight: 0
-   loss_weight: 0
-   propagate_down: false
-   propagate_down: false
-}
-
-layer {
-   name: "per_roi_loss_bbox"
-   type: "SmoothL1Loss"
-   bottom: "bbox_pred"
-   bottom: "bbox_targets"
-   bottom: "bbox_loss_weights"
-   top: "temp_loss_bbox"
-   top: "per_roi_loss_bbox"
-   loss_weight: 0
-   loss_weight: 0
-   propagate_down: false
-   propagate_down: false
-   propagate_down: false
-}
-
-layer {
-   name: "per_roi_loss"
-   type: "Eltwise"
-   bottom: "per_roi_loss_cls"
-   bottom: "per_roi_loss_bbox"
-   top: "per_roi_loss"
-   propagate_down: false
-   propagate_down: false
-}
-
-layer {
-   bottom: "rois"
-   bottom: "per_roi_loss"
-   bottom: "labels"
-   bottom: "bbox_loss_weights"
-   top: "labels_ohem"
-   top: "bbox_loss_weights_ohem"
-   name: "annotator_detector"
-   type: "BoxAnnotatorOHEM"
-   box_annotator_ohem_param {
-        roi_per_img: 128
-        ignore_label: -1
+	name: "loss"
+	type: "SoftmaxWithLoss"
+	bottom: "cls_score"
+	bottom: "labels"
+	top: "loss_cls"
+	loss_param {
+        normalization: VALID
    }
-   propagate_down: false
-   propagate_down: false
-   propagate_down: false
-   propagate_down: false
+	loss_weight: 1
 }
 
 layer {
-   name: "silence"
-   type: "Silence"
-   bottom: "temp_loss_cls"
-   bottom: "temp_prob_cls"
-   bottom: "temp_loss_bbox"
+	name: "accuarcy"
+	type: "Accuracy"
+	bottom: "cls_score"
+	bottom: "labels"
+	top: "accuarcy"
 }
 
-#-------------- end online hard example mining--------------
-
-# ============= backpropagated loss function ===============
 layer {
-   name: "loss_cls"
-   type: "SoftmaxWithLoss"
-   bottom: "cls_score"
-   bottom: "labels_ohem"
-   top: "loss_cls"
-   propagate_down: true
-   propagate_down: false
-   #1208 added because ohem creates ignore labels
-   loss_param {
-        ignore_label: -1
+	name: "loss_bbox"
+	type: "SmoothL1Loss"
+	bottom: "bbox_pred"
+	bottom: "bbox_targets"
+	bottom: "bbox_loss_weights"
+	top: "loss_bbox"
+	loss_param {
+        normalization: PRE_FIXED
+        pre_fixed_normalizer: 20 #0125 added: 20=0.25 x 80
    }
    loss_weight: 1
-}
-
-layer {
-   name: "loss_bbox"
-   type: "SmoothL1Loss"
-   bottom: "bbox_pred"
-   bottom: "bbox_targets"
-   bottom: "bbox_loss_weights_ohem"
-   top: "loss_bbox"
-   loss_weight: 1  #1207: 5-->1
-   loss_param {
-        normalization: PRE_FIXED
-        pre_fixed_normalizer: 32 #1207: 256 --> 32 (=0.25 fg_ratio x 128 batch_size_per_img)
-   }
-   propagate_down: true
-   propagate_down: false
-   propagate_down: false
-}
-
-layer {
-   name: "accuarcy"
-   type: "Accuracy"
-   bottom: "cls_score"
-   bottom: "labels_ohem"
-   top: "accuarcy"
-   #include: { phase: TEST }
-   accuracy_param {
-        ignore_label: -1
-   }
-   propagate_down: false
-   propagate_down: false
 }

@@ -19,6 +19,9 @@ function conf = proposal_config_widerface_batch2(varargin)
 %    ip.addParamValue('drop_fg_boxes_runoff_image', ...
 %                                         true,           @islogical);
     
+    % 0123 added for min and max test image size
+    ip.addParamValue('min_test_length', 64,           @isscalar);
+    ip.addParamValue('max_test_length', 3008,           @isscalar);
     % Image scales -- the short edge of input image                                                                                                
     ip.addParamValue('scales',          512,            @ismatrix); %720
     % Max pixel size of a scaled input image
@@ -55,6 +58,8 @@ function conf = proposal_config_widerface_batch2(varargin)
     
     %% testing
     ip.addParamValue('test_scales',     512,            @isscalar); %720
+    % 0124 added
+    ip.addParamValue('test_scale_range',[0.5 1 2],      @isvector); %720
     ip.addParamValue('test_max_size',   512,            @isscalar); % 960
     ip.addParamValue('test_nms',        0.5,            @isscalar);
     ip.addParamValue('test_binary',     false,          @islogical);

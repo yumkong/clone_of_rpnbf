@@ -100,7 +100,7 @@ catch
     %(13)
     imdb.roidb_func = @roidb_from_wider;
     %(14)
-    imdb.image_at = @(i) sprintf('%s/%s.%s', imdb.image_dir, imdb.image_ids{i}, imdb.extension);
+    imdb.image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir, filesep, imdb.image_ids{i}, imdb.extension);
 
     %(15) height, width
     sizes = zeros(imgsum_, 2);
