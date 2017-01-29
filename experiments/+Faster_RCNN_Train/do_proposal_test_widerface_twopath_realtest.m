@@ -1,7 +1,5 @@
-function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, imdb, roidb, nms_option)
+function do_proposal_test_widerface_twopath_realtest(conf, model_stage, imdb, cache_name, method_name, nms_option)
     % share the test with final3 for they have the same test network struct
-    %[aboxes_res23, aboxes_res45]  = proposal_test_widerface_twopath_happy_flip(conf, imdb, ...
-    %0129 added scale3 version
     [aboxes_res23, aboxes_res45]  = proposal_test_widerface_twopath_happy_flip_vn7(conf, imdb, ...
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
@@ -50,12 +48,12 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
     
     % 1121: add these 3 lines for drawing
     addpath(fullfile('external','export_fig'));
-    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic');
+    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic_realtest');
     mkdir_if_missing(res_dir);
     %1126 added to refresh figure
     close all;
 
-    SUBMIT_cachedir = fullfile(pwd, 'output', conf.exp_name, 'submit_BP-FPN_cachedir');
+    SUBMIT_cachedir = fullfile(pwd, 'output', conf.exp_name, 'realtest_submit_bpfpn');
     mkdir_if_missing(SUBMIT_cachedir);
     
     for i = 1:length(aboxes_res23)
