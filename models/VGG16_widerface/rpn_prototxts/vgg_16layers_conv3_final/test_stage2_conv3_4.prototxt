@@ -352,7 +352,7 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 40 #94.52
+      value: 56 #94.52 40
     }
     channel_shared: false
   }

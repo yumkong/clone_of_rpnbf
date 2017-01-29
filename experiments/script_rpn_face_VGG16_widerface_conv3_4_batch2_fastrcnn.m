@@ -29,8 +29,8 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-%model                       = Model.VGG16_for_rpn_widerface_conv3_4_batch2_fastrcnn(exp_name);
-model                       = Model.VGG16_for_rpn_widerface_conv3_4_batch2_fastrcnn_feat(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_conv3_4_batch2_fastrcnn(exp_name);
+%model                       = Model.VGG16_for_rpn_widerface_conv3_4_batch2_fastrcnn_feat(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -101,8 +101,8 @@ model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % ini
 %unshared
 %model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.init_net_file;
 %0125 added: training with score feat map
-%model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
-model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2_feat(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+%model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2_feat(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
 % test
-Faster_RCNN_Train.do_fast_rcnn_test_widerface_conv3_4_batch2(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+%Faster_RCNN_Train.do_fast_rcnn_test_widerface_conv3_4_batch2(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
 end

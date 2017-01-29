@@ -151,6 +151,7 @@ function [pred_boxes_all, scores_all] = proposal_im_detect_conv3_4_scale3(conf, 
 
                 % plus offset
                 scores_tmp = cat(1, scores_tmp, scores);
+                %0129: specially for 2x images
                 pred_boxes_tmp = cat(1, pred_boxes_tmp, bsxfun(@plus, pred_boxes, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*0.5-0.5));
             end
             % sort

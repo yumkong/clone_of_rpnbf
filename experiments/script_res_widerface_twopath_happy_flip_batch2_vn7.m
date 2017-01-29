@@ -91,7 +91,7 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal               = proposal_config_widerface_twopath_happy_batch2('image_means', model.mean_image, ...
+conf_proposal               = proposal_config_widerface_twopath_happy_batch2_vn7('image_means', model.mean_image, ...
                                                     'feat_stride_res23', model.feat_stride_res23, ...
                                                     'feat_stride_res45', model.feat_stride_res45);
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
@@ -106,7 +106,7 @@ output_map_name = 'output_map_twopath_happy';  % output_map_conv4, output_map_co
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_res23, conf_proposal.output_height_res23, ...
  conf_proposal.output_width_res45, conf_proposal.output_height_res45]...
-                             = proposal_calc_output_size_twopath_happy(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
+                             = proposal_calc_output_size_twopath_happy_vn7(conf_proposal, model.stage1_rpn.test_net_def_file, output_map_save_name);
 % 1209: no need to change: same with all multibox
 [conf_proposal.anchors_res23,conf_proposal.anchors_res45] = proposal_generate_anchors_twopath_flip(cache_data_this_model_dir, ...
                                                             'ratios', [1.25 0.8], 'scales',  2.^[-1:4], 'add_size', [432]);  %[8 16 32 64 128 256 360 512 720 900]
@@ -126,7 +126,7 @@ nms_option_test = 3;
 % dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 % %0106 use all test set for final evaluation: dataset.imdb_realtest
 % %dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
-Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 % %Faster_RCNN_Train.do_proposal_test_widerface_multibox_realtest(conf_proposal, model.stage1_rpn, dataset.imdb_realtest, cache_name, method_name, nms_option_test);
 
 end

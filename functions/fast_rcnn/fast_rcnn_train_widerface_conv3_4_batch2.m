@@ -16,9 +16,9 @@ function save_model_path = fast_rcnn_train_widerface_conv3_4_batch2(conf, imdb_t
     ip.addParamValue('imdb_val',        struct(),       @isstruct);
     ip.addParamValue('roidb_val',       struct(),       @isstruct);
     ip.addParamValue('val_iters',       100,            @isscalar); %0807: 500 --> 100
-    ip.addParamValue('val_interval',    1000,           @isscalar); 
+    ip.addParamValue('val_interval',    1000,           @isscalar); %1000
     ip.addParamValue('snapshot_interval',...
-                                        1000,          @isscalar);
+                                        1000,          @isscalar); %1000
     ip.addParamValue('solver_def_file', fullfile(pwd, 'models', 'Zeiler_conv5', 'solver.prototxt'), ...
                                                         @isstr);
     ip.addParamValue('net_file',        fullfile(pwd, 'models', 'Zeiler_conv5', 'Zeiler_conv5'), ...

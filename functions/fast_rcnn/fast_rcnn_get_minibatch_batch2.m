@@ -36,8 +36,8 @@ function [im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_blob] = 
         
         % Add to ROIs blob
         %1207: extend to [left, top, right, bottom] = [-0.5 -0.2 0.5 0.8]
-        %feat_rois = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scales(i), image_roidb(i).im_size);
-        feat_rois = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scales(i));
+        feat_rois = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scales(i), image_roidb(i).im_size);
+        %feat_rois = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scales(i));
         batch_ind = i * ones(size(feat_rois, 1), 1);
         rois_blob_this_image = [batch_ind, feat_rois];
         rois_blob = [rois_blob; rois_blob_this_image];

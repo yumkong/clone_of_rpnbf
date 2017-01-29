@@ -1,4 +1,4 @@
-function [image_roidb, bbox_means, bbox_stds] = fast_rcnn_prepare_image_roidb(conf, imdbs, roidbs, bbox_means, bbox_stds)
+function [image_roidb,score_maps, bbox_means, bbox_stds] = fast_rcnn_prepare_image_roidb_feat(conf, imdbs, roidbs, bbox_means, bbox_stds)
 % [image_roidb, bbox_means, bbox_stds] = fast_rcnn_prepare_image_roidb(conf, imdbs, roidbs, cache_img, bbox_means, bbox_stds)
 %   Gather useful information from imdb and roidb
 %   pre-calculate mean (bbox_means) and std (bbox_stds) of the regression
@@ -34,10 +34,16 @@ function [image_roidb, bbox_means, bbox_stds] = fast_rcnn_prepare_image_roidb(co
     image_roidb = cat(1, image_roidb{:});
     
     % enhance roidb to contain bounding-box regression targets
-    [image_roidb, bbox_means, bbox_stds] = append_bbox_regression_targets(conf, image_roidb, bbox_means, bbox_stds);
+    [image_roidb,valid_imgs, bbox_means, bbox_stds] = append_bbox_regression_targets(conf, image_roidb, bbox_means, bbox_stds);
+    % score_feat_maps
+    if iscell(roidbs)
+        score_maps = roidbs{1}.score_feat_maps(valid_imgs);
+    else
+        score_maps = roidbs.score_feat_maps(valid_imgs);
+    end
 end
 
-function [image_roidb, means, stds] = append_bbox_regression_targets(conf, image_roidb, means, stds)
+function [image_roidb,valid_imgs, means, stds] = append_bbox_regression_targets(conf, image_roidb, means, stds)
     % means and stds -- (k+1) * 4, include background class
 
     num_images = length(image_roidb);

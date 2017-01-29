@@ -1,4 +1,4 @@
-function [anchors_res23,anchors_res45, im_scales] = proposal_locate_anchors_twopath_happy(conf, im_size, target_scale, feature_map_size)
+function [anchors_res23,anchors_res45, im_scales] = proposal_locate_anchors_twopath_happy(conf, im_size, target_scale, feat23_size, feat45_size)
 % [anchors, im_scales] = proposal_locate_anchors(conf, im_size, target_scale, feature_map_size)
 % --------------------------------------------------------
 % Faster R-CNN
@@ -8,23 +8,26 @@ function [anchors_res23,anchors_res45, im_scales] = proposal_locate_anchors_twop
 % generate anchors for each scale
 
     % only for fcn
-    if ~exist('feature_map_size', 'var')
-        feature_map_size = [];
+    if ~exist('feat23_size', 'var')
+        feat23_size = [];
+    end
+    if ~exist('feat45_size', 'var')
+        feat45_size = [];
     end
 
     func = @proposal_locate_anchors_single_scale;
 
     if exist('target_scale', 'var')
-        [anchors_res23,anchors_res45, im_scales] = func(im_size, conf, target_scale, feature_map_size);
+        [anchors_res23,anchors_res45, im_scales] = func(im_size, conf, target_scale, feat23_size, feat45_size);
     else
-        [anchors_res23,anchors_res45, im_scales] = arrayfun(@(x) func(im_size, conf, x, feature_map_size), ...
+        [anchors_res23,anchors_res45, im_scales] = arrayfun(@(x) func(im_size, conf, x, feat23_size, feat45_size), ...
             conf.scales, 'UniformOutput', false);
     end
 
 end
 
-function [anchors_res23,anchors_res45, im_scale] = proposal_locate_anchors_single_scale(im_size, conf, target_scale, feature_map_size)
-    if isempty(feature_map_size)
+function [anchors_res23,anchors_res45, im_scale] = proposal_locate_anchors_single_scale(im_size, conf, target_scale, feat23_size, feat45_size)
+    if isempty(feat23_size)
         im_scale = prep_im_for_blob_size(im_size, target_scale, conf.max_size);
         img_size = round(im_size * im_scale);
 		% 1206 added: enlarge the height and width to 8N
@@ -34,7 +37,8 @@ function [anchors_res23,anchors_res45, im_scale] = proposal_locate_anchors_singl
         output_size_res45 = cell2mat([conf.output_height_res45.values({img_size(1)}), conf.output_width_res45.values({img_size(2)})]);
     else
         im_scale = prep_im_for_blob_size(im_size, target_scale, conf.max_size);
-        output_size_res23 = feature_map_size;
+        output_size_res23 = feat23_size;
+        output_size_res45 = feat45_size;
     end
     
     shift_x_res23 = [0:(output_size_res23(2)-1)] * conf.feat_stride_res23;

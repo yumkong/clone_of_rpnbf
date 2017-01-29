@@ -74,7 +74,7 @@ function save_model_path = fast_rcnn_train_widerface_conv3_4_batch2_feat(conf, i
 %% making tran/val data
     fprintf('Preparing training data...');
     [image_roidb_train,score_maps_train, bbox_means, bbox_stds]...
-                            = fast_rcnn_prepare_image_roidb(conf, opts.imdb_train, opts.roidb_train);
+                            = fast_rcnn_prepare_image_roidb_feat(conf, opts.imdb_train, opts.roidb_train);
     %0125 added
     %score_maps_train = opts.roidb_train{1}.score_feat_maps;
     fprintf('Done.\n');
@@ -82,7 +82,7 @@ function save_model_path = fast_rcnn_train_widerface_conv3_4_batch2_feat(conf, i
     if opts.do_val
         fprintf('Preparing validation data...');
         [image_roidb_val, score_maps_val]...
-                                = fast_rcnn_prepare_image_roidb(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
+                                = fast_rcnn_prepare_image_roidb_feat(conf, opts.imdb_val, opts.roidb_val, bbox_means, bbox_stds);
         % the following is erroneous, because some item may be deleted from
         % imdb_val, then score_feat_maps should delete these items too
         %score_maps_val = opts.roidb_val.score_feat_maps;
