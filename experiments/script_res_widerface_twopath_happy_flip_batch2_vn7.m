@@ -56,7 +56,7 @@ cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = true;  %true --> false
 % 0127: in vn7 only use 11 event for demo
-event_num                   = 11; %-1
+event_num                   = -1; %-1
 dataset                     = Dataset.widerface_all_flip_512(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 %0106 added all test images
@@ -102,7 +102,7 @@ conf_proposal.exp_name = exp_name;
 %[conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                            = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
-output_map_name = 'output_map_twopath_happy';  % output_map_conv4, output_map_conv5
+output_map_name = 'output_map_twopath_happy_full';  % output_map_conv4, output_map_conv5
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_res23, conf_proposal.output_height_res23, ...
  conf_proposal.output_width_res45, conf_proposal.output_height_res45]...
@@ -123,7 +123,7 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_twop
 % method_name = 'RPN-ped';
 nms_option_test = 3;
 % %0101: use all validation set instead of 500
-% dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 % %0106 use all test set for final evaluation: dataset.imdb_realtest
 % %dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
 Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);

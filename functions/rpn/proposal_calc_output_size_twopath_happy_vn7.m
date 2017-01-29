@@ -39,8 +39,9 @@ function [output_width_map_res23, output_height_map_res23, ...
         for i = 1:length(input)
             fprintf('calulating input size %d / %d\n',i,conf.max_size);
             % 1209 changed in order pool and deconv change dimension
-            s = input(i);
-            %s = ceil(input(i)/8)*8;
+            %0129 changed
+            %s = input(i);
+            s = ceil(input(i)/32)*32;
             %liu@0926 changed,because when s>= 1000, s x s is too big to feed to a net
             %im_blob = single(zeros(s, s, 3, 1));
             %im_blob = single(zeros(s, 504, 3, 1)); %1210: 500-->504

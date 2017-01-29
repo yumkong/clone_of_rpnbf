@@ -26,7 +26,7 @@ function [pred_boxes_res23_all, scores_res23_all, pred_boxes_res45_all, scores_r
         im_blob = im_blob_all{i};
         scaled_im_size = scaled_im_size_all(i,:);
         % 0124 added. treat small and medium size images as a whole
-        if (size(im_blob, 1) <= 1500) && (size(im_blob, 2) <= 1500)
+        if (size(im_blob, 1) <= 1024) && (size(im_blob, 2) <= 1024)
             % permute data into caffe c++ memory, thus [num, channels, height, width]
             im_blob = im_blob(:, :, [3, 2, 1], :); % from rgb to brg
             im_blob = permute(im_blob, [2, 1, 3, 4]);
@@ -173,24 +173,38 @@ function [pred_boxes_res23_all, scores_res23_all, pred_boxes_res45_all, scores_r
         else % 0124 added. treat large size (2x) images as four parts
             hei_im = size(im_blob, 1);
             wid_im = size(im_blob, 2);
-            hei_middle = round(hei_im/2);
-            wid_middle = round(wid_im/2);
+            %hei_middle = round(hei_im/2);
+            %wid_middle = round(wid_im/2);
+            h_part_num = ceil(hei_im / 1024);
+            w_part_num = ceil(wid_im / 1024);
+            %hei_middle = ceil(hei_im/2/32)*32;
+            %wid_middle = ceil(wid_im/2/32)*32;
+            hei_middle = ceil(hei_im/h_part_num/32)*32;
+            wid_middle = ceil(wid_im/w_part_num/32)*32;
             % [top-left bottom-left top-right bottom-right]
             %part_h = hei_middle + 16;
             %part_w = wid_middle + 16;
             % start position, also the offset position of bboxes
-            y_start = [1 hei_middle-16 1 hei_middle-16];
-            x_start = [1 1 wid_middle-16 wid_middle-16];
+            %y_start = [1 hei_middle-32 1 hei_middle-32];
+            y_start = repmat([1 hei_middle*(1:h_part_num-1)-32]',1,w_part_num);
+            y_start = y_start(:);
+            %x_start = [1 1 wid_middle-32 wid_middle-32];
+            x_start = repmat([1 wid_middle*(1:w_part_num-1)-32],h_part_num, 1);
+            x_start = x_start(:);
             % end position
-            y_end = [hei_middle+16 hei_im hei_middle+16 hei_im];
-            x_end = [wid_middle+16 wid_middle+16 wid_im wid_im];
+            %y_end = [hei_middle+32 hei_im hei_middle+32 hei_im];
+            y_end = repmat([hei_middle*(1:h_part_num-1)+32 hei_im]',1,w_part_num);
+            y_end = y_end(:);
+            %x_end = [wid_middle+32 wid_middle+32 wid_im wid_im];
+            x_end = repmat([wid_middle*(1:w_part_num-1)+32 wid_im],h_part_num, 1);
+            x_end = x_end(:);
             
             im_blob_complete = im_blob;
             scores_tmp23 = [];
             pred_boxes_tmp23 = [];
             scores_tmp45 = [];
             pred_boxes_tmp45 = [];
-            for kk = 1:4
+            for kk = 1:numel(y_start)
                 im_blob = im_blob_complete(y_start(kk):y_end(kk), x_start(kk):x_end(kk), :);
                 im_blob = im_blob(:, :, [3, 2, 1], :); % from rgb to brg
                 im_blob = permute(im_blob, [2, 1, 3, 4]);
@@ -281,14 +295,16 @@ function [pred_boxes_res23_all, scores_res23_all, pred_boxes_res45_all, scores_r
                 [pred_boxes_res23, scores_res23] = filter_border_boxes(y_start(kk),y_end(kk), x_start(kk),x_end(kk), pred_boxes_res23, scores_res23);
 
                 
-                assert(i==2 || i == 3); %assume only 1x or 2x image can be larger than 1500 x 1500
+                %assert(i==2 || i == 3); %assume only 1x or 2x image can be larger than 1500 x 1500
                 % plus offset
                 scores_tmp23 = cat(1, scores_tmp23, scores_res23);
                 %0129: specially for 2x images
                 if i == 3  %2x
                     pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*0.5-0.5));
-                else %1x
+                elseif i==2 %1x
                     pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)); 
+                else
+                    pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*2-2)); 
                 end
                 % ===================================================== for conv5
                 % Apply bounding-box regression deltas
@@ -342,14 +358,16 @@ function [pred_boxes_res23_all, scores_res23_all, pred_boxes_res45_all, scores_r
                 [pred_boxes_res45, scores_res45] = filter_border_boxes(y_start(kk),y_end(kk), x_start(kk),x_end(kk), pred_boxes_res45, scores_res45);
 
                 
-                assert(i==2 || i == 3); %assume only 1x or 2x image can be larger than 1500 x 1500
+                %assert(i==2 || i == 3); %assume only 1x or 2x image can be larger than 1500 x 1500
                 % plus offset
                 scores_tmp45 = cat(1, scores_tmp45, scores_res45);
                 %0129: specially for 2x images
                 if i == 3  %2x
                     pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*0.5-0.5));
-                else %1x
+                elseif i==2 %1x
                     pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)); 
+                else
+                    pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*2-2)); 
                 end
             end
             % sort

@@ -805,7 +805,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -863,7 +862,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	engine: CAFFE	
     }
     param {
         lr_mult: 1.0
@@ -928,7 +926,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -993,7 +990,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1066,7 +1062,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1131,7 +1126,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1196,7 +1190,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1269,7 +1262,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1334,7 +1326,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1399,7 +1390,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1472,7 +1462,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1537,7 +1526,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1602,7 +1590,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1722,7 +1709,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   engine: CAFFE
    }
 }
 
@@ -1768,7 +1754,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   engine: CAFFE
    }
 }
 
@@ -1796,7 +1781,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   engine: CAFFE
    }
 }
 # ========= end of res3 prediction =================
@@ -1812,7 +1796,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1870,7 +1853,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1935,7 +1917,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2000,7 +1981,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2073,7 +2053,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2138,7 +2117,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2203,7 +2181,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2276,7 +2253,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2341,7 +2317,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2406,7 +2381,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2479,7 +2453,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2544,7 +2517,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2609,7 +2581,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2682,7 +2653,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2747,7 +2717,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2812,7 +2781,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2885,7 +2853,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2950,7 +2917,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3015,7 +2981,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3088,7 +3053,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3153,7 +3117,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3218,7 +3181,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3291,7 +3253,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3356,7 +3317,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3421,7 +3381,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3494,7 +3453,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3559,7 +3517,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3624,7 +3581,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3697,7 +3653,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3762,7 +3717,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3827,7 +3781,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3900,7 +3853,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3965,7 +3917,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4030,7 +3981,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4103,7 +4053,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4168,7 +4117,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4233,7 +4181,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4306,7 +4253,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4371,7 +4317,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4436,7 +4381,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4509,7 +4453,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4574,7 +4517,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4639,7 +4581,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4712,7 +4653,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4777,7 +4717,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4842,7 +4781,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4915,7 +4853,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4980,7 +4917,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5045,7 +4981,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5118,7 +5053,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5183,7 +5117,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5248,7 +5181,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5321,7 +5253,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5386,7 +5317,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5451,7 +5381,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5524,7 +5453,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5589,7 +5517,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5654,7 +5581,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5727,7 +5653,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5792,7 +5717,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5857,7 +5781,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5930,7 +5853,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5995,7 +5917,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6060,7 +5981,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6133,7 +6053,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6198,7 +6117,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6263,7 +6181,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6336,7 +6253,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6401,7 +6317,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6466,7 +6381,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6568,7 +6482,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   engine: CAFFE
    }
 }
 # ================end res4 prediction=================
@@ -6584,7 +6497,6 @@ layer {
 		pad: 0
 		stride: 2
 		bias_term: false
-		engine: CAFFE
 	}
 	param {
         lr_mult: 1.0
@@ -6644,7 +6556,6 @@ layer {
 		pad: 0
 		stride: 2
 		bias_term: false
-		engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -6709,7 +6620,6 @@ layer {
 		pad: 1
 		stride: 1
 		bias_term: false
-		engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -6774,7 +6684,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6847,7 +6756,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6912,7 +6820,6 @@ layer {
 		pad: 1
 		stride: 1
 		bias_term: false
-		engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -6977,7 +6884,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -7050,7 +6956,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -7115,7 +7020,6 @@ layer {
 		pad: 1
 		stride: 1
 		bias_term: false
-		engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -7180,7 +7084,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -7300,7 +7203,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   engine: CAFFE
    }
 }
 
@@ -7346,7 +7248,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   engine: CAFFE
    }
 }
 
@@ -7374,7 +7275,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   engine: CAFFE
    }
 }
 # ========= end of res5 prediction =================

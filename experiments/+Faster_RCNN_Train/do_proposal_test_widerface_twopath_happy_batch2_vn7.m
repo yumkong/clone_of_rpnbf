@@ -41,7 +41,7 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
 
     fprintf('score_threshold res23 = %f, res45 = %f\n', score_thresh_res23, score_thresh_res45);
     % drop the boxes which scores are lower than the threshold
-    show_image = true;
+    show_image = false;
     save_result = false;
     
     % 1122 added to save combined results of conv4 and conv5
@@ -126,60 +126,60 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
         end
     end
     
-%     aboxes_nms = boxes_filter(aboxes_nms, -1, 0.33, -1, conf.use_gpu); %0.5
-%     for i = 1:length(aboxes_res23)
-%         % draw boxes after 'naive' thresholding
-%         sstr = strsplit(imdb.image_ids{i}, filesep);
-%         event_name = sstr{1};
-%         event_dir = fullfile(SUBMIT_cachedir, event_name);
-%         mkdir_if_missing(event_dir);
-%         fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'w');
-%         fprintf(fid, '%s\n', [imdb.image_ids{i} '.jpg']);
-%         bbs_all = aboxes_nms{i};
-%         
-%         fprintf(fid, '%d\n', size(bbs_all, 1));
-%         if ~isempty(bbs_all)
-%             for j = 1:size(bbs_all,1)
-%                 %each row: [x1 y1 w h score]
-%                 fprintf(fid, '%d %d %d %d %f\n', round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
-%             end
-%         end
-%         fclose(fid);
-%         fprintf('Done with saving image %d bboxes.\n', i);
-%         
-%         if show_image      
-%             %1121 also draw gt boxes
-%             img = imread(imdb.image_at(i));  
-%             bbs_gt = roidb.rois(i).boxes;
-%             bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
-%             bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
-%             bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
-%             % if a box has only 1 pixel in either size, remove it
-%             invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
-%             bbs_gt(invalid_idx, :) = [];
-%             
-%             figure(2); 
-%             imshow(img);  %im(img)
-%             hold on
-% 
-%             if ~isempty(bbs_all)
-%                   bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
-%                   bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
-%                   bbApply('draw',bbs_all,'g');
-%             end
-%             if ~isempty(bbs_gt)
-%               bbApply('draw',bbs_gt,'r');
-%             end
-%             hold off
-%             % 1121: save result
-%             if save_result
-%                 strs = strsplit(imdb.image_at(i), '/');
-%                 saveName = sprintf('%s%cres_%s',res_dir, filesep, strs{end}(1:end-4));
-%                 export_fig(saveName, '-png', '-a1', '-native');
-%                 fprintf('image %d saved.\n', i);
-%             end
-%         end
-%     end	
+    aboxes_nms = boxes_filter(aboxes_nms, -1, 0.33, -1, conf.use_gpu); %0.5
+    for i = 1:length(aboxes_res23)
+        % draw boxes after 'naive' thresholding
+        sstr = strsplit(imdb.image_ids{i}, filesep);
+        event_name = sstr{1};
+        event_dir = fullfile(SUBMIT_cachedir, event_name);
+        mkdir_if_missing(event_dir);
+        fid = fopen(fullfile(event_dir, [sstr{2} '.txt']), 'w');
+        fprintf(fid, '%s\n', [imdb.image_ids{i} '.jpg']);
+        bbs_all = aboxes_nms{i};
+        
+        fprintf(fid, '%d\n', size(bbs_all, 1));
+        if ~isempty(bbs_all)
+            for j = 1:size(bbs_all,1)
+                %each row: [x1 y1 w h score]
+                fprintf(fid, '%d %d %d %d %f\n', round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
+            end
+        end
+        fclose(fid);
+        fprintf('Done with saving image %d bboxes.\n', i);
+        
+        if show_image      
+            %1121 also draw gt boxes
+            img = imread(imdb.image_at(i));  
+            bbs_gt = roidb.rois(i).boxes;
+            bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
+            bbs_gt(:, 3) = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
+            bbs_gt(:, 4) = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+            % if a box has only 1 pixel in either size, remove it
+            invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
+            bbs_gt(invalid_idx, :) = [];
+            
+            figure(2); 
+            imshow(img);  %im(img)
+            hold on
+
+            if ~isempty(bbs_all)
+                  bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
+                  bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
+                  bbApply('draw',bbs_all,'g');
+            end
+            if ~isempty(bbs_gt)
+              bbApply('draw',bbs_gt,'r');
+            end
+            hold off
+            % 1121: save result
+            if save_result
+                strs = strsplit(imdb.image_at(i), '/');
+                saveName = sprintf('%s%cres_%s',res_dir, filesep, strs{end}(1:end-4));
+                export_fig(saveName, '-png', '-a1', '-native');
+                fprintf('image %d saved.\n', i);
+            end
+        end
+    end	
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)
