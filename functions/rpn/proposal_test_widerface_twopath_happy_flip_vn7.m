@@ -100,7 +100,7 @@ function [aboxes_res23, aboxes_res45] = proposal_test_widerface_twopath_happy_fl
                 aboxes45_tmp{j} = [boxes_res45{j}, scores_res45{j}];
                 aboxes_res45{i} = cat(1, aboxes_res45{i}, aboxes45_tmp{j});
             end
-            if 1
+            if 0
                 % debugging visualizations
                 im = imread(imdb.image_at(i));
                 figure(1),clf;
