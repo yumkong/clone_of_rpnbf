@@ -1,4 +1,4 @@
-function do_proposal_test_widerface_twopath_realtest(conf, model_stage, imdb, cache_name, method_name, nms_option)
+function do_proposal_test_widerface_twopath_realtest(conf, model_stage, imdb, nms_option)
     % share the test with final3 for they have the same test network struct
     [aboxes_res23, aboxes_res45]  = proposal_test_widerface_twopath_happy_flip_vn7(conf, imdb, ...
                                         'net_def_file',     model_stage.test_net_def_file, ...
@@ -10,8 +10,8 @@ function do_proposal_test_widerface_twopath_realtest(conf, model_stage, imdb, ca
     % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
     ave_per_image_topN_res23 = model_stage.nms.after_nms_topN_res23;
     ave_per_image_topN_res45 = model_stage.nms.after_nms_topN_res45;
-    model_stage.nms.ave_per_image_topN_res23 = -1;
-    model_stage.nms.ave_per_image_topN_res45 = -1;
+    model_stage.nms.after_nms_topN_res23 = -1;
+    model_stage.nms.after_nms_topN_res45 = -1;
     aboxes_res23              = boxes_filter(aboxes_res23, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_res23, conf.use_gpu);
     aboxes_res45              = boxes_filter(aboxes_res45, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_res45, conf.use_gpu);
     fprintf(' Done.\n');  
