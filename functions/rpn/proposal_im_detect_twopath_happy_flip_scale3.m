@@ -299,13 +299,13 @@ function [pred_boxes_res23_all, scores_res23_all, pred_boxes_res45_all, scores_r
                 % plus offset
                 scores_tmp23 = cat(1, scores_tmp23, scores_res23);
                 %0129: specially for 2x images
-                if i == 3  %2x
-                    pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*0.5-0.5));
-                elseif i==2 %1x
-                    pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)); 
-                else
-                    pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*2-2)); 
-                end
+                %if i == 3  %2x
+                    pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, ([x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)/im_scales(i)));
+                %elseif i==2 %1x
+                %    pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)); 
+                %else
+                %    pred_boxes_tmp23 = cat(1, pred_boxes_tmp23, bsxfun(@plus, pred_boxes_res23, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*2-2)); 
+                %end
                 % ===================================================== for conv5
                 % Apply bounding-box regression deltas
                 %box_deltas_res45 = output_blobs{2};
@@ -362,13 +362,14 @@ function [pred_boxes_res23_all, scores_res23_all, pred_boxes_res45_all, scores_r
                 % plus offset
                 scores_tmp45 = cat(1, scores_tmp45, scores_res45);
                 %0129: specially for 2x images
-                if i == 3  %2x
-                    pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*0.5-0.5));
-                elseif i==2 %1x
-                    pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)); 
-                else
-                    pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*2-2)); 
-                end
+                pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, ([x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)/im_scales(i)));
+%                 if i == 3  %2x
+%                     pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*0.5-0.5));
+%                 elseif i==2 %1x
+%                     pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]-1)); 
+%                 else
+%                     pred_boxes_tmp45 = cat(1, pred_boxes_tmp45, bsxfun(@plus, pred_boxes_res45, [x_start(kk) y_start(kk) x_start(kk) y_start(kk)]*2-2)); 
+%                 end
             end
             % sort
             [scores_tmp23, scores_ind] = sort(scores_tmp23, 'descend');

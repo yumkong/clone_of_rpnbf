@@ -128,6 +128,7 @@ dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, 
 Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
 %0106 use all test set for final evaluation: dataset.imdb_realtest
+
 %dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
 %Faster_RCNN_Train.do_proposal_test_widerface_twopath_realtest(conf_proposal, model.stage1_rpn, dataset.imdb_realtest, cache_name, method_name, nms_option_test);
 
