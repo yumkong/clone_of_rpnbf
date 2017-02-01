@@ -73,9 +73,6 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_widerface_mu
         aboxes_conv4 = cell(num_images, 1);
         aboxes_conv5 = cell(num_images, 1);
         aboxes_conv6 = cell(num_images, 1);
-        abox_deltas = cell(num_images, 1);
-        aanchors = cell(num_images, 1);
-        ascores = cell(num_images, 1);
         
         count = 0;
         for i = 1:num_images
@@ -89,30 +86,67 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_widerface_mu
             %[boxes, scores] = proposal_im_detect_multibox(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th));  
-            % 1229: specially for vn7
-            scores_conv4 = scores_conv4(scores_conv4 >= 0.5, :);
-            boxes_conv4 = boxes_conv4(scores_conv4 >= 0.5, :);
-            scores_conv5 = scores_conv5(scores_conv5 >= 0.55, :);
-            boxes_conv5 = boxes_conv5(scores_conv5 >= 0.55, :);
-            scores_conv6 = scores_conv6(scores_conv6 >= 0.55, :);
-            boxes_conv6 = boxes_conv6(scores_conv6 >= 0.55, :);
-            
-            aboxes_conv4{i} = [boxes_conv4, scores_conv4];
-            aboxes_conv5{i} = [boxes_conv5, scores_conv5];
-            aboxes_conv6{i} = [boxes_conv6, scores_conv6];
-            
+            aboxes4_tmp = cell(1, numel(scores_conv4));
+            aboxes5_tmp = cell(1, numel(scores_conv5));
+            aboxes6_tmp = cell(1, numel(scores_conv6));
+            for j = 1:numel(scores_conv4)
+                %1230 added
+                boxes_conv4{j} = boxes_conv4{j}(scores_conv4{j} >= 0.6,:);
+                scores_conv4{j} = scores_conv4{j}(scores_conv4{j} >= 0.6,:);  %0131:0.55-->0.6
+
+                boxes_conv5{j} = boxes_conv5{j}(scores_conv5{j} >= 0.6,:);
+                scores_conv5{j} = scores_conv5{j}(scores_conv5{j} >= 0.6,:);  %0131:0.55-->0.6
+                
+                boxes_conv6{j} = boxes_conv6{j}(scores_conv6{j} >= 0.6,:);
+                scores_conv6{j} = scores_conv6{j}(scores_conv6{j} >= 0.6,:);  %0131:0.55-->0.6
+
+                aboxes4_tmp{j} = [boxes_conv4{j}, scores_conv4{j}];
+                aboxes_conv4{i} = cat(1, aboxes_conv4{i}, aboxes4_tmp{j});
+                aboxes5_tmp{j} = [boxes_conv5{j}, scores_conv5{j}];
+                aboxes_conv5{i} = cat(1, aboxes_conv5{i}, aboxes5_tmp{j});
+                aboxes6_tmp{j} = [boxes_conv6{j}, scores_conv6{j}];
+                aboxes_conv6{i} = cat(1, aboxes_conv6{i}, aboxes6_tmp{j});
+            end
             if 0
                 % debugging visualizations
                 im = imread(imdb.image_at(i));
-                keep = nms(aboxes{i}, 0.3);
-                for k = 1:min(10, length(keep))
-                    if aboxes{i}(keep(k),end) > 0.95
-                        showboxes2(im, aboxes{i}(keep(k),1:4));
-                        title(sprintf('%s %d score: %.3f\n', imdb.classes{1}, ...
-                            k, aboxes{i}(keep(k),end)));
-                        pause;
+                figure(1),clf;
+                imshow(im);
+                color_cell4 = {'g', 'c', 'm'};
+                color_cell5 = {'r', 'b', 'y'};
+                color_cell6 = {'k', 'w', 'm'};
+                hold on
+                for j = 1:numel(scores_conv4)
+                    if ~isempty(aboxes4_tmp{j})
+                        keep = nms(aboxes4_tmp{j}, 0.3);
+                        bbs_show = aboxes4_tmp{j}(keep, :);
+                        bbs_show = bbs_show(bbs_show(:,5)>=0.9, :);
+                        bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
+                        bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
+                        bbApply('draw',bbs_show,color_cell4{j});
                     end
                 end
+                for j = 1:numel(scores_conv5)
+                    if ~isempty(aboxes5_tmp{j})
+                        keep = nms(aboxes5_tmp{j}, 0.3);
+                        bbs_show = aboxes5_tmp{j}(keep, :);
+                        bbs_show = bbs_show(bbs_show(:,5)>=0.9, :);
+                        bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
+                        bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
+                        bbApply('draw',bbs_show,color_cell5{j});
+                    end
+                end
+                for j = 1:numel(scores_conv6)
+                    if ~isempty(aboxes6_tmp{j})
+                        keep = nms(aboxes6_tmp{j}, 0.3);
+                        bbs_show = aboxes6_tmp{j}(keep, :);
+                        bbs_show = bbs_show(bbs_show(:,5)>=0.9, :);
+                        bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
+                        bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
+                        bbApply('draw',bbs_show,color_cell6{j});
+                    end
+                end
+                hold off
             end
         end    
         save(fullfile(cache_dir, ['proposal_boxes_' imdb.name opts.suffix]), 'aboxes_conv4', 'aboxes_conv5','aboxes_conv6', '-v7.3');
