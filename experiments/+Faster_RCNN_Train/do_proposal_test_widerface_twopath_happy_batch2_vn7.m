@@ -12,8 +12,8 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
     % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
     ave_per_image_topN_res23 = model_stage.nms.after_nms_topN_res23;
     ave_per_image_topN_res45 = model_stage.nms.after_nms_topN_res45;
-    model_stage.nms.ave_per_image_topN_res23 = -1;
-    model_stage.nms.ave_per_image_topN_res45 = -1;
+    model_stage.nms.after_nms_topN_res23 = -1;
+    model_stage.nms.after_nms_topN_res45 = -1;
     aboxes_res23              = boxes_filter(aboxes_res23, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_res23, conf.use_gpu);
     aboxes_res45              = boxes_filter(aboxes_res45, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_res45, conf.use_gpu);
     fprintf(' Done.\n');  
@@ -59,8 +59,8 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
     mkdir_if_missing(SUBMIT_cachedir);
     
     for i = 1:length(aboxes_res23)
-        aboxes_res23{i} = aboxes_res23{i}(aboxes_res23{i}(:, end) > 0.65, :);  %score_thresh_conv4, 0.7
-        aboxes_res45{i} = aboxes_res45{i}(aboxes_res45{i}(:, end) > 0.7, :);%score_thresh_conv5, 0.8
+        aboxes_res23{i} = aboxes_res23{i}(aboxes_res23{i}(:, end) > 0.99, :);  %0.99
+        aboxes_res45{i} = aboxes_res45{i}(aboxes_res45{i}(:, end) > 0.99, :);%0.99
         aboxes{i} = cat(1, aboxes_res23{i}, aboxes_res45{i});
         
         if show_image
@@ -86,7 +86,7 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
         
         %1006 added to do NPD-style nms
         time = tic;
-        aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
+        aboxes_nms{i} = pseudoNMS_v8_twopath(aboxes{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         
@@ -102,7 +102,7 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
                 invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
                 bbs_gt(invalid_idx, :) = [];
             end
-            
+            img = imread(imdb.image_at(i)); 
             figure(2); 
             imshow(img);  %im(img)
             hold on
@@ -118,8 +118,8 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
             hold off
             % 1121: save result
             if save_result
-                strs = strsplit(imdb.image_at(i), '/');
-                saveName = sprintf('%s/res_%s',res_dir, strs{end}(1:end-4));
+                strs = strsplit(imdb.image_at(i), filesep);
+                saveName = sprintf('%s%cres_%s',res_dir, filesep, strs{end}(1:end-4));
                 export_fig(saveName, '-png', '-a1', '-native');
                 fprintf('image %d saved.\n', i);
             end
@@ -172,7 +172,7 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
             end
             hold off
             % 1121: save result
-            if save_result
+            if 0
                 strs = strsplit(imdb.image_at(i), '/');
                 saveName = sprintf('%s%cres_%s',res_dir, filesep, strs{end}(1:end-4));
                 export_fig(saveName, '-png', '-a1', '-native');

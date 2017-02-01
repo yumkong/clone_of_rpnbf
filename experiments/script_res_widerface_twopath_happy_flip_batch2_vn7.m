@@ -28,6 +28,7 @@ active_caffe_mex(opts.gpu_id, opts.caffe_version);
 
 %0120 to use bbApply('draw',bbs_show,'m') in widerface_all_flip_512
 addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
+addpath(genpath('external/export_fig'));  % save image to png
 
 % 1009 use more anchors
 exp_name = 'Res50_widerface';
@@ -56,7 +57,7 @@ cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = true;  %true --> false
 % 0127: in vn7 only use 11 event for demo
-event_num                   = -1; %-1
+event_num                   = 11; %-1
 dataset                     = Dataset.widerface_all_flip_512(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 %0106 added all test images
@@ -123,11 +124,12 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_twop
 % method_name = 'RPN-ped';
 nms_option_test = 3;
 % 0129: use full-size validation images instead of 512x512
-%dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
-%Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
+Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
 %0106 use all test set for final evaluation: dataset.imdb_realtest
-dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
-Faster_RCNN_Train.do_proposal_test_widerface_twopath_realtest(conf_proposal, model.stage1_rpn, dataset.imdb_realtest, nms_option_test);
+
+%dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
+%Faster_RCNN_Train.do_proposal_test_widerface_twopath_realtest(conf_proposal, model.stage1_rpn, dataset.imdb_realtest, cache_name, method_name, nms_option_test);
 
 end
