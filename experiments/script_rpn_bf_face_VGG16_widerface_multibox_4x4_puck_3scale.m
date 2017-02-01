@@ -29,7 +29,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_rpn_widerface_multibox_ohem_happy_flip(exp_name);
+model                       = Model.VGG16_for_rpn_widerface_multibox_flip_3scale(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -149,15 +149,15 @@ model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %3
 is_test = true;
 roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_3scale(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
-%model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
-model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
-model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
-model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
-%model.stage1_rpn.nms.after_nms_topN = 50; %1000--> 200. 200 is enough (double of test topN), only keep the hard negative one
-model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %50
-model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %30
-model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %3
-roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
+% %model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
+% model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
+% model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
+% model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7;
+% %model.stage1_rpn.nms.after_nms_topN = 50; %1000--> 200. 200 is enough (double of test topN), only keep the hard negative one
+% model.stage1_rpn.nms.after_nms_topN_conv4      	= 50;  %50
+% model.stage1_rpn.nms.after_nms_topN_conv5      	= 30;  %30
+% model.stage1_rpn.nms.after_nms_topN_conv6      	= 3;  %3
+% roidb_train_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_train{1}, dataset.roidb_train{1}, ~is_test);
 
 %% train the BF
 BF_cachedir = fullfile(pwd, 'output', exp_name, 'bf_cachedir_context_4x4_context_puck');  %puck
@@ -208,14 +208,14 @@ pLoad={'lbls',{'person'},'ilbls',{'people'},'squarify',{3,.41}};  % delete?
 opts.pLoad = [pLoad 'hRng',[50 inf], 'vRng',[1 1] ];   % delete?
 
 % 1001: add 'ignores' field to roidb
-[roidb_train_BF.rois(:).ignores] = deal([]);
-for kk = 1:length(roidb_train_BF.rois)
-    tm_gt = roidb_train_BF.rois(kk).gt;
-    tm_gt = tm_gt(tm_gt > 0);
-    %all gts are not ignored in widerface
-    roidb_train_BF.rois(kk).ignores = zeros(size(tm_gt));
-end
-opts.roidb_train = roidb_train_BF;
+% [roidb_train_BF.rois(:).ignores] = deal([]);
+% for kk = 1:length(roidb_train_BF.rois)
+%     tm_gt = roidb_train_BF.rois(kk).gt;
+%     tm_gt = tm_gt(tm_gt > 0);
+%     %all gts are not ignored in widerface
+%     roidb_train_BF.rois(kk).ignores = zeros(size(tm_gt));
+% end
+% opts.roidb_train = roidb_train_BF;
 % 1001: add 'ignores' field to roidb
 [roidb_test_BF.rois(:).ignores] = deal([]);
 for kk = 1:length(roidb_test_BF.rois)
@@ -273,27 +273,27 @@ opts.feat_len = size(feat,2); %1203 changed: length(feat)
 %     [~,train_gts{i}]=bbGt('bbLoad',fs{i},opts.pLoad);
 % end
 
-% get gt boxes
-train_gts = cell(length(dataset.roidb_train{1}.rois), 1);
-for i = 1:length(train_gts)
-    % [x y x2 y2]
-     tmp_gt = dataset.roidb_train{1}.rois(i).boxes;
-     % [x y w h is_gt], always set is_gt as 1
-    %train_gts{i} = cat(2, train_gts{i}, ones(size(train_gts{i},1),1));
-     train_gts{i} = [tmp_gt(:,1) tmp_gt(:,2) tmp_gt(:,3)-tmp_gt(:,1)+1 tmp_gt(:,4)-tmp_gt(:,2)+1 ones(size(tmp_gt(:,1)))];
-    
-end
-opts.train_gts = train_gts;
+% % get gt boxes
+% train_gts = cell(length(dataset.roidb_train{1}.rois), 1);
+% for i = 1:length(train_gts)
+%     % [x y x2 y2]
+%      tmp_gt = dataset.roidb_train{1}.rois(i).boxes;
+%      % [x y w h is_gt], always set is_gt as 1
+%     %train_gts{i} = cat(2, train_gts{i}, ones(size(train_gts{i},1),1));
+%      train_gts{i} = [tmp_gt(:,1) tmp_gt(:,2) tmp_gt(:,3)-tmp_gt(:,1)+1 tmp_gt(:,4)-tmp_gt(:,2)+1 ones(size(tmp_gt(:,1)))];
+%     
+% end
+% opts.train_gts = train_gts;
 
 % train BF detector
 detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
 
-show_image = false;
-SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_val');
+show_image = true;
+SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_val_3scale');
 mkdir_if_missing(SUBMIT_cachedir);
 final_score_path = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
 mkdir_if_missing(final_score_path);
-final_score_file = fullfile(final_score_path, 'val_box_score.mat');
+final_score_file = fullfile(final_score_path, 'val_box_score_3scale.mat');
 try
     % try to load cache
     ld = load(final_score_file);
@@ -373,9 +373,9 @@ for i = 1:length(bbs_repo)
     if ~isempty(bbs)
         for j = 1:size(bbs,1)
             %each row: [x1 y1 w h score]
-            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 6));
             %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), max(bbs(j, 5), bbs(j, 6)));
-            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + 2*bbs(j, 6))/3);
+            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + 2*bbs(j, 6))/3);
         end
     end
 

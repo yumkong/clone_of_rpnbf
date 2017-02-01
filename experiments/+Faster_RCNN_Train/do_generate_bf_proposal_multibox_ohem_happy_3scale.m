@@ -4,7 +4,7 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_3scale(conf, mod
     %cache_dir = fullfile(pwd, 'output', model_stage.cache_name, imdb.name);
     %save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF.mat']);
     %1011 changed
-    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF.mat']);
+    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF_3scale.mat']);
     if exist(save_roidb_name, 'file')
         ld = load(save_roidb_name);
         roidb_BF = ld.roidb_BF;
@@ -17,7 +17,7 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_3scale(conf, mod
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
                                         'cache_name',       model_stage.cache_name, ...
-                                        'suffix',  '_thr_50_55_55'); 
+                                        'suffix',  '_thr_60_60_60'); 
     
     fprintf('Doing nms ... ');   
     % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
