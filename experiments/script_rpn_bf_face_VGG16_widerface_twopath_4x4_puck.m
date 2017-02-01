@@ -49,7 +49,7 @@ exp_name = 'Res16_widerface_twopath_happy_flip';
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = true;  %true --> false
-event_num                   = -1; %11
+event_num                   = 11; %11
 event_num_test              = -1;  %1007 added: test all val images
 
 dataset                     = Dataset.widerface_all_flip_512(dataset, 'train', use_flipped, event_num, cache_data_this_model_dir, model_name_base);
@@ -86,7 +86,8 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 
 %% read the RPN model
 imdbs_name = cell2mat(cellfun(@(x) x.name, dataset.imdb_train, 'UniformOutput', false));
-log_dir = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, imdbs_name);
+%use previous trained model on vgg16 (ohem multibox)
+log_dir = fullfile(pwd, 'output', 'VGG16_widerface_multibox_ohem_happy_flip', 'rpn_cachedir', 'rpn_widerface_VGG16_stage1_rpn', imdbs_name);
 %log_dir = fullfile(pwd, 'output', model.stage1_rpn.cache_name, imdbs_name);
 
 final_model_path = fullfile(log_dir, 'final');
@@ -99,7 +100,7 @@ end
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
 %model.stage1_rpn.nms.nms_overlap_thres = 1; %1004: 1-->0.5
-model.stage1_rpn.nms.nms_overlap_thres   	= 1; %0.7
+model.stage1_rpn.nms.nms_overlap_thres   	= 0.7; %1
 %1201: since only 3 anchors, 100 is enough(in RPN: only 50 for conv4)
 %model.stage1_rpn.nms.after_nms_topN = 50;  %600 --> 100 
 model.stage1_rpn.nms.after_nms_topN_res23      	= 100;  %50
@@ -121,8 +122,8 @@ mkdir_if_missing(BF_cachedir);
 dataDir = fullfile('datasets','caltech');                % Caltech ==> to be replaced?
 %posGtDir = fullfile(dataDir, 'train', 'annotations');  % Caltech ==> to be replaced?
 addpath(fullfile('external', 'code3.2.1'));              % Caltech ==> to be replaced?
-addpath(genpath('external/toolbox'));  % piotr's image and video toolbox
-%addpath(fullfile('..','external', 'toolbox'));
+addpath(genpath(fullfile('external','toolbox')));  % piotr's image and video toolbox
+%addpath(fullfile('external','export_fig'));
 BF_prototxt_path = fullfile('models', 'VGG16_widerface', 'bf_prototxts', 'test_feat_conv34atrous_multibox_ohem.prototxt'); %test_feat_conv34atrous_multibox_ohem_5x5
 conf.image_means = model.mean_image;
 conf.test_scales = conf_proposal.test_scales;
@@ -230,16 +231,16 @@ opts.feat_len = size(feat,2); %1203 changed: length(feat)
 % end
 
 % get gt boxes
-train_gts = cell(length(dataset.roidb_train{1}.rois), 1);
-for i = 1:length(train_gts)
-    % [x y x2 y2]
-     tmp_gt = dataset.roidb_train{1}.rois(i).boxes;
-     % [x y w h is_gt], always set is_gt as 1
-    %train_gts{i} = cat(2, train_gts{i}, ones(size(train_gts{i},1),1));
-     train_gts{i} = [tmp_gt(:,1) tmp_gt(:,2) tmp_gt(:,3)-tmp_gt(:,1)+1 tmp_gt(:,4)-tmp_gt(:,2)+1 ones(size(tmp_gt(:,1)))];
-    
-end
-opts.train_gts = train_gts;
+% train_gts = cell(length(dataset.roidb_train{1}.rois), 1);
+% for i = 1:length(train_gts)
+%     % [x y x2 y2]
+%      tmp_gt = dataset.roidb_train{1}.rois(i).boxes;
+%      % [x y w h is_gt], always set is_gt as 1
+%     %train_gts{i} = cat(2, train_gts{i}, ones(size(train_gts{i},1),1));
+%      train_gts{i} = [tmp_gt(:,1) tmp_gt(:,2) tmp_gt(:,3)-tmp_gt(:,1)+1 tmp_gt(:,4)-tmp_gt(:,2)+1 ones(size(tmp_gt(:,1)))];
+%     
+% end
+% opts.train_gts = train_gts;
 
 % train BF detector
 detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
@@ -312,7 +313,8 @@ for i = 1:length(bbs_repo)
     % 0107: add visualization here!!!
     if show_image
         img = imread(dataset.imdb_test.image_at(i));
-        bbs_show = [bbs(:,1:4) (bbs(:,5)+bbs(:,6))/2];
+        %bbs_show = [bbs(:,1:4) (bbs(:,5)+bbs(:,6))/2];
+        bbs_show = [bbs(:,1:4) bbs(:,5)];
         figure(1), clf;
         imshow(img);
         hold on
@@ -324,14 +326,17 @@ for i = 1:length(bbs_repo)
         hold off
     end
     
+    %0131 added ==> the result slightly drops
+    %bbs = bbs(bbs(:,5)>=0.3,:);
     % print the bbox number
     fprintf(fid, '%d\n', size(bbs, 1));
+    
     if ~isempty(bbs)
         for j = 1:size(bbs,1)
             %each row: [x1 y1 w h score]
-            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 5));
+            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), bbs(j, 6));
             %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), max(bbs(j, 5), bbs(j, 6)));
-            fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + 2*bbs(j, 6))/3);
+            %fprintf(fid, '%d %d %d %d %f\n', round([bbs(j,1) bbs(j,2) bbs(j,3)-bbs(j,1)+1 bbs(j,4)-bbs(j,2)+1]), (bbs(j, 5) + 2*bbs(j, 6))/3);
         end
     end
 

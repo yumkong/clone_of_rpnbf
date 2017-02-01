@@ -24,8 +24,8 @@ function roidb_BF = do_generate_bf_proposal_twopath(conf, model_stage, imdb, roi
     % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
     ave_per_image_topN_res23 = model_stage.nms.after_nms_topN_res23;
     ave_per_image_topN_res45 = model_stage.nms.after_nms_topN_res45;
-    model_stage.nms.ave_per_image_topN_res23 = -1;
-    model_stage.nms.ave_per_image_topN_res45 = -1;
+    model_stage.nms.after_nms_topN_res23 = -1;
+    model_stage.nms.after_nms_topN_res45 = -1;
     aboxes_res23              = boxes_filter(aboxes_res23, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_res23, conf.use_gpu);
     aboxes_res45              = boxes_filter(aboxes_res45, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN_res45, conf.use_gpu);
     fprintf(' Done.\n');  
@@ -57,24 +57,14 @@ function roidb_BF = do_generate_bf_proposal_twopath(conf, model_stage, imdb, roi
     aboxes = cell(length(aboxes_res23), 1);  % conv4 and conv6 are also ok
     aboxes_nms = cell(length(aboxes_res23), 1);
     
-    % 1121: add these 3 lines for drawing
-    addpath(fullfile('external','export_fig'));
-    res_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir','res_pic');
-    mkdir_if_missing(res_dir);
-    %1126 added to refresh figure
-    close all;
-
-    SUBMIT_cachedir = fullfile(pwd, 'output', conf.exp_name, 'submit_BP-FPN_cachedir');
-    mkdir_if_missing(SUBMIT_cachedir);
-    
     for i = 1:length(aboxes_res23)
-        aboxes_res23{i} = aboxes_res23{i}(aboxes_res23{i}(:, end) > 0.8, :);%0.65
-        aboxes_res45{i} = aboxes_res45{i}(aboxes_res45{i}(:, end) > 0.8, :);%0.7
+        aboxes_res23{i} = aboxes_res23{i}(aboxes_res23{i}(:, end) > 0.99, :);%0.65
+        aboxes_res45{i} = aboxes_res45{i}(aboxes_res45{i}(:, end) > 0.99, :);%0.7
         aboxes{i} = cat(1, aboxes_res23{i}, aboxes_res45{i});
         
         %1006 added to do NPD-style nms
         time = tic;
-        aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
+        aboxes_nms{i} = pseudoNMS_v8_twopath(aboxes{i}, nms_option);
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         

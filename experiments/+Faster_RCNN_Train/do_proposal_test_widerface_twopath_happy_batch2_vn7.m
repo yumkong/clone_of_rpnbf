@@ -86,7 +86,7 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
         
         %1006 added to do NPD-style nms
         time = tic;
-        aboxes_nms{i} = pseudoNMS_v8_twopath(aboxes{i}, nms_option);
+        aboxes_nms{i} = pseudoNMS_v8_twopath(aboxes{i}, nms_option);%4
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         
@@ -147,7 +147,7 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
         fclose(fid);
         fprintf('Done with saving image %d bboxes.\n', i);
         
-        if show_image      
+        if 0      
             %1121 also draw gt boxes
             img = imread(imdb.image_at(i));  
             bbs_gt = roidb.rois(i).boxes;
@@ -158,7 +158,7 @@ function do_proposal_test_widerface_twopath_happy_batch2_vn7(conf, model_stage, 
             invalid_idx = (bbs_gt(:, 3) <= 1) | (bbs_gt(:, 4) <= 1);
             bbs_gt(invalid_idx, :) = [];
             
-            figure(3); 
+            figure(6); 
             imshow(img);  %im(img)
             hold on
 
