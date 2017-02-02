@@ -743,3 +743,16 @@ All scales: gt recall num = 20291, gt_num = 39294, total num = 967550
 401-inf: gt recall num = 238, gt_num = 241, total num = 273523
 
 
+0201:
+multibox ohem with 2x 1x and 0.5x 
+(1) no prior NMS, just psudoNMS
+gt recall rate (ol >0.5) = 0.7943
+gt recall rate (ol >0.7) = 0.6185
+gt recall rate (ol >0.8) = 0.4346
+gt recall rate (ol >0.9) = 0.1639
+(2) prior NMS 0.7 (for conv34, conv5 and conv6)
+gt recall rate (ol >0.5) = 0.7802
+gt recall rate (ol >0.7) = 0.5502
+gt recall rate (ol >0.8) = 0.2986
+gt recall rate (ol >0.9) = 0.0412
+

@@ -1,11 +1,11 @@
-function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_3scale(conf, model_stage, imdb, roidb, is_test)
+function roidb_BF = do_generate_bf_proposal_multibox_3scale_pNMS(conf, model_stage, imdb, roidb, is_test)
 %function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_3scale(conf, model_stage, imdb, roidb, is_test, start_num)
     
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
     %cache_dir = fullfile(pwd, 'output', model_stage.cache_name, imdb.name);
     %save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF.mat']);
     %1011 changed
-    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF_3scale.mat']);
+    save_roidb_name = fullfile(cache_dir, [ 'roidb_' imdb.name '_BF_3scale_pNMS.mat']);
     if exist(save_roidb_name, 'file')
         ld = load(save_roidb_name);
         roidb_BF = ld.roidb_BF;

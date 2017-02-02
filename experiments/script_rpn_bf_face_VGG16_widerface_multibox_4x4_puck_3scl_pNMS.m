@@ -1,4 +1,4 @@
-function script_rpn_bf_face_VGG16_widerface_multibox_4x4_puck_3scale()
+function script_rpn_bf_face_VGG16_widerface_multibox_4x4_puck_3scl_pNMS()
 %function script_rpn_bf_face_VGG16_widerface_multibox_4x4_puck_3scale(start_num)
 
 clc;
@@ -140,9 +140,9 @@ end
 %% generate proposal for training the BF
 model.stage1_rpn.nms.per_nms_topN = -1;
 %model.stage1_rpn.nms.nms_overlap_thres = 1; %1004: 1-->0.5
-model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 1; %0.7
-model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 1; %0.7
-model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 1; %0.7
+model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; %1
+model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7; %1
+model.stage1_rpn.nms.nms_overlap_thres_conv6   	= 0.7; %1
 %1201: since only 3 anchors, 100 is enough(in RPN: only 50 for conv4)
 %model.stage1_rpn.nms.after_nms_topN = 50;  %600 --> 100 
 model.stage1_rpn.nms.after_nms_topN_conv4      	= 100;  %50
@@ -150,7 +150,7 @@ model.stage1_rpn.nms.after_nms_topN_conv5      	= 100;  %30
 model.stage1_rpn.nms.after_nms_topN_conv6      	= 10;  %3
 is_test = true;
 %roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_3scale(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test, start_num);
-roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_ohem_happy_3scale(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
+roidb_test_BF = Faster_RCNN_Train.do_generate_bf_proposal_multibox_3scale_pNMS(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, is_test);
 % %model.stage1_rpn.nms.nms_overlap_thres = 0.7; % not have so much overlap, since the upmost size is only 32x32, but still do it here
 % model.stage1_rpn.nms.nms_overlap_thres_conv4   	= 0.7; % no nms for conv4
 % model.stage1_rpn.nms.nms_overlap_thres_conv5   	= 0.7;
@@ -290,12 +290,12 @@ opts.feat_len = size(feat,2); %1203 changed: length(feat)
 % train BF detector
 detector = DeepTrain_otf_trans_ratio_4x4_context( opts );
 
-show_image = true;
+show_image = false;
 SUBMIT_cachedir = fullfile(pwd, 'output', exp_name, 'submit_bf_val_3scale');
 mkdir_if_missing(SUBMIT_cachedir);
 final_score_path = fullfile(pwd, 'output', exp_name, 'rpn_cachedir', model.stage1_rpn.cache_name, dataset.imdb_test.name);
 mkdir_if_missing(final_score_path);
-final_score_file = fullfile(final_score_path, 'val_box_score_3scale.mat');
+final_score_file = fullfile(final_score_path, 'val_box_score_3scale_pNMS.mat');
 try
     % try to load cache
     ld = load(final_score_file);
