@@ -1,4 +1,4 @@
-function script_res_widerface_twopath_happy_flip_batch2_vn7()
+function script_res_widerface_twopath_happy_flip_batch2_e1_e11()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -36,7 +36,7 @@ exp_name = 'Res50_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.Res101_for_rpn_widerface_twopath_happy_flip_batch2(exp_name);
+model                       = Model.Res101_for_rpn_widerface_twopath_batch2_e1_e11(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_Res101';
 %cache_base_fast_rcnn        = '';
@@ -51,7 +51,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'res101_twopath';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'Res16_widerface_twopath_happy_flip';
+exp_name = 'Res16_widerface_twopath_e1-e11';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -62,25 +62,6 @@ dataset                     = Dataset.widerface_all_flip_512(dataset, 'train', u
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 %0106 added all test images
 dataset                     = Dataset.widerface_all_512(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
-
-val_sel_file_name = fullfile(cache_data_this_model_dir, 'sel_idx.mat');
-try
-    load(val_sel_file_name);
-catch
-    test_num = length(dataset.imdb_test.image_ids);
-    if test_num > 1000
-        sel_val_idx = randperm(test_num, 1000);
-    else
-        sel_val_idx = 1:test_num;
-    end
-    sel_val_idx = sel_val_idx';
-    save(val_sel_file_name, 'sel_val_idx', 'test_num');
-end
-fprintf('Selecting %d from a total of %d test images.\n', length(sel_val_idx), test_num);
-% randomly select test 
-dataset.imdb_test.image_ids = dataset.imdb_test.image_ids(sel_val_idx,:);
-dataset.imdb_test.sizes = dataset.imdb_test.sizes(sel_val_idx,:);
-dataset.roidb_test.rois = dataset.roidb_test.rois(:, sel_val_idx);
 
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
@@ -122,10 +103,10 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_twop
 % 1020: currently do not consider test
 % cache_name = 'widerface';
 % method_name = 'RPN-ped';
-nms_option_test = 3;
+%nms_option_test = 3;
 % 0129: use full-size validation images instead of 512x512
-dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
-Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+%dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
+%Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_vn7(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 
