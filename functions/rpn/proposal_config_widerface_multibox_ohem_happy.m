@@ -61,7 +61,7 @@ function conf = proposal_config_widerface_multibox_ohem_happy(varargin)
     %% testing
     ip.addParamValue('test_scales',     900,            @isscalar); %720
     % 0131 added
-    ip.addParamValue('test_scale_range',[0.5 1 2],      @isvector); %720
+    ip.addParamValue('test_scale_range',[0.5 1 2],      @isvector); %[0.5 1 2]
     
     ip.addParamValue('test_max_size',   1500,            @isscalar); % 960
     ip.addParamValue('test_nms',        0.5,            @isscalar);

@@ -6,7 +6,6 @@ function [boxes_conv4_all, scores_conv4_all, boxes_conv5_all, scores_conv5_all, 
 % Copyright (c) 2015, Shaoqing Ren
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------    
-
     im = single(im);
 	%1209: get_image_blob has been changed to have im_blob size of 8N
     [im_blob, im_scales] = get_image_blob(conf, im); %[0.5 1 2]
@@ -34,8 +33,8 @@ function [boxes_conv4_all, scores_conv4_all, boxes_conv5_all, scores_conv5_all, 
         hei_im = size(im_blob, 1);
         wid_im = size(im_blob, 2);
 
-        h_part_num = ceil(hei_im / 1024);%1504 is out memory, so 1024
-        w_part_num = ceil(wid_im / 1024);
+        h_part_num = ceil(hei_im / 1200);%1504 is out memory, so 1024
+        w_part_num = ceil(wid_im / 1200);
 
         hei_middle = ceil(hei_im/h_part_num/8)*8;
         wid_middle = ceil(wid_im/w_part_num/8)*8;
