@@ -9,7 +9,7 @@ function [boxes_conv4_all, scores_conv4_all, boxes_conv5_all, scores_conv5_all, 
 
     im = single(im);
 	%1209: get_image_blob has been changed to have im_blob size of 8N
-    [im_blob, im_scales] = get_image_blob(conf, im);
+    [im_blob, im_scales] = get_image_blob(conf, im); %[0.5 1 2]
     im_size = size(im);
     %scaled_im_size = round(im_size * im_scales);
     scaled_im_size = round(im_scales' * im_size);

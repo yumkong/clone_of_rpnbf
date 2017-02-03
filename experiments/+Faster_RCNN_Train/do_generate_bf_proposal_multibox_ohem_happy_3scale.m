@@ -67,37 +67,44 @@ function roidb_BF = do_generate_bf_proposal_multibox_ohem_happy_3scale(conf, mod
     aboxes = cell(length(aboxes_conv4), 1);  % conv5 and conv6 are also ok
     aboxes_nms = cell(length(aboxes_conv4), 1);
     nms_option = 3;
+    show_image = true;
     % eval the gt recall
-    gt_num = 0;
-    gt_re_num_5 = 0;
-    gt_re_num_7 = 0;
-    gt_re_num_8 = 0;
-    gt_re_num_9 = 0;
+
     for i = 1:length(roidb.rois)
-        %aboxes{i} = cat(1, aboxes_conv4{i}, aboxes_conv5{i}, aboxes_conv6{i});
-        aboxes{i} = cat(1, aboxes_conv4{i}(aboxes_conv4{i}(:, end) > 0.65, :),...
-                           aboxes_conv5{i}(aboxes_conv5{i}(:, end) > 0.7, :),...
-                           aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.7, :));
-        aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
-        fprintf('PseudoNms for image %d / %d', i, length(roidb.rois));
-        %gts = roidb.rois(i).boxes(roidb.rois(i).ignores~=1, :);
-        gts = roidb.rois(i).boxes;
-        if ~isempty(gts)
-            gt_num = gt_num + size(gts, 1);
-            if ~isempty(aboxes{i})
-                rois = aboxes{i}(:, 1:4);
-                max_ols = max(boxoverlap(rois, gts));
-                gt_re_num_5 = gt_re_num_5 + sum(max_ols >= 0.5);
-                gt_re_num_7 = gt_re_num_7 + sum(max_ols >= 0.7);
-                gt_re_num_8 = gt_re_num_8 + sum(max_ols >= 0.8);
-                gt_re_num_9 = gt_re_num_9 + sum(max_ols >= 0.9);
+        tmpbox_conv4 = aboxes_conv4{i}(aboxes_conv4{i}(:, end) > 0.65, :);
+        tmpbox_conv5 = aboxes_conv5{i}(aboxes_conv5{i}(:, end) > 0.7, :);
+        tmpbox_conv6 = aboxes_conv6{i}(aboxes_conv6{i}(:, end) > 0.7, :);
+        aboxes{i} = cat(1, tmpbox_conv4, tmpbox_conv5, tmpbox_conv6);              
+        if show_image
+            img = imread(imdb.image_at(i));  
+            %draw before NMS
+            bbs_conv4 = tmpbox_conv4;
+            bbs_conv5 = tmpbox_conv5;
+            bbs_conv6 = tmpbox_conv6;
+            figure(1); 
+            imshow(img);  %im(img)
+            hold on
+            if ~isempty(bbs_conv4)
+              bbs_conv4(:, 3) = bbs_conv4(:, 3) - bbs_conv4(:, 1) + 1;
+              bbs_conv4(:, 4) = bbs_conv4(:, 4) - bbs_conv4(:, 2) + 1;
+              bbApply('draw',bbs_conv4,'g');
             end
+            if ~isempty(bbs_conv5)
+              bbs_conv5(:, 3) = bbs_conv5(:, 3) - bbs_conv5(:, 1) + 1;
+              bbs_conv5(:, 4) = bbs_conv5(:, 4) - bbs_conv5(:, 2) + 1;
+              bbApply('draw',bbs_conv5,'c');
+            end
+            if ~isempty(bbs_conv6)
+              bbs_conv6(:, 3) = bbs_conv6(:, 3) - bbs_conv6(:, 1) + 1;
+              bbs_conv6(:, 4) = bbs_conv6(:, 4) - bbs_conv6(:, 2) + 1;
+              bbApply('draw',bbs_conv6,'c');
+            end
+            hold off
         end
+        aboxes_nms{i} = pseudoNMS_v8(aboxes{i}, nms_option);
+        fprintf('PseudoNms for image %d / %d\n', i, length(roidb.rois));
     end
-    fprintf('gt recall rate (ol >0.5) = %.4f\n', gt_re_num_5 / gt_num);
-    fprintf('gt recall rate (ol >0.7) = %.4f\n', gt_re_num_7 / gt_num);
-    fprintf('gt recall rate (ol >0.8) = %.4f\n', gt_re_num_8 / gt_num);
-    fprintf('gt recall rate (ol >0.9) = %.4f\n', gt_re_num_9 / gt_num);
+
 
     aboxes_nms = boxes_filter(aboxes_nms, -1, 0.33, -1, conf.use_gpu); %0.5
     %roidb_regions.boxes = aboxes;
