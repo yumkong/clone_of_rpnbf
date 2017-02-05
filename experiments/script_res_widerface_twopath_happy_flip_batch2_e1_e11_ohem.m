@@ -1,4 +1,4 @@
-function script_res_widerface_twopath_happy_flip_batch2_e1_e11()
+function script_res_widerface_twopath_happy_flip_batch2_e1_e11_ohem()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -36,7 +36,7 @@ exp_name = 'Res50_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.Res101_for_rpn_widerface_twopath_batch2_e1_e11(exp_name);
+model                       = Model.Res101_for_rpn_widerface_twopath_batch2_ohem(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_Res101';
 %cache_base_fast_rcnn        = '';
@@ -51,7 +51,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'res101_twopath';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'Res16_widerface_twopath_e1-e11';
+exp_name = 'Res16_widerface_twopath_e1-e11_ohem';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -73,7 +73,8 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal               = proposal_config_widerface_twopath_happy_batch2_vn7('image_means', model.mean_image, ...
+%conf_proposal               = proposal_config_widerface_twopath_happy_batch2_vn7('image_means', model.mean_image, ...
+conf_proposal               = proposal_config_widerface_twopath_happy_batch2_v2('image_means', model.mean_image, ...
                                                     'feat_stride_res23', model.feat_stride_res23, ...
                                                     'feat_stride_res45', model.feat_stride_res45);
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
@@ -98,7 +99,8 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_twopath_happy_batch2(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+%model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_twopath_happy_batch2(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_twopath_ohem_batch2(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 % 1020: currently do not consider test
 % cache_name = 'widerface';

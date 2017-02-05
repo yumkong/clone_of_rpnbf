@@ -149,7 +149,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -214,7 +213,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -279,7 +277,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -352,7 +349,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -417,7 +413,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -482,7 +477,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -555,7 +549,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -620,7 +613,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -685,7 +677,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -749,25 +740,10 @@ layer {
 
 # ========= add prediction layer for res2 =================
 layer {
-  name: "res2c_norm"
-  type: "Normalize"
-  bottom: "res2c"
-  top: "res2c_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 40  #1120: 20-->40, since its channel is only 256, so need 80?
-    }
-    channel_shared: false
-  }
-}
-
-layer {
-   name: "res2_proposal"
+   name: "res2_reduce"
    type: "Convolution"
-   bottom: "res2c_norm"
-   top: "res2_proposal"
+   bottom: "res2c"
+   top: "res2_reduce"
 	param {
 		lr_mult: 1.0
 	}
@@ -776,8 +752,8 @@ layer {
 	}
    convolution_param{
 	   num_output: 256
-	   kernel_size: 3
-	   pad: 1
+	   kernel_size: 1
+	   pad: 0
 	   stride: 1
 	   weight_filler {
 		 type: "gaussian"
@@ -787,9 +763,16 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
+
+layer {
+    bottom: "res2_reduce"
+    top: "res2_reduce"
+    name: "res2_reduce_relu"
+    type: "ReLU"
+}
+
 # ================end res2 prediction=================
 
 layer {
@@ -803,7 +786,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -861,7 +843,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE	
     }
     param {
         lr_mult: 1.0
@@ -926,7 +907,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -991,7 +971,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1064,7 +1043,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1129,7 +1107,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1194,7 +1171,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1267,7 +1243,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1332,7 +1307,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1397,7 +1371,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1470,7 +1443,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1535,7 +1507,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1600,7 +1571,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1663,44 +1633,11 @@ layer {
 }
 
 # ========= add prediction layer for res3 =================
-# deconvolution by 2
 layer {
-  bottom: "res3b3" 
-  top: "res3_2x"
-  name: "res3_2x" 
-  type: "Deconvolution"
-  convolution_param {
-    kernel_size: 4 
-    stride: 2
-    num_output: 512
-    group: 512
-    pad: 1
-    weight_filler: { type: "bilinear" } 
-    bias_term: false
-  }
-  param { lr_mult: 0 decay_mult: 0 }
-}
-
-layer {
-  name: "res3_norm"
-  type: "Normalize"
-  bottom: "res3_2x"
-  top: "res3_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 40  #1120: 20-->40, since its channel is only 256, so need 80?
-    }
-    channel_shared: false
-  }
-}
-
-layer {
-   name: "res3_proposal"
+   name: "res3_reduce"
    type: "Convolution"
-   bottom: "res3_norm"
-   top: "res3_proposal"
+   bottom: "res3b3"
+   top: "res3_reduce"
 	param {
 		lr_mult: 1.0
 	}
@@ -1708,9 +1645,9 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 512
-	   kernel_size: 3
-	   pad: 1
+	   num_output: 256
+	   kernel_size: 1
+	   pad: 0
 	   stride: 1
 	   weight_filler {
 		 type: "gaussian"
@@ -1720,27 +1657,62 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
 layer {
-    bottom: "res2_proposal"
-    bottom: "res3_proposal"
-    top: "conv_proposal_res23"
-    name: "conv_proposal_res23"
-    type: "Concat"
-    concat_param {
-	axis: 1
-    }
+    bottom: "res3_reduce"
+    top: "res3_reduce"
+    name: "res3_reduce_relu"
+    type: "ReLU"
 }
 
+# deconvolution by 2
 layer {
-   name: "relu_proposal_res23"
-   type: "ReLU"
-   bottom: "conv_proposal_res23"
-   top: "conv_proposal_res23"
+  bottom: "res3_reduce" 
+  top: "res3_2x"
+  name: "res3_2x" 
+  type: "Deconvolution"
+  convolution_param {
+    kernel_size: 4 
+    stride: 2
+    num_output: 256
+    group: 256
+    pad: 1
+    weight_filler: { type: "bilinear" } 
+    bias_term: false
+  }
+  param { lr_mult: 0 decay_mult: 0 }
 }
+
+
+#elemtwise addition of res2_norm and res3_norm
+layer {
+  name: "eltwise_sum23"
+  type: "Eltwise"
+  bottom: "res2_reduce"
+  bottom: "res3_2x"
+  top: "conv_proposal_res23"
+  eltwise_param { operation: SUM }
+}
+
+#layer {
+#    bottom: "res2_proposal"
+#    bottom: "res3_proposal"
+#    top: "conv_proposal_res23"
+#    name: "conv_proposal_res23"
+#    type: "Concat"
+#    concat_param {
+#	axis: 1
+#    }
+#}
+
+#layer {
+#   name: "relu_proposal_res23"
+#   type: "ReLU"
+#   bottom: "conv_proposal_res23"
+#   top: "conv_proposal_res23"
+#}
 
 layer {
    name: "proposal_cls_score_res23"
@@ -1766,7 +1738,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
@@ -1794,7 +1765,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 # ========= end of res3 prediction =================
@@ -1810,7 +1780,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1868,7 +1837,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1933,7 +1901,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6528,25 +6495,10 @@ layer {
 
 # ========= add prediction layer for res4 =================
 layer {
-  name: "res4_norm"
-  type: "Normalize"
-  bottom: "res4b22"
-  top: "res4_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 40  #1120: 20-->40, since its channel is only 256, so need 80?
-    }
-    channel_shared: false
-  }
-}
-
-layer {
-   name: "res4_proposal"
+   name: "res4_reduce"
    type: "Convolution"
-   bottom: "res4_norm"
-   top: "res4_proposal"
+   bottom: "res4b22"
+   top: "res4_reduce"
 	param {
 		lr_mult: 1.0
 	}
@@ -6554,9 +6506,9 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 512
-	   kernel_size: 3
-	   pad: 1
+	   num_output: 1024
+	   kernel_size: 1
+	   pad: 0
 	   stride: 1
 	   weight_filler {
 		 type: "gaussian"
@@ -6566,9 +6518,16 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
+
+layer {
+    bottom: "res4_reduce"
+    top: "res4_reduce"
+    name: "res4_reduce_relu"
+    type: "ReLU"
+}
+
 # ================end res4 prediction=================
 
 layer {
@@ -6582,7 +6541,6 @@ layer {
 		pad: 0
 		stride: 2
 		bias_term: false
-		#engine: CAFFE
 	}
 	param {
         lr_mult: 1.0
@@ -6642,7 +6600,6 @@ layer {
 		pad: 0
 		stride: 2
 		bias_term: false
-		#engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -6707,7 +6664,6 @@ layer {
 		pad: 1
 		stride: 1
 		bias_term: false
-		#engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -7048,7 +7004,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -7241,44 +7196,11 @@ layer {
 }
 
 # ========= add prediction layer for res5 =================
-# deconvolution by 2
 layer {
-  bottom: "res5c" 
-  top: "res5_2x"
-  name: "res5_2x" 
-  type: "Deconvolution"
-  convolution_param {
-    kernel_size: 4 
-    stride: 2
-    num_output: 2048
-    group: 2048
-    pad: 1
-    weight_filler: { type: "bilinear" } 
-    bias_term: false
-  }
-  param { lr_mult: 0 decay_mult: 0 }
-}
-
-layer {
-  name: "res5_norm"
-  type: "Normalize"
-  bottom: "res5_2x"
-  top: "res5_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 40  #1120: 20-->40, since its channel is only 256, so need 80?
-    }
-    channel_shared: false
-  }
-}
-
-layer {
-   name: "res5_proposal"
+   name: "res5_reduce"
    type: "Convolution"
-   bottom: "res5_norm"
-   top: "res5_proposal"
+   bottom: "res5c"
+   top: "res5_reduce"
 	param {
 		lr_mult: 1.0
 	}
@@ -7287,8 +7209,8 @@ layer {
 	}
    convolution_param{
 	   num_output: 1024
-	   kernel_size: 3
-	   pad: 1
+	   kernel_size: 1
+	   pad: 0
 	   stride: 1
 	   weight_filler {
 		 type: "gaussian"
@@ -7298,27 +7220,61 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
 layer {
-    bottom: "res4_proposal"  #512
-    bottom: "res5_proposal"  #1024
-    top: "conv_proposal_res45"
-    name: "conv_proposal_res45"
-    type: "Concat"
-    concat_param {
-	axis: 1
-    }
+    bottom: "res5_reduce"
+    top: "res5_reduce"
+    name: "res5_reduce_relu"
+    type: "ReLU"
 }
 
+# deconvolution by 2
 layer {
-   name: "relu_proposal_res45"
-   type: "ReLU"
-   bottom: "conv_proposal_res45"
-   top: "conv_proposal_res45"
+  bottom: "res5_reduce" 
+  top: "res5_2x"
+  name: "res5_2x" 
+  type: "Deconvolution"
+  convolution_param {
+    kernel_size: 4 
+    stride: 2
+    num_output: 1024
+    group: 1024
+    pad: 1
+    weight_filler: { type: "bilinear" } 
+    bias_term: false
+  }
+  param { lr_mult: 0 decay_mult: 0 }
 }
+
+#elemtwise addition of res4_norm and res5_norm
+layer {
+  name: "eltwise_sum45"
+  type: "Eltwise"
+  bottom: "res4_reduce"
+  bottom: "res5_2x"
+  top: "conv_proposal_res45"
+  eltwise_param { operation: SUM }
+}
+
+#layer {
+#    bottom: "res4_proposal"  #512
+#    bottom: "res5_proposal"  #1024
+#    top: "conv_proposal_res45"
+#    name: "conv_proposal_res45"
+#    type: "Concat"
+#    concat_param {
+#	axis: 1
+#    }
+#}
+
+#layer {
+#   name: "relu_proposal_res45"
+#   type: "ReLU"
+#   bottom: "conv_proposal_res45"
+#   top: "conv_proposal_res45"
+#}
 
 layer {
    name: "proposal_cls_score_res45"
@@ -7344,7 +7300,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
@@ -7372,7 +7327,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 # ========= end of res5 prediction =================

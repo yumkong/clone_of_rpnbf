@@ -5,6 +5,56 @@ input_dim: 3
 input_dim: 224
 input_dim: 224
 
+# 0120 added for res2plus3
+input: "labels_res23"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 6        # 3 anchors * 2 flips = 6 anchors
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_res23"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 6        # 3 anchors * 2 flips
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_res23"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 24  		# 4 (coords) * 6(anchors)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_res23"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 24  		# 4 (coords) * 6(anchors)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+# 0120 added for res4plus5
+input: "labels_res45"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 8        # 4(anchors) * 2 = 8     
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_res45"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 8        # 4(anchors) * 2 = 8        
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_res45"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 32  		# 4 (coords) * 8(anchors) 
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_res45"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 32  		# 4 (coords) * 8(anchors) 
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
 layer {
     bottom: "data"
     top: "conv1"
@@ -149,7 +199,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -214,7 +263,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -279,7 +327,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -352,7 +399,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -417,7 +463,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -482,7 +527,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -555,7 +599,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -620,7 +663,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -685,7 +727,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -787,7 +828,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 # ================end res2 prediction=================
@@ -803,7 +843,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -861,7 +900,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE	
     }
     param {
         lr_mult: 1.0
@@ -926,7 +964,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -991,7 +1028,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1064,7 +1100,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1129,7 +1164,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1194,7 +1228,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1267,7 +1300,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1332,7 +1364,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1397,7 +1428,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1470,7 +1500,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1535,7 +1564,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1600,7 +1628,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1720,7 +1747,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
@@ -1766,7 +1792,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
@@ -1794,7 +1819,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 # ========= end of res3 prediction =================
@@ -1810,7 +1834,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1868,7 +1891,6 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1933,7 +1955,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1998,7 +2019,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2071,7 +2091,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2136,7 +2155,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2201,7 +2219,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2274,7 +2291,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2339,7 +2355,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2404,7 +2419,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2477,7 +2491,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2542,7 +2555,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2607,7 +2619,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2680,7 +2691,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2745,7 +2755,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2810,7 +2819,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2883,7 +2891,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2948,7 +2955,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3013,7 +3019,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3086,7 +3091,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3151,7 +3155,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3216,7 +3219,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3289,7 +3291,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3354,7 +3355,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3419,7 +3419,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3492,7 +3491,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3557,7 +3555,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3622,7 +3619,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3695,7 +3691,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3760,7 +3755,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3825,7 +3819,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3898,7 +3891,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3963,7 +3955,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4028,7 +4019,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4101,7 +4091,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4166,7 +4155,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4231,7 +4219,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4304,7 +4291,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4369,7 +4355,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4434,7 +4419,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4507,7 +4491,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4572,7 +4555,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4637,7 +4619,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4710,7 +4691,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4775,7 +4755,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4840,7 +4819,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4913,7 +4891,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4978,7 +4955,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5043,7 +5019,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5116,7 +5091,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5181,7 +5155,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5246,7 +5219,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5319,7 +5291,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5384,7 +5355,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5449,7 +5419,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5522,7 +5491,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5587,7 +5555,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5652,7 +5619,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5725,7 +5691,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5790,7 +5755,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5855,7 +5819,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5928,7 +5891,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5993,7 +5955,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6058,7 +6019,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6131,7 +6091,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6196,7 +6155,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6261,7 +6219,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6334,7 +6291,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6399,7 +6355,6 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6464,7 +6419,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6566,7 +6520,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 # ================end res4 prediction=================
@@ -6582,7 +6535,6 @@ layer {
 		pad: 0
 		stride: 2
 		bias_term: false
-		#engine: CAFFE
 	}
 	param {
         lr_mult: 1.0
@@ -6642,7 +6594,6 @@ layer {
 		pad: 0
 		stride: 2
 		bias_term: false
-		#engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -6707,7 +6658,6 @@ layer {
 		pad: 1
 		stride: 1
 		bias_term: false
-		#engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -6772,7 +6722,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6845,7 +6794,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6910,7 +6858,6 @@ layer {
 		pad: 1
 		stride: 1
 		bias_term: false
-		#engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -6975,7 +6922,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -7048,7 +6994,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -7113,7 +7058,6 @@ layer {
 		pad: 1
 		stride: 1
 		bias_term: false
-		#engine: CAFFE
 	}
     param {
         lr_mult: 1.0
@@ -7178,7 +7122,6 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
-	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -7298,7 +7241,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
@@ -7344,7 +7286,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 
@@ -7372,7 +7313,6 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
-	   #engine: CAFFE
    }
 }
 # ========= end of res5 prediction =================
@@ -7396,14 +7336,124 @@ layer {
 }
 
 layer {
-   name: "proposal_cls_prob_res23"
-   type: "Softmax"
+   bottom: "labels_res23"
+   top: "labels_res23_reshape"
+   name: "labels_res23_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights_res23"
+   top: "labels_weights_res23_reshape"
+   name: "labels_weights_res23_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+#1123 add ignore_label
+# this is the overall accuracy of all fgs (thresh >= 0.5) and bgs (0 <= thresh < 0.3)
+layer {
+   name: "accuarcy_res23"
+   type: "Accuracy"
    bottom: "proposal_cls_score_res23_reshape"
-   top: "proposal_cls_prob_res23"
+   bottom: "labels_res23_reshape"
+   top: "accuarcy_res23"
+   accuracy_param {
+        ignore_label: -1
+   }
+}
+
+#liu@0203: res23 ohem
+layer {
+   name: "per_anchor_cls_loss_res23"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_res23_reshape"  #[1, 2, 7*56, 56]
+   bottom: "labels_res23_reshape"              #[1, 1, 7*56, 56]
+   top: "temp_loss_cls_res23"  #no use 
+   top: "temp_prob_cls_res23"  #no use
+   top: "per_anchor_cls_loss_res23"            # should be:[1, 1, 7*56, 56]
+   loss_weight: 0
+   loss_weight: 0
+   loss_weight: 0
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   bottom: "per_anchor_cls_loss_res23"  #[1, 1, 7*56, 56] == [num ch hei wid]
+   bottom: "labels_res23_reshape"	#[1, 1, 7*56, 56]
+   bottom: "bbox_loss_weights_res23"    #[1, 4*7, 56, 56]
+   bottom: "labels_weights_res23_reshape"
+   top: "labels_ohem_res23"
+   top: "bbox_loss_weights_ohem_res23"
+   top: "labels_weights_ohem_res23"
+   name: "cls_ohem_res23"
+   type: "RpnClsOHEM"
+   rpn_cls_ohem_param {
+        bg_per_img: 40  #256, set it accordingly
+	anchor_num: 6  #0203:res23-6, res45-8
+	random_shuffle_percent: 0.5
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   name: "silence"
+   type: "Silence"
+   bottom: "temp_loss_cls_res23"
+   bottom: "temp_prob_cls_res23"
+}
+
+# final loss cls output 
+layer {
+   name: "loss_res23"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_res23_reshape"
+   bottom: "labels_ohem_res23"
+   bottom: "labels_weights_ohem_res23"
+   top: "loss_cls_res23"
+   loss_weight: 1
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: true
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+  name: "loss_bbox_res23"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_res23" #[1 28 28 28]
+  bottom: "bbox_targets_res23"       #[1 28 28 28]
+  bottom: "bbox_loss_weights_ohem_res23"  #[1 28 28 28]
+  top: "loss_bbox_res23"
+  loss_weight: 80
 }
 
 #-----------------------output2/2 (for res45)------------------------
-
 # to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
 layer {
    bottom: "proposal_cls_score_res45"
@@ -7421,8 +7471,119 @@ layer {
 }
 
 layer {
-   name: "proposal_cls_prob_res45"
-   type: "Softmax"
+   bottom: "labels_res45"
+   top: "labels_res45_reshape"
+   name: "labels_res45_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights_res45"
+   top: "labels_weights_res45_reshape"
+   name: "labels_weights_res45_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+#1123 add ignore_label
+# this is the overall accuracy of all fgs (thresh >= 0.5) and bgs (0 <= thresh < 0.3)
+layer {
+   name: "accuarcy_res45"
+   type: "Accuracy"
    bottom: "proposal_cls_score_res45_reshape"
-   top: "proposal_cls_prob_res45"
+   bottom: "labels_res45_reshape"
+   top: "accuarcy_res45"
+   accuracy_param {
+        ignore_label: -1
+   }
+}
+
+#================ liu@0203: res45 ohem
+layer {
+   name: "per_anchor_cls_loss_res45"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_res45_reshape"  #[1, 2, 7*56, 56]
+   bottom: "labels_res45_reshape"              #[1, 1, 7*56, 56]
+   top: "temp_loss_cls_res45"  #no use 
+   top: "temp_prob_cls_res45"  #no use
+   top: "per_anchor_cls_loss_res45"            # should be:[1, 1, 7*56, 56]
+   loss_weight: 0
+   loss_weight: 0
+   loss_weight: 0
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   bottom: "per_anchor_cls_loss_res45"  #[1, 1, 7*56, 56] == [num ch hei wid]
+   bottom: "labels_res45_reshape"	#[1, 1, 7*56, 56]
+   bottom: "bbox_loss_weights_res45"    #[1, 4*7, 56, 56]
+   bottom: "labels_weights_res45_reshape"
+   top: "labels_ohem_res45"
+   top: "bbox_loss_weights_ohem_res45"
+   top: "labels_weights_ohem_res45"
+   name: "cls_ohem_res45"
+   type: "RpnClsOHEM"
+   rpn_cls_ohem_param {
+        bg_per_img: 40  #256, set it accordingly
+	anchor_num: 6  #0203:res23-6, res45-8
+	random_shuffle_percent: 0.5
+        ignore_label: -1
+   }
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+   name: "silence"
+   type: "Silence"
+   bottom: "temp_loss_cls_res45"
+   bottom: "temp_prob_cls_res45"
+}
+
+# final loss cls output 
+layer {
+   name: "loss_res45"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_res45_reshape"
+   bottom: "labels_ohem_res45"
+   bottom: "labels_weights_ohem_res45"
+   top: "loss_cls_res45"
+   loss_weight: 1
+   loss_param {
+        ignore_label: -1
+   }
+   propagate_down: true
+   propagate_down: false
+   propagate_down: false
+}
+
+layer {
+  name: "loss_bbox_res45"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_res45" #[1 28 28 28]
+  bottom: "bbox_targets_res45"       #[1 28 28 28]
+  bottom: "bbox_loss_weights_ohem_res45"  #[1 28 28 28]
+  top: "loss_bbox_res45"
+  loss_weight: 5
 }

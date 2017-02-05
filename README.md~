@@ -750,4 +750,42 @@ gt recall rate (ol >0.5) = 0.7943
 gt recall rate (ol >0.7) = 0.6185
 gt recall rate (ol >0.8) = 0.4346
 gt recall rate (ol >0.9) = 0.1639
+(2) prior NMS 0.7 (for conv34, conv5 and conv6)
+gt recall rate (ol >0.5) = 0.7802
+gt recall rate (ol >0.7) = 0.5502
+gt recall rate (ol >0.8) = 0.2986
+gt recall rate (ol >0.9) = 0.0412
 
+===========================================
+0203: use 2xgt_num boxes to calcu recall rate for e1-e11
+(1) same model as res101 full (160 samples/ 2 image)
+gt recall rate (ol >0.5) = 0.6996
+gt recall rate (ol >0.7) = 0.4362
+gt recall rate (ol >0.8) = 0.2425
+gt recall rate (ol >0.9) = 0.0449
+(2) reduce (1)'s batch size to (80 samples/ 2 image)
+gt recall rate (ol >0.5) = 0.6898
+gt recall rate (ol >0.7) = 0.4192
+gt recall rate (ol >0.8) = 0.2249
+gt recall rate (ol >0.9) = 0.0371
+(3) ohem: 
+=== 0.8 + 0.8 as thresh
+gt recall rate (ol >0.5) = 0.6832
+gt recall rate (ol >0.7) = 0.4213
+gt recall rate (ol >0.8) = 0.2214
+gt recall rate (ol >0.9) = 0.0379
+=== 0.75 + 0.75 as thresh
+gt recall rate (ol >0.5) = 0.6913
+gt recall rate (ol >0.7) = 0.4229
+gt recall rate (ol >0.8) = 0.2215
+gt recall rate (ol >0.9) = 0.0381
+=== 0.7 + 0.7 as thresh
+gt recall rate (ol >0.5) = 0.6991
+gt recall rate (ol >0.7) = 0.4247
+gt recall rate (ol >0.8) = 0.2220
+gt recall rate (ol >0.9) = 0.0381
+=== 0.65 + 0.65 as thresh
+gt recall rate (ol >0.5) = 0.7026
+gt recall rate (ol >0.7) = 0.4248
+gt recall rate (ol >0.8) = 0.2224
+gt recall rate (ol >0.9) = 0.0381
