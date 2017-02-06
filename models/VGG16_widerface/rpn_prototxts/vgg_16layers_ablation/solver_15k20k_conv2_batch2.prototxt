@@ -1,0 +1,13 @@
+net: "./models/VGG16_widerface/rpn_prototxts/vgg_16layers_ablation/train_val_conv2_batch2.prototxt"
+base_lr: 0.0005 #0.001
+lr_policy: "step"
+gamma: 0.1
+stepsize: 15000 #0122 reduce iter 20k->16k, due to batch2 (process 2 images/iteration)
+display: 20
+max_iter: 20000 #0122 reduce iter 30k->20k, due to batch2 (process 2 images/iteration)
+momentum: 0.9
+weight_decay: 0.0005
+# We disable standard caffe solver snapshotting and implement our own snapshot
+snapshot: 0
+#debug_info: true
+
