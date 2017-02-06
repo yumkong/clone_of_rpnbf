@@ -1,4 +1,4 @@
-function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
+function aboxes = proposal_test_widerface_ablation(conf, imdb, varargin)
 % aboxes = proposal_test_caltech(conf, imdb, varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -117,7 +117,7 @@ function aboxes = proposal_test_widerface_conv3_4(conf, imdb, varargin)
                     end
                 end
             else
-                [boxes, scores] = proposal_im_detect_conv3_4(conf, caffe_net, im);
+                [boxes, scores] = proposal_im_detect_ablation(conf, caffe_net, im);
                 fprintf(' time: %.3fs\n', toc(th));  
                 %0112 added to save space
                 scores = scores(scores >= 0.5, :);

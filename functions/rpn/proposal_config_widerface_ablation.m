@@ -1,4 +1,4 @@
-function conf = proposal_config_widerface_batch2(varargin)
+function conf = proposal_config_widerface_ablation(varargin)
 % conf = proposal_config_caltech(varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -29,7 +29,7 @@ function conf = proposal_config_widerface_batch2(varargin)
     % Images per batch, only supports ims_per_batch = 1 currently
     ip.addParamValue('ims_per_batch',   3,              @isscalar);%0205:2-->3
     % Minibatch size
-    ip.addParamValue('batch_size',      160,            @isscalar); %original 120,0122: 256(for 1 image)  --> 160 (for 2 images) 
+    ip.addParamValue('batch_size',      240,            @isscalar); %original 120,0122: 256(for 1 image)  --> 240 (for 3 images) 
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
     % weight of background samples, when weight of foreground samples is

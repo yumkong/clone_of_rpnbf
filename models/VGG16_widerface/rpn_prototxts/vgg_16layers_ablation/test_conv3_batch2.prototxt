@@ -130,17 +130,92 @@ layer {
 	}
 }
 
+layer {
+	bottom: "pool2"
+	top: "conv3_1"
+	name: "conv3_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_1"
+	name: "relu3_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_2"
+	name: "conv3_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_2"
+	name: "relu3_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_3"
+	name: "conv3_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_3"
+	top: "conv3_3"
+	name: "relu3_3"
+	type: "ReLU"
+}
+
 #0205 added norm layer
 layer {
-  name: "conv2_norm"
+  name: "conv3_norm"
   type: "Normalize"
-  bottom: "pool2"
-  top: "conv2_norm"
+  bottom: "conv3_3"
+  top: "conv3_norm"
   norm_param {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 12  #0205: 40-->12 
+      value: 16  #0205: 40-->16 
     }
     channel_shared: false
   }
@@ -150,7 +225,7 @@ layer {
 layer {
    name: "conv_proposal1"
    type: "Convolution"
-   bottom: "conv2_norm"
+   bottom: "conv3_norm"
    top: "conv_proposal1"
 	param {
 		lr_mult: 1.0

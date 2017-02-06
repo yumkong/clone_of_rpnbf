@@ -13,7 +13,7 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_batch2(c
 %     end
     % =============================
     num_images = length(image_roidb);
-    assert(num_images == 2, 'proposal_generate_minibatch_fcn only support num_images == 2');
+    assert(num_images == 1 || num_images == 2 || num_images == 3, 'proposal_generate_minibatch_fcn only support num_images == 1,2 or 3');
 
     % Sample random scales to use for each image in this batch
     random_scale_inds = randi(length(conf.scales), num_images, 1);
