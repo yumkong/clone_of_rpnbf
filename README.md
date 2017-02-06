@@ -794,3 +794,9 @@ gt recall rate (ol >0.5) = 0.6799
 gt recall rate (ol >0.7) = 0.4240
 gt recall rate (ol >0.8) = 0.2276
 gt recall rate (ol >0.9) = 0.0430
+(5) fpn2 (use 1x1 conv instead of l2-norm)
+gt recall rate (ol >0.5) = 0.6813
+gt recall rate (ol >0.7) = 0.4119
+gt recall rate (ol >0.8) = 0.2117
+gt recall rate (ol >0.9) = 0.0343
+
