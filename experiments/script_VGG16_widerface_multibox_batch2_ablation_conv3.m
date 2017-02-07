@@ -63,7 +63,35 @@ dataset                     = Dataset.widerface_ablation_512(dataset, 'train', u
 %0106 added all test images
 test_event_pool             = 1:61;
 dataset                     = Dataset.widerface_ablation_512(dataset, 'test', false, test_event_pool, cache_data_this_model_dir, model_name_base);
-
+% 0206 added: adapt dataset created in puck to VN7
+if ispc
+    devkit = 'D:\\datasets\\WIDERFACE';
+    %train
+    dataset.imdb_train.image_dir = fullfile(devkit, 'WIDER_train_ablation', 'images');
+    dataset.imdb_train.image_ids = cellfun(@(x) strrep(x,'/',filesep), dataset.imdb_train.image_ids, 'UniformOutput', false);
+    dataset.imdb_train.image_at = @(i) sprintf('%s%c%s.%s', dataset.imdb_train.image_dir, filesep, dataset.imdb_train.image_ids{i}, dataset.imdb_train.extension);
+    %val
+    dataset.imdb_test.image_dir = fullfile(devkit, 'WIDER_val_ablation', 'images');
+    dataset.imdb_test.image_ids = cellfun(@(x) strrep(x,'/',filesep), dataset.imdb_test.image_ids, 'UniformOutput', false);
+    dataset.imdb_test.image_at = @(i) sprintf('%s%c%s.%s', dataset.imdb_test.image_dir, filesep, dataset.imdb_test.image_ids{i}, dataset.imdb_test.extension);
+    %verify
+    if 0
+        %---train-----------
+        im = imread(dataset.imdb_train.image_at(666));
+        figure(1),imshow(im)
+        box = dataset.roidb_train.rois(666).boxes;
+        box(:,3) = box(:,3) - box(:,1) +1;
+        box(:,4) = box(:,4) - box(:,2) +1;
+        bbApply('draw', box, 'm');
+        %----test---------
+        im = imread(dataset.imdb_test.image_at(666));
+        figure(2),imshow(im)
+        box = dataset.roidb_test.rois(666).boxes;
+        box(:,3) = box(:,3) - box(:,1) +1;
+        box(:,4) = box(:,4) - box(:,2) +1;
+        bbApply('draw', box, 'm');
+    end
+end
 %0805 added, make sure imdb_train and roidb_train are of cell type
 if ~iscell(dataset.imdb_train)
     dataset.imdb_train = {dataset.imdb_train};
@@ -99,10 +127,10 @@ fprintf('\n***************\nstage one RPN \n***************\n');
 model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ablation_batch2(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 % 1020: currently do not consider test
-%nms_option_test = 3;
+nms_option_test = 3;
 % 0129: use full-size validation images instead of 512x512
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
-%Faster_RCNN_Train.do_proposal_test_widerface_twopath_happy_batch2_e1_e11(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_ablation(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 

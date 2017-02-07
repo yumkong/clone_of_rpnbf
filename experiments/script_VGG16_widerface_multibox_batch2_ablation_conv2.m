@@ -1,4 +1,4 @@
-function script_VGG16_widerface_multibox_batch2_ablation()
+function script_VGG16_widerface_multibox_batch2_ablation_conv2()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
