@@ -1,4 +1,4 @@
-net: "./models/VGG16_widerface/rpn_prototxts/vgg_16layers_ablation/train_val_conv3_batch3.prototxt"
+net: "./models/VGG16_widerface/rpn_prototxts/vgg_16layers_ablation/train_val_conv2_stride8.prototxt"
 base_lr: 0.0005 #0.001
 lr_policy: "step"
 gamma: 0.1
