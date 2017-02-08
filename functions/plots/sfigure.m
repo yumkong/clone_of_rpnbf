@@ -27,6 +27,8 @@ if( nargin > 1 )
     scaleY = s2;
   end
   pos = get(h,'Position');
+  %0207 added to move the figure box to bottom-left direction
+  pos(1:2) = pos(1:2)*0.5;
   pos(3:4) = [400 300].*[scaleX scaleY];
   set(gcf,'Position',pos);
 end
