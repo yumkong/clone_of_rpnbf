@@ -1,0 +1,287 @@
+name: "VGG_ILSVRC_16"
+
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 224
+input_dim: 224
+
+layer {
+	bottom: "data"
+	top: "conv1_1"
+	name: "conv1_1"
+	type: "Convolution"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_1"
+	name: "relu1_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_2"
+	name: "conv1_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "conv1_2"
+	name: "relu1_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "pool1"
+	name: "pool1"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool1"
+	top: "conv2_1"
+	name: "conv2_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_1"
+	name: "relu2_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_2"
+	name: "conv2_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "conv2_2"
+	name: "relu2_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "pool2"
+	name: "pool2"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+# do pooling the 2nd time
+layer {
+	bottom: "pool2"
+	top: "pool2_twice"
+	name: "pool2_twice"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+# do pooling the 3rd time
+layer {
+	bottom: "pool2_twice"
+	top: "pool2_3rd"
+	name: "pool2_3rd"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+#0205 added norm layer
+layer {
+  name: "conv2_norm"
+  type: "Normalize"
+  bottom: "pool2_3rd"
+  top: "conv2_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 12  #0205: 40-->12 
+    }
+    channel_shared: false
+  }
+}
+
+#-----------------------layer +-------------------------
+layer {
+   name: "conv_proposal1"
+   type: "Convolution"
+   bottom: "conv2_norm"
+   top: "conv_proposal1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 256  #0205: 512->256
+	   kernel_size: 3
+	   pad: 1
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "relu_proposal1"
+   type: "ReLU"
+   bottom: "conv_proposal1"
+   top: "conv_proposal1"
+}
+
+layer {
+   name: "proposal_cls_score"
+   type: "Convolution"
+   bottom: "conv_proposal1"
+   top: "proposal_cls_score"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 14   # 2(bg/fg) * 3(anchors) -->2*10
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "proposal_bbox_pred"
+   type: "Convolution"
+   bottom: "conv_proposal1"
+   top: "proposal_bbox_pred"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 28	# 4 * 3(anchors) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+#-----------------------output------------------------
+
+# to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
+layer {
+   bottom: "proposal_cls_score"
+   top: "proposal_cls_score_reshape"
+   name: "proposal_cls_score_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 2
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   name: "proposal_cls_prob"
+   type: "Softmax"
+   bottom: "proposal_cls_score_reshape"
+   top: "proposal_cls_prob"
+}
