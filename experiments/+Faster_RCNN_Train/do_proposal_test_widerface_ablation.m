@@ -47,7 +47,7 @@ function aboxes = do_proposal_test_widerface_ablation(conf, model_stage, imdb, r
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes, start_thresh,thresh_interval,thresh_end);
     save(fullfile(cache_dir,'recall_vector.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
     fprintf('For all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
-    h = figure(1);
+    h = figure(2);
     h = sfigure(h, 2.5, 2);
     rotation_plot(gt_recall_pool./(gt_num_pool+eps), start_thresh, thresh_interval, thresh_end);
     %save plot here
