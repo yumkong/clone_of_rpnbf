@@ -415,18 +415,18 @@ layer {
 	type: "ReLU"
 }
 
-# deconv
+#0208 change from deconv 4x to 2x
 layer {
   bottom: "conv5_3_reduce" 
-  top: "conv5_3_4x"
-  name: "conv5_3_4x" 
+  top: "conv5_3_2x"
+  name: "conv5_3_2x" 
   type: "Deconvolution"
   convolution_param {
-    kernel_size: 8 
-    stride: 4
+    kernel_size: 4 
+    stride: 2
     num_output: 256
     group: 256
-    pad: 2
+    pad: 1
     weight_filler: { type: "bilinear" } 
     bias_term: false
   }
@@ -437,7 +437,7 @@ layer {
 layer {
   name: "conv5_norm"
   type: "Normalize"
-  bottom: "conv5_3_4x"
+  bottom: "conv5_3_2x"
   top: "conv5_norm"
   norm_param {
     across_spatial: false
