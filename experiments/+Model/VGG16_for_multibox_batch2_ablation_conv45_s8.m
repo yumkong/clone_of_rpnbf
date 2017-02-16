@@ -1,4 +1,4 @@
-function model = VGG16_for_multibox_batch2_ablation_conv34_s8(exp_name, model)
+function model = VGG16_for_multibox_batch2_ablation_conv45_s8(exp_name, model)
 
 
 model.mean_image                                = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'mean_image');
@@ -7,8 +7,8 @@ model.pre_trained_net_file                      = fullfile(pwd, 'models', exp_na
 model.feat_stride                               = 8;
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride8_exp', 'solver_30k40k_conv34_elmadd_s8.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride8_exp', 'test_conv34_elmadd_s8.prototxt');
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride8_exp', 'solver_30k40k_conv45_elmadd_s8.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride8_exp', 'test_conv45_elmadd_s8.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting
