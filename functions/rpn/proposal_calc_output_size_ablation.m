@@ -37,7 +37,8 @@ function [output_width_map, output_height_map] = proposal_calc_output_size_ablat
             %liu@0926 changed,because when s>= 1000, s x s is too big to feed to a net
             %im_blob = single(zeros(s, s, 3, 1));
             %im_blob = single(zeros(s, 500, 3, 1));
-            im_blob = single(zeros(s, conf.min_test_length, 3, 1));
+            %im_blob = single(zeros(s, conf.min_test_length, 3, 1));
+            im_blob = single(zeros(s, 128, 3, 1));
             net_inputs = {im_blob};
 
             % Reshape net's input blobs

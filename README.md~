@@ -800,3 +800,10 @@ gt recall rate (ol >0.7) = 0.4119
 gt recall rate (ol >0.8) = 0.2117
 gt recall rate (ol >0.9) = 0.0343
 
+===========================
+0218
+conv6_s16:
+For all scales: gt recall rate = 22092 / 68723 = 0.3215
+conv34_s8:
+For all scales: gt recall rate = 35305 / 69480 = 0.5081
+
