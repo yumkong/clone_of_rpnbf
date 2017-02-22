@@ -806,4 +806,13 @@ conv6_s16:
 For all scales: gt recall rate = 22092 / 68723 = 0.3215
 conv34_s8:
 For all scales: gt recall rate = 35305 / 69480 = 0.5081
-
+conv45_s4:
+For all scales: gt recall rate = 33198 / 69453 = 0.4780
+conv345_s16:
+For all scales: gt recall rate = 29241 / 69271 = 0.4221
+conv45_s16:
+For all scales: gt recall rate = 29199 / 69208 = 0.4219
+conv56_s16:
+For all scales: gt recall rate = 26144 / 69177 = 0.3779
+conv6_s32:
+For all scales: gt recall rate = 14765 / 57591 = 0.2564

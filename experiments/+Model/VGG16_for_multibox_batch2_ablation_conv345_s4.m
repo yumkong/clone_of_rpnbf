@@ -7,8 +7,8 @@ model.pre_trained_net_file                      = fullfile(pwd, 'models', exp_na
 model.feat_stride                               = 4;
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride4_exp', 'solver_30k40k_conv345_concat.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride4_exp', 'test_conv345_concat.prototxt');
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride4_exp', 'solver_30k40k_conv345_elmadd.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'stride4_exp', 'test_conv345_elmadd.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting

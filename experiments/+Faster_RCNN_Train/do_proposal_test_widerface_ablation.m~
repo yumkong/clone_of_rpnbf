@@ -41,18 +41,18 @@ function aboxes = do_proposal_test_widerface_ablation(conf, model_stage, imdb, r
     end
 
     % 0206 added
-    start_thresh = 5; %5
-    thresh_interval = 3;%3
-    thresh_end = 500; % 500
+    start_thresh = 5;
+    thresh_interval = 10;
+    thresh_end = 300;
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes, start_thresh,thresh_interval,thresh_end);
-    save(fullfile(cache_dir,'recall_vector_fine.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
+    save(fullfile(cache_dir,'recall_vector.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
     fprintf('For all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
-    %h = figure(2);
-    %h = sfigure(h, 2.5, 2);
-    %rotation_plot(gt_recall_pool./(gt_num_pool+eps), start_thresh, thresh_interval, thresh_end);
-    %%save plot here
-    %plotSaveName = fullfile(cache_dir,'recall_plot');
-    %export_fig(plotSaveName, '-png', '-a1', '-native');
+    h = figure(2);
+    h = sfigure(h, 2.5, 2);
+    rotation_plot(gt_recall_pool./(gt_num_pool+eps), start_thresh, thresh_interval, thresh_end);
+    %save plot here
+    plotSaveName = fullfile(cache_dir,'recall_plot');
+    export_fig(plotSaveName, '-png', '-a1', '-native');
 end
 
 function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes, start_thresh,thresh_interval,thresh_end)
@@ -112,13 +112,11 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
             part_idx = (face_height>= k + thresh_interval); % 300~inf
             part_gts = gts(part_idx, :);
 
-            if ~isempty(part_gts)
+            if (~isempty(part_gts)) && (~isempty(rois))
+                max_ols = max(boxoverlap(rois, part_gts));
                 gt_num_pool(cnt) = gt_num_pool(cnt) + size(part_gts, 1);
-                if ~isempty(rois)
-                    max_ols = max(boxoverlap(rois, part_gts));
-                    if ~isempty(max_ols)
-                        gt_recall_pool(cnt) = gt_recall_pool(cnt) + sum(max_ols >= 0.5);
-                    end
+                if ~isempty(max_ols)
+                    gt_recall_pool(cnt) = gt_recall_pool(cnt) + sum(max_ols >= 0.5);
                 end
             end
         end
