@@ -1,4 +1,4 @@
-function script_VGG16_widerface_multibox_batch2_ablation_conv5()
+function script_VGG16_widerface_multibox_batch2_ablation_conv2_s4()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -36,7 +36,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_multibox_batch2_ablation_conv5(exp_name);
+model                       = Model.VGG16_for_multibox_batch2_ablation_conv2_s4(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -51,7 +51,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'VGG16_multibox_ablation';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ablation_conv5';
+exp_name = 'VGG16_widerface_multibox_ablation_conv2_s4';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
