@@ -810,7 +810,7 @@ layer {
    name: "conv_proposal_s4"
    type: "Convolution"
    bottom: "conv_proposal23_s4"
-   top: "conv_proposal_s4"
+   top: "conv_proposal1_s4"
 	param {
 		lr_mult: 1.0
 	}

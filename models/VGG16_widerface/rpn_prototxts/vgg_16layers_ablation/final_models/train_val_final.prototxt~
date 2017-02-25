@@ -6,6 +6,81 @@ input_dim: 3
 input_dim: 224
 input_dim: 224
 
+# for conv23 at stride 4
+input: "labels_s4"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_s4"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_s4"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 4  		# 4 (coords) * 1 anchor
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_s4"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 4  		# 4 (coords) * 1 anchor
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+# for conv345 at stride 8
+input: "labels_s8"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 3           # 3(anchors): [8 16 32]--> 10 anchors
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_s8"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 3           # 3(anchors): [8 16 32]     
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_s8"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 12  		# 4 (coords) * 3(anchors): [8 16 32] 
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_s8"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 12  		# 4 (coords) * 3(anchors): [8 16 32] 
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+# for conv3456 at stride 16
+input: "labels_s16"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 3            # 4(anchors)        
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14 		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_s16"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 3           # 4(anchors)        
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14 		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets_s16"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 12  		# 4 (coords) * 3(anchors) 
+input_dim: 14 		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights_s16"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 12  		# 4 (coords) * 3(anchors) 
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14 		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
 layer {
 	bottom: "data"
 	top: "conv1_1"
@@ -810,7 +885,7 @@ layer {
    name: "conv_proposal_s4"
    type: "Convolution"
    bottom: "conv_proposal23_s4"
-   top: "conv_proposal_s4"
+   top: "conv_proposal1_s4"
 	param {
 		lr_mult: 1.0
 	}
@@ -1091,10 +1166,61 @@ layer {
 }
 
 layer {
-   name: "proposal_cls_prob_s4"
-   type: "Softmax"
+   bottom: "labels_s4"
+   top: "labels_reshape_s4"
+   name: "labels_reshape_s4"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights_s4"
+   top: "labels_weights_reshape_s4"
+   name: "labels_weights_reshape_s4"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   name: "loss_cls_s4"
+   type: "SoftmaxWithLoss"
    bottom: "proposal_cls_score_reshape_s4"
-   top: "proposal_cls_prob_s4"
+   bottom: "labels_reshape_s4"
+   bottom: "labels_weights_reshape_s4"
+   top: "loss_cls_s4"
+   loss_weight: 1
+}
+
+layer {
+   name: "accuarcy_s4"
+   type: "Accuracy"
+   bottom: "proposal_cls_score_reshape_s4"
+   bottom: "labels_reshape_s4"
+   top: "accuarcy_s4"
+}
+
+layer {
+  name: "loss_bbox_s4"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_s4"
+  bottom: "bbox_targets_s4"
+  bottom: "bbox_loss_weights_s4"
+  top: "loss_bbox_s4"
+  loss_weight: 200  #0224: 20->200
 }
 
 #-----------------------output s8------------------------
@@ -1116,11 +1242,63 @@ layer {
 }
 
 layer {
-   name: "proposal_cls_prob_s8"
-   type: "Softmax"
-   bottom: "proposal_cls_score_reshape_s8"
-   top: "proposal_cls_prob_s8"
+   bottom: "labels_s8"
+   top: "labels_reshape_s8"
+   name: "labels_reshape_s8"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
 }
+
+layer {
+   bottom: "labels_weights_s8"
+   top: "labels_weights_reshape_s8"
+   name: "labels_weights_reshape_s8"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   name: "loss_cls_s8"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape_s8"
+   bottom: "labels_reshape_s8"
+   bottom: "labels_weights_reshape_s8"
+   top: "loss_cls_s8"
+   loss_weight: 1
+}
+
+layer {
+   name: "accuarcy_s8"
+   type: "Accuracy"
+   bottom: "proposal_cls_score_reshape_s8"
+   bottom: "labels_reshape_s8"
+   top: "accuarcy_s8"
+}
+
+layer {
+  name: "loss_bbox_s8"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_s8"
+  bottom: "bbox_targets_s8"
+  bottom: "bbox_loss_weights_s8"
+  top: "loss_bbox_s8"
+  loss_weight: 50  #0224: 20->50
+}
+
 
 #-----------------------output s16------------------------
 
@@ -1141,8 +1319,59 @@ layer {
 }
 
 layer {
-   name: "proposal_cls_prob_s16"
-   type: "Softmax"
+   bottom: "labels_s16"
+   top: "labels_reshape_s16"
+   name: "labels_reshape_s16"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights_s16"
+   top: "labels_weights_reshape_s16"
+   name: "labels_weights_reshape_s16"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   name: "loss_cls_s16"
+   type: "SoftmaxWithLoss"
    bottom: "proposal_cls_score_reshape_s16"
-   top: "proposal_cls_prob_s16"
+   bottom: "labels_reshape_s16"
+   bottom: "labels_weights_reshape_s16"
+   top: "loss_cls_s16"
+   loss_weight: 1
+}
+
+layer {
+   name: "accuarcy_s16"
+   type: "Accuracy"
+   bottom: "proposal_cls_score_reshape_s16"
+   bottom: "labels_reshape_s16"
+   top: "accuarcy_s16"
+}
+
+layer {
+  name: "loss_bbox_s16"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred_s16"
+  bottom: "bbox_targets_s16"
+  bottom: "bbox_loss_weights_s16"
+  top: "loss_bbox_s16"
+  loss_weight: 12  #0224: 10->12
 }
