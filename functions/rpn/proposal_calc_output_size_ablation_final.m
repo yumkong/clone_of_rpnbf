@@ -72,7 +72,7 @@ function [w_s4, h_s4, w_s8, h_s8, w_s16, h_s16] = proposal_calc_output_size_abla
         %save(cache_output_width_map, 'output_width_map', '-v7.3');
         %save(cache_output_height_map, 'output_height_map', '-v7.3');
         %0925
-        save(output_map_save_name, 'output_width_map', 'output_height_map');
+        save(output_map_save_name, 'w_s4', 'h_s4', 'w_s8', 'h_s8', 'w_s16', 'h_s16');
         caffe.reset_all(); 
     end
 end

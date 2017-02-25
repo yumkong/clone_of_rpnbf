@@ -199,43 +199,37 @@ function [image_roidb, bbox_mean_s4, bbox_std_s4, bbox_mean_s8, bbox_std_s8, bbo
     % Normalize targets
     for i = 1:num_images
         for j = 1:length(conf.scales)
-            targets = image_roidb(i).bbox_targets_conv6{j};
+            targets = image_roidb(i).bbox_targets_s16{j};
             gt_inds = find(targets(:, 1) > 0);
             if ~isempty(gt_inds)
                 image_roidb(i).bbox_targets_s16{j}(gt_inds, 2:end) = ...
-                    bsxfun(@minus, image_roidb(i).bbox_targets_conv6{j}(gt_inds, 2:end), bbox_mean_s16);
+                    bsxfun(@minus, image_roidb(i).bbox_targets_s16{j}(gt_inds, 2:end), bbox_mean_s16);
                 image_roidb(i).bbox_targets_s16{j}(gt_inds, 2:end) = ...
-                    bsxfun(@rdivide, image_roidb(i).bbox_targets_conv6{j}(gt_inds, 2:end), bbox_std_s16);
+                    bsxfun(@rdivide, image_roidb(i).bbox_targets_s16{j}(gt_inds, 2:end), bbox_std_s16);
             end
         end
     end
 end
 
 function scaled_rois = scale_rois(rois, im_size, im_scale)
-    % make
-    rois_tmp = max(1, rois);
-    %0805 added check invalid ground-truth rois: any of the [x1 y1 x2 y2]
-    %is <= zero
-    invalid_idx = (rois_tmp(:,3) <= rois_tmp(:,1)) | (rois_tmp(:,4) <= rois_tmp(:,2));
-    if sum(invalid_idx) ~= 0
-        fprintf('Error: invalid coordinates appear.\n'); 
+    %0225 added
+    if ~isempty(rois)
+        rois_tmp = max(1, rois);
+        %0805 added check invalid ground-truth rois: any of the [x1 y1 x2 y2]
+        %is <= zero
+        invalid_idx = (rois_tmp(:,3) <= rois_tmp(:,1)) | (rois_tmp(:,4) <= rois_tmp(:,2));
+        if sum(invalid_idx) ~= 0
+            fprintf('Error: invalid coordinates appear.\n'); 
+        end
+        im_size_scaled = round(im_size * im_scale);
+        scale = (im_size_scaled - 1) ./ (im_size - 1);
+        scaled_rois = bsxfun(@times, rois_tmp-1, [scale(2), scale(1), scale(2), scale(1)]) + 1;
+
+        % get rid of them
+        scaled_rois(invalid_idx,:) = [];
+    else
+        scaled_rois = [];
     end
-    
-
-    im_size_scaled = round(im_size * im_scale);
-    scale = (im_size_scaled - 1) ./ (im_size - 1);
-    scaled_rois = bsxfun(@times, rois_tmp-1, [scale(2), scale(1), scale(2), scale(1)]) + 1;
-    
-    % get rid of them
-    scaled_rois(invalid_idx,:) = [];
-%     tmpRowSum = sum(double(scaled_rois < 0), 2);
-%     allnegIdx = find(tmpRowSum == 4);
-%     if ~isempty(allnegIdx)
-%        fprintf('Error: all coordinates are neg.\n'); 
-%     end
-%     tmpRowProd = prod(double(scaled_rois > 0), 2);
-%     scaled_rois = scaled_rois(tmpRowProd > 0,:);
-
 end
 
 function bbox_targets = compute_targets(conf, gt_rois, gt_labels, ex_rois, image_roidb, im_scale)

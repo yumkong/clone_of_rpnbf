@@ -30,8 +30,10 @@ function [anchors_s4, anchors_s8, anchors_s16] = proposal_generate_anchors_ablat
         anchor_cache_file           = fullfile(cache_name, 'anchors');
     end
     try
-        ld                      = load(anchor_cache_file);
-        anchors                 = ld.anchors;
+        ld                         = load(anchor_cache_file);
+        anchors_s4                 = ld.anchors_s4;
+        anchors_s8                 = ld.anchors_s8;
+        anchors_s16                = ld.anchors_s16;
     catch
         base_anchor             = [1, 1, opts.base_size, opts.base_size];
         ratio_anchors           = ratio_jitter(base_anchor, opts.ratios);
@@ -42,7 +44,7 @@ function [anchors_s4, anchors_s8, anchors_s16] = proposal_generate_anchors_ablat
         anchors_s8 = anchors(2:4, :);  % [16 32 64]
         anchors_s16 = anchors(5:end, :);  % [128 256 480]
         if ~opts.ignore_cache
-            save(anchor_cache_file, 'anchors_conv4', 'anchors_conv5', 'anchors_conv6');
+            save(anchor_cache_file, 'anchors_s4', 'anchors_s8', 'anchors_s16');
         end
     end
     
