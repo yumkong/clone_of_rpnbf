@@ -14,7 +14,8 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
 %     end
     % =============================
     num_images = length(image_roidb);
-    assert(num_images == 1, 'proposal_generate_minibatch_fcn only support num_images == 1');
+    %%0225 masked
+    %assert(num_images == 1, 'proposal_generate_minibatch_fcn only support num_images == 1');
 
     % Sample random scales to use for each image in this batch
     random_scale_inds = 1; %randi(length(conf.scales), num_images, 1);
