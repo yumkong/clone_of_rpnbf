@@ -18,7 +18,7 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
     %assert(num_images == 1, 'proposal_generate_minibatch_fcn only support num_images == 1');
 
     % Sample random scales to use for each image in this batch
-    random_scale_inds = 1; %randi(length(conf.scales), num_images, 1);
+    random_scale_inds = randi(length(conf.scales), num_images, 1);
 
     assert(mod(conf.batch_size, num_images) == 0, ...
         sprintf('num_images %d must divide BATCH_SIZE %d', num_images, conf.batch_size));

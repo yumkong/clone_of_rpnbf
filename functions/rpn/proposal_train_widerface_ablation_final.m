@@ -15,10 +15,10 @@ function save_model_path = proposal_train_widerface_ablation_final(conf, imdb_tr
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           1000,                 @isscalar);%201
-    ip.addParamValue('val_interval',        5000,               @isscalar);%1000
+    ip.addParamValue('val_iters',           1000,                 @isscalar);%1000
+    ip.addParamValue('val_interval',        5000,               @isscalar);%5000
     ip.addParamValue('snapshot_interval',...
-                                            5000,              @isscalar); %1000
+                                            5000,              @isscalar); %5000
                                                                        
     % Max pixel size of a scaled input image
     ip.addParamValue('solver_def_file',     fullfile(pwd, 'proposal_models', 'Zeiler_conv5', 'solver.prototxt'), ...
@@ -171,15 +171,15 @@ function save_model_path = proposal_train_widerface_ablation_final(conf, imdb_tr
         
         %format long
         fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds, 1/cost_time);
-        for kkk = [1 4 7 10 11]
+        for kkk = [2 5 8 10 11]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n\t\t\t    ');
-        for kkk = [2 5 8 12 13]
+        for kkk = [3 6 9 12 13]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n\t\t\t    ');  %print conv6
-        for kkk = [3 6 9 14 15]
+        for kkk = [1 4 7 14 15]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n');
@@ -456,7 +456,7 @@ end
 function history_rec = show_state_and_plot(iter, train_results, val_results, history_rec, modelFigPath1, modelFigPath2, modelFigPath3)
         % --------- begin previously show_state part ------------
     fprintf('\n------------------------- Iteration %d -------------------------\n', iter);
-    fprintf('Training : err_fg_conv4 %.3g, err_bg_s4 %.3g, loss_s4 (cls %.3g + reg %.3g)\n', ...
+    fprintf('Training : err_fg_s4 %.3g, err_bg_s4 %.3g, loss_s4 (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg_s4.data), 1 - mean(train_results.accuracy_bg_s4.data), ...
         mean(train_results.loss_cls_s4.data), ...
         mean(train_results.loss_bbox_s4.data));
@@ -487,7 +487,7 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     % ========= newly added plot part =====================
     %conv4
     history_rec.train.err_fg_s4 = [history_rec.train.err_fg_s4; 1 - mean(train_results.accuracy_fg_s4.data)];
-    history_rec.train.err_bg_s4 = [history_rec.train.err_bg_conv4; 1 - mean(train_results.accuracy_bg_s4.data)];
+    history_rec.train.err_bg_s4 = [history_rec.train.err_bg_s4; 1 - mean(train_results.accuracy_bg_s4.data)];
     history_rec.train.loss_cls_s4 = [history_rec.train.loss_cls_s4; mean(train_results.loss_cls_s4.data)];
     history_rec.train.loss_bbox_s4 = [history_rec.train.loss_bbox_s4; mean(train_results.loss_bbox_s4.data)];
     history_rec.val.err_fg_s4 = [history_rec.val.err_fg_s4; 1 - mean(val_results.accuracy_fg_s4.data)];
@@ -583,7 +583,7 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     % for conv6
     figure(3) ; clf ;
     titles3 = {'err\_fg\_s16', 'err\_bg\_s16', 'loss\_cls\_s16', 'loss\_bbox\_s16'};
-    plots3 = {'err_fg_conv6', 'err_bg_s16', 'loss_cls_s16', 'loss_bbox_s16'};
+    plots3 = {'err_fg_s16', 'err_bg_s16', 'loss_cls_s16', 'loss_bbox_s16'};
 
     %half_plot_num = ceil(numel(plots)/2);
     cnt = 0;
