@@ -125,7 +125,8 @@ function save_model_path = proposal_train_widerface_ablation_final(conf, imdb_tr
      
 %% -------------------- Training -------------------- 
 
-    proposal_generate_minibatch_fun = @proposal_generate_minibatch_ablation_final;
+    %proposal_generate_minibatch_fun = @proposal_generate_minibatch_ablation_final;
+    proposal_generate_minibatch_fun = @proposal_generate_minibatch_ablation_final_batchmulti;
 
     % training
     shuffled_inds = [];
@@ -170,15 +171,31 @@ function save_model_path = proposal_train_widerface_ablation_final(conf, imdb_tr
         rst = check_error(rst, caffe_solver);
         
         %format long
-        fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds, 1/cost_time);
+        % 0227: for single batch
+%         fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds, 1/cost_time);
+%         for kkk = [2 5 8 10 11]
+%             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
+%         end
+%         fprintf('\n\t\t\t    ');
+%         for kkk = [3 6 9 12 13]
+%             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
+%         end
+%         fprintf('\n\t\t\t    ');  %print conv6
+%         for kkk = [1 4 7 14 15]
+%             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
+%         end
+%         fprintf('\n');
+        % 0227 for batch 3
+        fprintf('Iter %d, Image %d, %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), sub_db_inds(3), 1/cost_time);
+        fprintf('\n\t');
         for kkk = [2 5 8 10 11]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
-        fprintf('\n\t\t\t    ');
+        fprintf('\n\t');
         for kkk = [3 6 9 12 13]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
-        fprintf('\n\t\t\t    ');  %print conv6
+        fprintf('\n\t');  %print conv6
         for kkk = [1 4 7 14 15]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
