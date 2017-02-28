@@ -8,7 +8,7 @@ function aboxes = do_proposal_test_widerface_ablation(conf, model_stage, imdb, r
 	%cache_dir = fullfile(pwd, 'output', opts.cache_name, imdb.name);
     try
         % try to load cache
-        box_nms_name = fullfile(cache_dir, ['proposal_boxes_afterNMS_' imdb.name]);
+        box_nms_name = fullfile(cache_dir, ['proposal_boxes_afterNMS2_' imdb.name]);
         ld = load(box_nms_name);
         aboxes = ld.aboxes;
     catch 
@@ -51,7 +51,7 @@ function aboxes = do_proposal_test_widerface_ablation(conf, model_stage, imdb, r
     thresh_interval = 3;%3
     thresh_end = 500; % 500
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes, start_thresh,thresh_interval,thresh_end);
-    save(fullfile(cache_dir,'recall_vector_fine.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
+    save(fullfile(cache_dir,'recall_vector_fine2.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
     fprintf('For all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
     %h = figure(2);
     %h = sfigure(h, 2.5, 2);
