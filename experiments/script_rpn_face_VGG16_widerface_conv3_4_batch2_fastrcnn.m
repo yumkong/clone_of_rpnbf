@@ -104,5 +104,5 @@ model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % ini
 model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
 %model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2_feat(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
 % test
-%Faster_RCNN_Train.do_fast_rcnn_test_widerface_conv3_4_batch2(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+Faster_RCNN_Train.do_fast_rcnn_test_widerface_conv3_4_batch2(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
 end

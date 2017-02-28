@@ -1,4 +1,4 @@
-function script_VGG16_widerface_multibox_batch2_ablation_all()
+function script_VGG16_widerface_multibox_batch2_ablation_fastrcnn()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -51,7 +51,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'VGG16_multibox_ablation';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ablation_final3';
+exp_name = 'VGG16_widerface_multibox_ablation_final2';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -133,6 +133,9 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_abla
 nms_option_test = 3;
 % 0129: use full-size validation images instead of 512x512
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
+% 1207: use rpn's result to update roidb_train and roidb_test
+dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_widerface_ablation_final(conf_proposal, model.stage1_rpn, x, y), ...
+                                                                            dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
 Faster_RCNN_Train.do_proposal_test_widerface_ablation_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
 %0106 use all test set for final evaluation: dataset.imdb_realtest
