@@ -15,10 +15,10 @@ function save_model_path = proposal_train_widerface_ablation_final(conf, imdb_tr
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           1000,                 @isscalar);%1000
-    ip.addParamValue('val_interval',        5000,               @isscalar);%5000
+    ip.addParamValue('val_iters',           500,                 @isscalar);%1000
+    ip.addParamValue('val_interval',        2000,               @isscalar);%5000
     ip.addParamValue('snapshot_interval',...
-                                            5000,              @isscalar); %5000
+                                            2000,              @isscalar); %5000
                                                                        
     % Max pixel size of a scaled input image
     ip.addParamValue('solver_def_file',     fullfile(pwd, 'proposal_models', 'Zeiler_conv5', 'solver.prototxt'), ...
