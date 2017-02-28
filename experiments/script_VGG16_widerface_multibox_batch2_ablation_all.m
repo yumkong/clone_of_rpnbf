@@ -130,10 +130,10 @@ fprintf('\n***************\nstage one RPN \n***************\n');
 model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ablation_final(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 % 1020: currently do not consider test
-%nms_option_test = 3;
+nms_option_test = 3;
 % 0129: use full-size validation images instead of 512x512
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
-%Faster_RCNN_Train.do_proposal_test_widerface_ablation(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+Faster_RCNN_Train.do_proposal_test_widerface_ablation_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 

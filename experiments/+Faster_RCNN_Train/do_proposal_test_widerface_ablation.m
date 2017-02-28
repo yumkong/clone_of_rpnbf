@@ -36,6 +36,12 @@ function aboxes = do_proposal_test_widerface_ablation(conf, model_stage, imdb, r
             aboxes{i} = aboxes{i}(aboxes{i}(:, end) >= score_thresh, :);
             % 0206: psudoNms
             aboxes{i} = pseudoNMS_v8_twopath(aboxes{i}, nms_option);%4
+            %0226 added: sort by score ()pseudoNMS may make the box
+            %not sorted in descending order of scores
+            if ~isempty(aboxes{i})
+                [~, scores_ind] = sort(aboxes{i}(:,5), 'descend');
+                aboxes{i} = aboxes{i}(scores_ind, :);
+            end
         end
         save(box_nms_name, 'aboxes');
     end
