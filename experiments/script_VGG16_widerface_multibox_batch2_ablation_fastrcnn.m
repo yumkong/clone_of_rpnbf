@@ -36,7 +36,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_multibox_batch2_ablation_all(exp_name);
+model                       = Model.VGG16_for_multibox_batch2_ablation_fastrcnn(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -51,7 +51,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'VGG16_multibox_ablation';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ablation_final2';
+exp_name = 'VGG16_widerface_multibox_ablation_final_fastrcnn';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -104,11 +104,11 @@ end
 % conf
 conf_proposal          = proposal_config_widerface_ablation_final('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
                                                                     'feat_stride_s8', model.feat_stride_s8, 'feat_stride_s16', model.feat_stride_s16);
-%conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
+conf_fast_rcnn              = fast_rcnn_config_widerface_batch2('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
 conf_proposal.exp_name = exp_name;
-%conf_fast_rcnn.exp_name = exp_name;
+conf_fast_rcnn.exp_name = exp_name;
 %[conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                            = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
@@ -136,11 +136,19 @@ nms_option_test = 3;
 % 1207: use rpn's result to update roidb_train and roidb_test
 dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_widerface_ablation_final(conf_proposal, model.stage1_rpn, x, y), ...
                                                                             dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
-Faster_RCNN_Train.do_proposal_test_widerface_ablation_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+dataset.roidb_test = Faster_RCNN_Train.do_proposal_test_widerface_ablation_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
+% liu@0816 masked --> not necessary currently
+%%  fast rcnn train
+fprintf('\n***************\nstage one fast rcnn\n***************\n');
+% train
+%shared
+model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % init with trained rpn model
+%unshared
 %0106 use all test set for final evaluation: dataset.imdb_realtest
-
-%dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
-%Faster_RCNN_Train.do_proposal_test_widerface_twopath_realtest(conf_proposal, model.stage1_rpn, dataset.imdb_realtest, cache_name, method_name, nms_option_test);
-
+%0125 added: training with score feat map
+model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+%model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_conv3_4_batch2_feat(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+% test
+Faster_RCNN_Train.do_fast_rcnn_test_widerface_conv3_4_batch2(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
 end
