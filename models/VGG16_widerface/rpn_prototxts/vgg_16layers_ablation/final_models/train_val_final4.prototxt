@@ -34,25 +34,25 @@ input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match i
 # for conv345 at stride 8
 input: "labels_s8"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 3           # 3(anchors): [8 16 32]--> 10 anchors
+input_dim: 4           # 3(anchors): [8 16 32]--> 10 anchors
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "labels_weights_s8"
 input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 3           # 3(anchors): [8 16 32]     
+input_dim: 4           # 3(anchors): [8 16 32]     
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_targets_s8"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 12  		# 4 (coords) * 3(anchors): [8 16 32] 
+input_dim: 16  		# 4 (coords) * 3(anchors): [8 16 32] 
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
 input: "bbox_loss_weights_s8"
 input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 12  		# 4 (coords) * 3(anchors): [8 16 32] 
+input_dim: 16  		# 4 (coords) * 3(anchors): [8 16 32] 
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
@@ -337,41 +337,45 @@ layer {
 	}
 }
 
+# 0302 added to discriminate conv3_s4 and conv3_s8
+layer {
+	bottom: "pool3"
+	top: "conv3_s8_buffer"
+	name: "conv3_s8_buffer"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv3_s8_buffer"
+	top: "conv3_s8_buffer"
+	name: "relu_conv3_s8_buffer"
+	type: "ReLU"
+}
+
 #0205 added norm layer (1/8 of the original spatial resolution)
 layer {
   name: "conv3_norm_s8"
   type: "Normalize"
-  bottom: "pool3"
+  bottom: "conv3_s8_buffer"
   top: "conv3_norm_s8"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 16  #0205: 40-->16 
-    }
-    channel_shared: false
-  }
-}
-
-# 0208: add a 2nd pooling layer
-layer {
-	bottom: "pool3"
-	top: "pool3_twice"
-	name: "pool3_twice"
-	type: "Pooling"
-	pooling_param {
-		pool: MAX
-		kernel_size: 2
-		stride: 2
-	}
-}
-
-#0205 added norm layer
-layer {
-  name: "conv3_norm_s16"
-  type: "Normalize"
-  bottom: "pool3_twice"
-  top: "conv3_norm_s16"
   norm_param {
     across_spatial: false
     scale_filler {
@@ -523,59 +527,6 @@ layer {
 		kernel_size: 2
 		stride: 2
 	}
-}
-
-# dim reduce and relu
-layer {
-	name: "conv4_reduce"
-	bottom: "pool4"
-	top: "conv4_reduce"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 256
-		pad: 0
-		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
-	}
-}
-
-layer {
-	bottom: "conv4_reduce"
-	top: "conv4_reduce"
-	name: "relu_conv4_reduce"
-	type: "ReLU"
-}
-
-#0208 delete deconv layer
-
-# normalize
-layer {
-  name: "conv4_norm_s16"
-  type: "Normalize"
-  bottom: "conv4_reduce"
-  top: "conv4_norm_s16"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 16  #0207: 40-->16 
-    }
-    channel_shared: false
-  }
 }
 
 layer {
@@ -735,13 +686,44 @@ layer {
 }
 # =============== end of proposal conv345 for stride 8 ======================
 
-#0208: remove deconv
+# added to discriminate conv5_s8 and conv5_s16
+layer {
+	bottom: "conv5_3_reduce"
+	top: "conv5_s16_buffer"
+	name: "conv5_s16_buffer"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv5_s16_buffer"
+	top: "conv5_s16_buffer"
+	name: "relu_conv5_s16_buffer"
+	type: "ReLU"
+}
 
 # normalize
 layer {
   name: "conv5_norm_s16"
   type: "Normalize"
-  bottom: "conv5_3_reduce"
+  bottom: "conv5_s16_buffer"
   top: "conv5_norm_s16"
   norm_param {
     across_spatial: false
@@ -870,13 +852,11 @@ layer {
 
 #elemtwise addition of conv5_norm and conv6_norm
 layer {
-  name: "eltwise_sum3456"
+  name: "eltwise_sum56"
   type: "Eltwise"
-  bottom: "conv3_norm_s16"
-  bottom: "conv4_norm_s16"
   bottom: "conv5_norm_s16"
   bottom: "conv6_norm_s16"
-  top: "conv_proposal3456_s16"
+  top: "conv_proposal56_s16"
   eltwise_param { operation: SUM }
 }
 
@@ -1016,7 +996,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 6   # 2(bg/fg) * 3(anchors) -->2*10
+	   num_output: 8   # 2(bg/fg) * 3(anchors) -->2*10
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -1043,7 +1023,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 12	# 4 * 3(anchors) 
+	   num_output: 16	# 4 * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -1062,7 +1042,7 @@ layer {
 layer {
    name: "conv_proposal_s16"
    type: "Convolution"
-   bottom: "conv_proposal3456_s16"
+   bottom: "conv_proposal56_s16"
    top: "conv_proposal_s16"
 	param {
 		lr_mult: 1.0
@@ -1105,7 +1085,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 8   # 2(bg/fg) * 3(anchors) -->2*10
+	   num_output: 6   # 2(bg/fg) * 3(anchors) -->2*10
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -1132,7 +1112,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 16	# 4 * 3(anchors) 
+	   num_output: 12	# 4 * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
