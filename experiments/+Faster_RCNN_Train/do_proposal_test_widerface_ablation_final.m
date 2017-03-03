@@ -4,7 +4,7 @@ function do_proposal_test_widerface_ablation_final(conf, model_stage, imdb, roid
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
                                         'cache_name',       model_stage.cache_name, ...
-                                        'suffix',           '_thr_30_30_30'); 
+                                        'suffix',           '_thr_10_10_10'); 
     cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
 	%cache_dir = fullfile(pwd, 'output', opts.cache_name, imdb.name);
     try
@@ -143,7 +143,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
             else
                 rois_s4 = [];
             end
-            idx_s8 = (face_height>= 11) & (face_height< 65);
+            idx_s8 = (face_height>= 11) & (face_height< 128);%65
             gt_num_s8 = sum(idx_s8);
             this_pred_num = min(2*gt_num_s8, size(aboxes_s8{i}, 1));
             if this_pred_num ~= 0
@@ -151,7 +151,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
             else
                 rois_s8 = [];
             end
-            idx_s16 = (face_height>= 65);
+            idx_s16 = (face_height>= 128); %65
             gt_num_s16 = sum(idx_s16);
             this_pred_num = min(2*gt_num_s16, size(aboxes_s16{i}, 1));
             if this_pred_num ~= 0
@@ -192,8 +192,8 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
                     end
                 end
             end
-            %0226: stride 8
-            for k = 11:thresh_interval:65-1
+            %0226: stride 8 65-->128
+            for k = 11:thresh_interval:128-1
                 cnt = cnt + 1;
                 part_idx = (face_height>= k) & (face_height < k + thresh_interval); % eg.:4~14
                 part_gts = gts(part_idx, :);
@@ -208,8 +208,8 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
                     end
                 end
             end
-            %0226: stride 16
-            for k = 65:thresh_interval:thresh_end
+            %0226: stride 16 65-->128
+            for k = 128:thresh_interval:thresh_end
                 cnt = cnt + 1;
                 part_idx = (face_height>= k) & (face_height < k + thresh_interval); % eg.:4~14
                 part_gts = gts(part_idx, :);

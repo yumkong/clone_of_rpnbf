@@ -41,8 +41,8 @@ function [anchors_s4, anchors_s8, anchors_s16] = proposal_generate_anchors_ablat
         anchors                 = cat(1, anchors{:});
         % 1112 added
         anchors_s4 = anchors(1, :);  % [8]
-        anchors_s8 = anchors(2:4, :);  % [16 32 64]
-        anchors_s16 = anchors(4:end, :);  % 0227: [128 256 480]->[64 128 256 480]
+        anchors_s8 = anchors(2:5, :);  % [16 32 64]
+        anchors_s16 = anchors(5:end, :);  % 0227: [128 256 480]->[64 128 256 480]
         if ~opts.ignore_cache
             save(anchor_cache_file, 'anchors_s4', 'anchors_s8', 'anchors_s16');
         end

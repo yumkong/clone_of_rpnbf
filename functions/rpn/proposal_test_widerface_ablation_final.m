@@ -87,12 +87,12 @@ function [aboxes_s4, aboxes_s8, aboxes_s16] = proposal_test_widerface_ablation_f
             
             fprintf(' time: %.3fs\n', toc(th)); 
             %1230 added
-            scores_s4 = scores_s4(scores_s4 >= 0.3,:);  %0101:0.1-->0.55
-            boxes_s4 = boxes_s4(scores_s4 >= 0.3,:);
-            scores_s8 = scores_s8(scores_s8 >= 0.3,:);
-            boxes_s8 = boxes_s8(scores_s8 >= 0.3,:);
-            scores_s16 = scores_s16(scores_s16 >= 0.3,:);
-            boxes_s16 = boxes_s16(scores_s16 >= 0.3,:);
+            boxes_s4 = boxes_s4(scores_s4 >= 0.1,:);
+            scores_s4 = scores_s4(scores_s4 >= 0.1,:);  %0101:0.1-->0.55
+            boxes_s8 = boxes_s8(scores_s8 >= 0.1,:);
+            scores_s8 = scores_s8(scores_s8 >= 0.1,:);
+            boxes_s16 = boxes_s16(scores_s16 >= 0.1,:);
+            scores_s16 = scores_s16(scores_s16 >= 0.1,:);
 
             aboxes_s4{i} = [boxes_s4, scores_s4];
             aboxes_s8{i} = [boxes_s8, scores_s8];
