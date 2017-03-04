@@ -191,7 +191,7 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
     bg_inds = find(bbox_targets(:, 1) < 0);
     
     %1123 add ohem: all need to change is labels
-    ohem_flag = false;
+    ohem_flag = true;
     if ohem_flag
         labels = -1 * ones(size(bbox_targets, 1), 1);
         % set foreground labels
