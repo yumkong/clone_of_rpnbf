@@ -1281,7 +1281,7 @@ layer {
    type: "RpnClsOHEM"
    rpn_cls_ohem_param {
         bg_per_img: 40  #256
-		anchor_num: 1
+		anchor_num: 4
 		random_shuffle_percent: 0.5
         ignore_label: -1
    }
@@ -1413,7 +1413,7 @@ layer {
    type: "RpnClsOHEM"
    rpn_cls_ohem_param {
         bg_per_img: 40  #256
-		anchor_num: 1
+		anchor_num: 3
 		random_shuffle_percent: 0.5
         ignore_label: -1
    }
