@@ -27,7 +27,7 @@ layer {
 		num_output: 64
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
+		#engine: CUDNN
 	}
 }
 
@@ -53,7 +53,7 @@ layer {
 		num_output: 64
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
+		#engine: CUDNN
 	}
 }
 
@@ -91,7 +91,7 @@ layer {
 		num_output: 128
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
+		#engine: CUDNN
 	}
 }
 
@@ -117,7 +117,7 @@ layer {
 		num_output: 128
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
+		#engine: CUDNN
 	}
 }
 
@@ -155,7 +155,7 @@ layer {
 		num_output: 256
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
+		#engine: CUDNN
 	}
 }
 
@@ -181,7 +181,7 @@ layer {
 		num_output: 256
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
+		#engine: CUDNN
 	}
 }
 
@@ -207,7 +207,7 @@ layer {
 		num_output: 256
 		pad: 1
 		kernel_size: 3
-		engine: CUDNN
+		#engine: CUDNN
 	}
 }
 
@@ -311,6 +311,154 @@ layer {
 	type: "ReLU"
 }
 
+# dim reduce and relu for conv4
+layer {
+	name: "conv4_3_reduce"
+	bottom: "conv4_3"
+	top: "conv4_3_reduce"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+	}
+}
+
+layer {
+	bottom: "conv4_3_reduce"
+	top: "conv4_3_reduce"
+	name: "relu_conv4_3_reduce"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv4_3"
+	top: "pool4"
+	name: "pool4"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 1
+	}
+}
+
+layer {
+	bottom: "pool4"
+	top: "conv5_1"
+	name: "conv5_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 4
+		kernel_size: 3
+		dilation: 4  #filter_stride: 2
+		#engine: CUDNN
+	}
+}
+
+layer {
+	bottom: "conv5_1"
+	top: "conv5_1"
+	name: "relu5_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv5_1"
+	top: "conv5_2"
+	name: "conv5_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 4
+		kernel_size: 3
+		dilation: 4  #filter_stride: 2
+		#engine: CUDNN
+	}
+}
+
+layer {
+	bottom: "conv5_2"
+	top: "conv5_2"
+	name: "relu5_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv5_2"
+	top: "conv5_3"
+	name: "conv5_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 4
+		kernel_size: 3
+		dilation: 4  #filter_stride: 2
+		#engine: CUDNN
+	}
+}
+
+layer {
+	bottom: "conv5_3"
+	top: "conv5_3"
+	name: "relu5_3"
+	type: "ReLU"
+}
+
+# dim reduce and relu
+layer {
+	name: "conv5_3_reduce"
+	bottom: "conv5_3"
+	top: "conv5_3_reduce"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+	}
+}
+
+layer {
+	bottom: "conv5_3_reduce"
+	top: "conv5_3_reduce"
+	name: "relu_conv5_3_reduce"
+	type: "ReLU"
+}
 
 # ------------- roi layer --------
 #1207 added normalization
@@ -336,8 +484,8 @@ layer {
 	name: "roi_pool3_3"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 4
-		pooled_h: 4
+		pooled_w: 5
+		pooled_h: 5
 		spatial_scale: 0.25  #stride 4
 	}
 }
@@ -346,13 +494,13 @@ layer {
 layer {
   name: "conv4_3_norm"
   type: "Normalize"
-  bottom: "conv4_3"
+  bottom: "conv4_3_reduce"
   top: "conv4_3_norm"
   norm_param {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 56 #94.52 40
+      value: 40 #94.52 40
     }
     channel_shared: false
   }
@@ -365,8 +513,37 @@ layer {
 	name: "roi_pool4_3"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 4
-		pooled_h: 4
+		pooled_w: 5
+		pooled_h: 5
+		spatial_scale: 0.25  #stride 4
+	}
+}
+
+#0304 added normlization for conv5
+layer {
+  name: "conv5_3_norm"
+  type: "Normalize"
+  bottom: "conv5_3_reduce"
+  top: "conv5_3_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 40 #94.52 40
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "conv5_3_norm"
+	bottom: "rois"
+	top: "roi_pool5_3"
+	name: "roi_pool5_3"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 5
+		pooled_h: 5
 		spatial_scale: 0.25  #stride 4
 	}
 }
@@ -374,11 +551,12 @@ layer {
 layer {
     bottom: "roi_pool3_3"
 	bottom: "roi_pool4_3"
+	bottom: "roi_pool5_3"
 	top: "concat_roi_feat"
 	name: "concat_roi_feat"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels
+		axis: 1  #concat along channels-> 19200
 	}
 }
 
@@ -515,33 +693,6 @@ layer {
   }
 }
 
-layer {
-  name: "bbox_pred"
-  type: "InnerProduct"
-  bottom: "fc8"
-  top: "bbox_pred"
-  param {
-    name: "bbox_pred_w"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "bbox_pred_b"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 4 #84-->8-->4
-    weight_filler {
-      type: "gaussian"
-      std: 0.001
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
 
 # ============= output ===============
 layer {

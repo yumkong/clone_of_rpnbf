@@ -16,16 +16,16 @@ function [feat_rois] = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scal
     feat_rois = (im_rois-1) * im_scale_factor + 1;
     boxes = feat_rois;
     
-    leftright_ratio = 0.2;  %1207: 1--> 0.5
+    leftright_ratio = 0;  %1207: 1--> 0.5
     boxes_width_change = (boxes(:,3)-boxes(:,1) + 1) * leftright_ratio;
     boxes(:,1) = round(boxes(:,1) - boxes_width_change);
     boxes(:,3) = round(boxes(:,3) + boxes_width_change);
     
-    top_ratio = 0.2;
+    top_ratio = 0;
     boxes_top_change = (boxes(:,4)-boxes(:,2) + 1) * top_ratio;
     boxes(:,2) = round(boxes(:,2) - boxes_top_change);
     
-    bottom_ratio = 0.2; %1207: 1.8--> 0.8
+    bottom_ratio = 0; %1207: 1.8--> 0.8
     boxes_bottom_change = (boxes(:,4)-boxes(:,2) + 1) * bottom_ratio;
     boxes(:,4) = round(boxes(:,4) + boxes_bottom_change);
     
