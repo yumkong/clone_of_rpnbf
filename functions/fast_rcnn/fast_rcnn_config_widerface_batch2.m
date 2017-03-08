@@ -21,7 +21,7 @@ function conf = fast_rcnn_config_widerface_batch2(varargin)
     % Images per batch
     ip.addParamValue('ims_per_batch',   2,              @isscalar); %2-->1
     % Minibatch size
-    ip.addParamValue('batch_size',      80,            @isscalar); %128-->160-->80(for 2 images) 
+    ip.addParamValue('batch_size',      64,            @isscalar); %128-->160-->80(for 2 images)->64(2 images)
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1207: 32 faces for an average image
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)

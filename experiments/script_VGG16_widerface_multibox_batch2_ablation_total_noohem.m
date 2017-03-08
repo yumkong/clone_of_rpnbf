@@ -1,4 +1,4 @@
-function script_VGG16_widerface_multibox_batch2_ablation_all_ohem()
+function script_VGG16_widerface_multibox_batch2_ablation_total_noohem()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -36,7 +36,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_multibox_batch2_ablation_all(exp_name);
+model                       = Model.VGG16_for_multibox_batch2_ablation_total(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -51,18 +51,18 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'VGG16_multibox_ablation';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ablation_final3_ohem3';
+exp_name = 'VGG16_widerface_multibox_ablation_total_noohem';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
 % 0127: in vn7 only use 11 event for demo
 train_event_pool            = [1 61 3 5 6 9 11 12 14 33 37 38 45 51 56]; %-1
-dataset                     = Dataset.widerface_ablation_512(dataset, 'train', use_flipped, train_event_pool, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_ablation_total_800(dataset, 'train', use_flipped, train_event_pool, cache_data_this_model_dir, model_name_base);
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 %0106 added all test images
 test_event_pool             = 1:61;
-dataset                     = Dataset.widerface_ablation_512(dataset, 'test', false, test_event_pool, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_ablation_total_800(dataset, 'test', false, test_event_pool, cache_data_this_model_dir, model_name_base);
 % 0206 added: adapt dataset created in puck to VN7
 if ispc
     devkit = 'D:\\datasets\\WIDERFACE';

@@ -47,7 +47,10 @@ function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn(conf, imd
     caffe_log_file_base = fullfile(cache_dir, 'caffe_log');
     caffe.init_log(caffe_log_file_base);
     caffe_solver = caffe.Solver(opts.solver_def_file);
+    %0306 training from iter_14000-> the last ok iteration
     caffe_solver.net.copy_from(opts.net_file);
+    %caffe_solver.net.copy_from(fullfile(pwd, 'output','VGG16_widerface_multibox_ablation_final_fastrcnn','fast_rcnn_cachedir',...
+    %                                         'rpn_widerface_VGG16_stage1_fast_rcnn','WIDERFACE_train', 'iter_14000_puck'));
 
     % init log
     timestamp = datestr(datevec(now()), 'yyyymmdd_HHMMSS');

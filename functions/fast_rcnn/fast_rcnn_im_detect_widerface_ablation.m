@@ -1,4 +1,4 @@
-function [pred_boxes, scores] = fast_rcnn_im_detect_widerface(conf, caffe_net, im, boxes, max_rois_num_in_gpu)
+function scores = fast_rcnn_im_detect_widerface_ablation(conf, caffe_net, im, boxes, max_rois_num_in_gpu)
 % [pred_boxes, scores] = fast_rcnn_im_detect(conf, caffe_net, im, boxes, max_rois_num_in_gpu)
 % --------------------------------------------------------
 % Fast R-CNN
@@ -27,7 +27,7 @@ function [pred_boxes, scores] = fast_rcnn_im_detect_widerface(conf, caffe_net, i
     
     total_rois = size(rois_blob, 4);
     total_scores = cell(ceil(total_rois / max_rois_num_in_gpu), 1);
-    total_box_deltas = cell(ceil(total_rois / max_rois_num_in_gpu), 1);
+    %total_box_deltas = cell(ceil(total_rois / max_rois_num_in_gpu), 1);
     for i = 1:ceil(total_rois / max_rois_num_in_gpu)
         
         sub_ind_start = 1 + (i-1) * max_rois_num_in_gpu;
@@ -40,39 +40,47 @@ function [pred_boxes, scores] = fast_rcnn_im_detect_widerface(conf, caffe_net, i
         caffe_net.reshape_as_input(net_inputs);
         output_blobs = caffe_net.forward(net_inputs);
 
-        if conf.test_binary
-            % simulate binary logistic regression
-            scores = caffe_net.blobs('cls_score').get_data();
-            scores = squeeze(scores)';
-            % Return scores as fg - bg
-            scores = bsxfun(@minus, scores, scores(:, 1));
-        else
-            % use softmax estimated probabilities
-            scores = output_blobs{2};
-            scores = squeeze(scores)';
-        end
+%         if conf.test_binary
+%             % simulate binary logistic regression
+%             scores = caffe_net.blobs('cls_score').get_data();
+%             scores = squeeze(scores)';
+%             % Return scores as fg - bg
+%             scores = bsxfun(@minus, scores, scores(:, 1));
+%         else
+%             % use softmax estimated probabilities
+%             scores = output_blobs{2};
+%             scores = squeeze(scores)';
+%         end
+        scores = output_blobs{1};
+        scores = squeeze(scores)';
 
         % Apply bounding-box regression deltas
-        box_deltas = output_blobs{1};
-        box_deltas = squeeze(box_deltas)';
+        %box_deltas = output_blobs{1};
+        %box_deltas = squeeze(box_deltas)';
         
         total_scores{i} = scores;
-        total_box_deltas{i} = box_deltas;
+        %total_box_deltas{i} = box_deltas;
     end 
     
     scores = cell2mat(total_scores);
-    box_deltas = cell2mat(total_box_deltas);
+    %box_deltas = cell2mat(total_box_deltas);
     
-    pred_boxes = fast_rcnn_bbox_transform_inv(boxes, box_deltas);
-    pred_boxes = clip_boxes(pred_boxes, size(im, 2), size(im, 1));
+    %pred_boxes = fast_rcnn_bbox_transform_inv(boxes, box_deltas);
+    %pred_boxes = clip_boxes(pred_boxes, size(im, 2), size(im, 1));
 
     % Map scores and predictions back to the original set of boxes
     scores = scores(inv_index, :);
-    pred_boxes = pred_boxes(inv_index, :);
+    %pred_boxes = pred_boxes(inv_index, :);
     
     % remove scores and boxes for back-ground
-    pred_boxes = pred_boxes(:, 5:end);
-    scores = scores(:, 2:end);
+    %pred_boxes = pred_boxes(:, 5:end);
+    % *** liu@0307 sth wrong with it? temply changed it
+    %scores = scores(:, 2:end);
+    if ~isempty(scores)
+        scores = scores(:, 1);
+    else
+        scores = []; 
+    end
 end
 
 function [data_blob, rois_blob, im_scale_factors] = get_blobs(conf, im, rois)
