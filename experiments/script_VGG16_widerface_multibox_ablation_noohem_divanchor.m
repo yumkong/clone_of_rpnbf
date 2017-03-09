@@ -1,4 +1,4 @@
-function script_VGG16_widerface_multibox_batch2_ablation_total_noohem()
+function script_VGG16_widerface_multibox_ablation_noohem_divanchor()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -14,7 +14,7 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_bn'; %'caffe_faster_rcnn_win_cudnn_final'
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_newL1'; %'caffe_faster_rcnn_win_cudnn_bn'
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
@@ -36,7 +36,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_multibox_batch2_ablation_total(exp_name);
+model                       = Model.VGG16_for_multibox_batch2_ablation_divanchor(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -51,18 +51,18 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'VGG16_multibox_ablation';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_multibox_ablation_total_noohem';
+exp_name = 'VGG16_widerface_multibox_ablation_noohem_divanchor';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
 use_flipped                 = false;  %true --> false
 % 0127: in vn7 only use 11 event for demo
-train_event_pool            = 1:61; %[1 61 3 5 6 9 11 12 14 33 37 38 45 51 56];
-dataset                     = Dataset.widerface_ablation_total_800(dataset, 'train', use_flipped, train_event_pool, cache_data_this_model_dir, model_name_base);
+train_event_pool            = [1 61 3 5 6 9 11 12 14 33 37 38 45 51 56]; %-1
+dataset                     = Dataset.widerface_ablation_512(dataset, 'train', use_flipped, train_event_pool, cache_data_this_model_dir, model_name_base);
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, event_num, cache_data_this_model_dir, model_name_base);
 %0106 added all test images
 test_event_pool             = 1:61;
-dataset                     = Dataset.widerface_ablation_total_800(dataset, 'test', false, test_event_pool, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_ablation_512(dataset, 'test', false, test_event_pool, cache_data_this_model_dir, model_name_base);
 % 0206 added: adapt dataset created in puck to VN7
 if ispc
     devkit = 'D:\\datasets\\WIDERFACE';
@@ -102,7 +102,7 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal          = proposal_config_widerface_ablation_final('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
+conf_proposal          = proposal_config_widerface_ablation_divanchor('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
                                                                     'feat_stride_s8', model.feat_stride_s8, 'feat_stride_s16', model.feat_stride_s16);
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
@@ -127,7 +127,7 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ablation_final(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ablation_divanchor(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 % 1020: currently do not consider test
 nms_option_test = 3;

@@ -1,4 +1,4 @@
-function save_model_path = proposal_train_widerface_ablation_final_noohem(conf, imdb_train, roidb_train, varargin)
+function save_model_path = proposal_train_widerface_ablation_divanchor(conf, imdb_train, roidb_train, varargin)
 % save_model_path = proposal_train_caltech(conf, imdb_train, roidb_train, varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -126,7 +126,7 @@ function save_model_path = proposal_train_widerface_ablation_final_noohem(conf, 
 %% -------------------- Training -------------------- 
 
     %proposal_generate_minibatch_fun = @proposal_generate_minibatch_ablation_final;
-    proposal_generate_minibatch_fun = @proposal_generate_minibatch_ablation_batchmulti_noohem;
+    proposal_generate_minibatch_fun = @proposal_generate_minibatch_ablation_divanchor_noohem;
 
     % training
     shuffled_inds = [];
@@ -186,8 +186,7 @@ function save_model_path = proposal_train_widerface_ablation_final_noohem(conf, 
 %         end
 %         fprintf('\n');
         % 0227 for batch 3
-        %fprintf('Iter %d, Image %d, %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), sub_db_inds(3), 1/cost_time);
-        fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds(1), 1/cost_time);
+        fprintf('Iter %d, Image %d, %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), sub_db_inds(3), 1/cost_time);
         fprintf('\n\t');
         for kkk = [2 5 8 10 11]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
