@@ -820,3 +820,5 @@ conv3456_s16:
 For all scales: gt recall rate = 29478 / 69489 = 0.4242
 conv456_s16:
 For all scales: gt recall rate = 27894 / 69489 = 0.4014
+Final_moreanchor
+For all scales: gt recall rate = 39885 / 69489 = 0.5740
