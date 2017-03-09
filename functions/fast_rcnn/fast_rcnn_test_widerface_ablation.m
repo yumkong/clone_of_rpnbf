@@ -35,17 +35,16 @@ function mAP = fast_rcnn_test_widerface_ablation(conf, imdb, roidb, varargin)
     diary(log_file);
     
     num_images = length(imdb.image_ids);
-    num_classes = imdb.num_classes;
-    
+    save_file = fullfile(cache_dir, ['aboxes_' imdb.name opts.suffix]);
     try
-      aboxes = cell(num_classes, 1);
-      if opts.ignore_cache
-          throw('');
-      end
-      for i = 1:num_classes
-        load(fullfile(cache_dir, [imdb.classes{i} '_boxes_' imdb.name opts.suffix]));
-        aboxes{i} = boxes;
-      end
+        ld = load(save_file);%'aboxes_old', 'aboxes_new','score_ind_old', 'score_ind_new'
+        aboxes_old = ld.aboxes_old;
+        aboxes_new = ld.aboxes_new;
+%         aboxes_new = 1 - aboxes_new;
+%         aboxes_new = aboxes_new(end:-1:1,:);
+%         score_ind_old = ld.score_ind_old;
+%         score_ind_new = ld.score_ind_new;
+%         score_ind_new = score_ind_new(end:-1:1,:);
     catch    
 %%      testing 
         % init caffe net
@@ -73,26 +72,10 @@ function mAP = fast_rcnn_test_widerface_ablation(conf, imdb, roidb, varargin)
         disp('conf:');
         disp(conf);
         
-        %heuristic: keep an average of 40 detections per class per images prior to NMS
-        max_per_set = 40 * num_images;
-        % heuristic: keep at most 100 detection per class per image prior to NMS
-        max_per_image = 100;
-        % detection thresold for each class (this is adaptively set based on the max_per_set constraint)
-        thresh = -inf * ones(num_classes, 1);
-        % top_scores will hold one minheap of scores per class (used to enforce the max_per_set constraint)
-        top_scores = cell(num_classes, 1);
-        % all detections are collected into:
-        %    all_boxes[cls][image] = N x 5 array of detections in
-        %    (x1, y1, x2, y2, score)
-%         aboxes = cell(num_classes, 1);
-%         box_inds = cell(num_classes, 1);
-%         for i = 1:num_classes
-%             aboxes{i} = cell(length(imdb.image_ids), 1);
-%             box_inds{i} = cell(length(imdb.image_ids), 1);
-%         end
-        
         aboxes_old = cell(length(imdb.image_ids), 1);
         aboxes_new = cell(length(imdb.image_ids), 1);
+        score_ind_old = cell(length(imdb.image_ids), 1);
+        score_ind_new = cell(length(imdb.image_ids), 1);
 
         count = 0;
         t_start = tic;
@@ -115,6 +98,7 @@ function mAP = fast_rcnn_test_widerface_ablation(conf, imdb, roidb, varargin)
             if ~isempty(aboxes_old{i})
                 [~, scores_ind] = sort(aboxes_old{i}(:,5), 'descend');
                 aboxes_old{i} = aboxes_old{i}(scores_ind, :);
+                score_ind_old{i} = scores_ind;
             end
             aboxes_new{i} = pseudoNMS_v8_twopath(aboxes_new{i}, 3);%nms_option=3
             %0226 added: sort by score ()pseudoNMS may make the box
@@ -122,65 +106,13 @@ function mAP = fast_rcnn_test_widerface_ablation(conf, imdb, roidb, varargin)
             if ~isempty(aboxes_new{i})
                 [~, scores_ind] = sort(aboxes_new{i}(:,5), 'descend');
                 aboxes_new{i} = aboxes_new{i}(scores_ind, :);
+                score_ind_new{i} = scores_ind;
             end
-            
-%             for j = 1:num_classes
-%                 inds = find(~d.gt & scores(:, j) > thresh(j));
-%                 if ~isempty(inds)
-%                     [~, ord] = sort(scores(inds, j), 'descend');
-%                     ord = ord(1:min(length(ord), max_per_image));
-%                     inds = inds(ord);
-%                     cls_boxes = boxes(inds, (1+(j-1)*4):((j)*4));
-%                     cls_scores = scores(inds, j);
-%                     aboxes{j}{i} = [aboxes{j}{i}; cat(2, single(cls_boxes), single(cls_scores))];
-%                     box_inds{j}{i} = [box_inds{j}{i}; inds];
-%                 else
-%                     aboxes{j}{i} = [aboxes{j}{i}; zeros(0, 5, 'single')];
-%                     box_inds{j}{i} = box_inds{j}{i};
-%                 end
-%             end
 
-            fprintf(' time: %.3fs\n', toc(th));  
-
-%             if mod(count, 1000) == 0
-%                 for j = 1:num_classes
-%                 [aboxes{j}, box_inds{j}, thresh(j)] = ...
-%                     keep_top_k(aboxes{j}, box_inds{j}, i, max_per_set, thresh(j));
-%                 end
-%                 disp(thresh);
-%             end    
+            fprintf(' time: %.3fs\n', toc(th));     
         end
-        save_file = fullfile(cache_dir, [imdb.classes{i} '_boxes_' imdb.name opts.suffix]);
-        save(save_file, 'aboxes_old', 'aboxes_new');
-
-%         for j = 1:num_classes
-%             [aboxes{j}, box_inds{j}, thresh(j)] = ...
-%                 keep_top_k(aboxes{j}, box_inds{j}, i, max_per_set, thresh(j));
-%         end
-%         disp(thresh);
-
-        %for i = 1:num_images
-
-%             top_scores{i} = sort(top_scores{i}, 'descend');  
-%             if (length(top_scores{i}) > max_per_set)
-%                 thresh(i) = top_scores{i}(max_per_set);
-%             end
-% 
-%             % go back through and prune out detections below the found threshold
-%             for j = 1:length(imdb.image_ids)
-%                 if ~isempty(aboxes{i}{j})
-%                     I = find(aboxes{i}{j}(:,end) < thresh(i));
-%                     aboxes{i}{j}(I,:) = [];
-%                     box_inds{i}{j}(I,:) = [];
-%                 end
-%             end
-% 
-%             save_file = fullfile(cache_dir, [imdb.classes{i} '_boxes_' imdb.name opts.suffix]);
-%             boxes = aboxes{i};
-%             inds = box_inds{i};
-%             save(save_file, 'boxes', 'inds');
-%             clear boxes inds;
-        %end
+        %save_file = fullfile(cache_dir, ['aboxes_' imdb.name opts.suffix]);
+        save(save_file, 'aboxes_old', 'aboxes_new','score_ind_old', 'score_ind_new');
         fprintf('test all images in %f seconds.\n', toc(t_start));
         
         caffe.reset_all(); 
@@ -195,33 +127,9 @@ function mAP = fast_rcnn_test_widerface_ablation(conf, imdb, roidb, varargin)
     fprintf('OLD all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
     
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_new, start_thresh,thresh_interval,thresh_end);
-    save(fullfile(cache_dir,'recall_vector_old.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
+    save(fullfile(cache_dir,'recall_vector_new.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
     fprintf('NEW all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
-    % ------------------------------------------------------------------------
-    % Peform AP evaluation
-    % ------------------------------------------------------------------------
 
-%     if isequal(imdb.eval_func, @imdb_eval_voc)
-%         for model_ind = 1:num_classes
-%           cls = imdb.classes{model_ind};
-%           res(model_ind) = imdb.eval_func(cls, aboxes{model_ind}, imdb, opts.cache_name, opts.suffix);
-%         end
-%     else
-%     % ilsvrc
-%         res = imdb.eval_func(aboxes, imdb, opts.cache_name, opts.suffix);
-%     end
-% 
-%     if ~isempty(res)
-%         fprintf('\n~~~~~~~~~~~~~~~~~~~~\n');
-%         fprintf('Results:\n');
-%         aps = [res(:).ap]' * 100;
-%         disp(aps);
-%         disp(mean(aps));
-%         fprintf('~~~~~~~~~~~~~~~~~~~~\n');
-%         mAP = mean(aps);
-%     else
-%         mAP = nan;
-%     end
     mAP = 0.0;
     diary off;
 end
@@ -235,6 +143,10 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
 
     %0110 added
     for i = 1:length(roidb.rois)
+        if ~isempty(aboxes{i})
+            aboxes{i} = aboxes{i}(end:-1:1,:);
+            aboxes{i}(:,5) = 1 - aboxes{i}(:,5);
+        end
         %gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
         gts = roidb.rois(i).boxes(roidb.rois(i).gt,:); % for widerface, no ignored bboxes
         if ~isempty(gts)

@@ -3,7 +3,7 @@ function [imdb, roidb] = imdb_from_widerface_ablation_total_800(root_dir, image_
 
 switch image_set
     case {'trainval'}
-        data_num_str = '15events';
+        data_num_str = 'allevents';
         cache_imdb = fullfile(cache_dir, sprintf('train_imdb_%s_%s',model_name_base, data_num_str));  %imdb
         cache_roidb = fullfile(cache_dir, sprintf('train_roidb_%s_%s', model_name_base, data_num_str));  %roidb
         %0205 changed
@@ -11,7 +11,7 @@ switch image_set
         doc_dir = fullfile('wider_face_split','wider_face_train');
         name = 'WIDERFACE_train';
     case {'test'}
-        data_num_str = '15events';
+        data_num_str = 'allevents';
         cache_imdb = fullfile(cache_dir, sprintf('test_imdb_%s_%s',model_name_base, data_num_str));  %imdb
         cache_roidb = fullfile(cache_dir, sprintf('test_roidb_%s_%s', model_name_base, data_num_str));  %roidb
         devpath = fullfile('WIDER_val_ablation','images');
@@ -58,9 +58,8 @@ catch
     % self added to have a list of bboxes regardless of event folders
     tmpboxdb.image_boxes = cell(imgsum_,1);
     % 0120 add image boxes for cropped images
-    tmpboxdb.image_boxes_x05 = cell(imgsum_,1);
-    tmpboxdb.image_boxes_x1 = cell(imgsum_,1);
-    tmpboxdb.image_boxes_x2 = cell(imgsum_,1);
+    tmpboxdb.image_boxes_800 = cell(imgsum_,1);
+    tmpboxdb.image_boxes_800_flip = cell(imgsum_,1);
     %tmpboxdb.image_boxes_flip = cell(imgsum_,1);
     
     %eventNum = numel(event_list);
@@ -87,13 +86,11 @@ catch
     %(5)
     imdb.flip = flip;
     %(6)  1020
-    show_debug = false;
+    show_debug = true;
     if 1
         image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
-        x05_image_at = @(i) sprintf('%s%c%s_x05.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
-        x1_image_at = @(i) sprintf('%s%c%s_x1.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
-        x2_image_at = @(i) sprintf('%s%c%s_x2.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
-        %flip_image_at = @(i) sprintf('%s%c%s_flip512.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
+        image_at_800 = @(i) sprintf('%s%c%s_800.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
+        image_at_800_flip = @(i) sprintf('%s%c%s_800_flip.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
         % 1: fliplr, 2: flipud, 3: rot90 (counterclock-90), 4: rot90-lr (clockwise-90)
         if 1  %fix randi seed to make result repeatable
             rng_seed = 6;
@@ -102,7 +99,8 @@ catch
         end
         %0120: use x0.5 x1 or x2?
         %flip_which_image_pool = randi(3,1,length(imdb.image_ids));
-        %flip_type_pool = randi(4,1,length(imdb.image_ids));
+        %0309: {1,2,3,4,5} flip_lr, 6 - flipud, 7-rot90, 8-rot90_lr
+        flip_type_pool = randi(8,1,length(imdb.image_ids));
         if 1
             rng(prev_rng);
         end
@@ -112,21 +110,16 @@ catch
             fprintf('Processing image %d... \n', i);
             %end
             % generate cropped image from x05
-            if ~exist(x05_image_at(i), 'file')
-                im_ori = imread(image_at(i));
-                im = imresize(im_ori, 0.5);
+            if ~exist(image_at_800(i), 'file')
+                im = imread(image_at(i));
                 %[x1 y1 w h]
                 box_ = tmpboxdb.image_boxes{i};
-                box_(:,1) = (box_(:,1) - 1) * 0.5 + 1;
-                box_(:,2) = (box_(:,2) - 1) * 0.5 + 1;
-                box_(:,3) = box_(:,3) * 0.5;
-                box_(:,4) = box_(:,4) * 0.5;
-                [im_crop_x05, final_bbox_x05] = cropImg_getNewbox(im, box_);
+                [im_crop_800, final_bbox_800] = cropImg_getNewbox(im, box_);
                 if show_debug
                 %show new bbox and new image
-                bbs_show = final_bbox_x05;
+                bbs_show = final_bbox_800;
                 figure(1), clf;
-                imshow(im_crop_x05);
+                imshow(im_crop_800);
                 hold on
                 if ~isempty(bbs_show)
                     %bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
@@ -137,51 +130,79 @@ catch
                 end
                 %save new bbox and new image
                 if ~show_debug
-                tmpboxdb.image_boxes_x05{i} = final_bbox_x05;
-                imwrite(im_crop_x05, x05_image_at(i));  
+                tmpboxdb.image_boxes_800{i} = final_bbox_800;
+                imwrite(im_crop_800, image_at_800(i));  
                 end
+            end
+            % 0309: decide whether x0.5/ x1/ x2
+            [mval, ~] = max(box_(:,4));
+            if mval >= 500
+                sfactor = 0.5;
+            elseif mval <= 250
+                sfactor = 2;
+            else
+                sfactor = 1;
             end
             % generate cropped image from x1
-            if ~exist(x1_image_at(i), 'file')
-                im = imread(image_at(i));
-                box_ = tmpboxdb.image_boxes{i};
-                [im_crop_x1, final_bbox_x1] = cropImg_getNewbox(im, box_);
-                if show_debug
-                %show new bbox and new image
-                bbs_show = final_bbox_x1;
-                figure(2), clf;
-                imshow(im_crop_x1);
-                hold on
-                if ~isempty(bbs_show)
-                    %bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
-                    %bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
-                    bbApply('draw',bbs_show,'m');
-                end
-                hold off
-                end
-                %save new bbox and new image
-                if ~show_debug
-                tmpboxdb.image_boxes_x1{i} = final_bbox_x1;
-                imwrite(im_crop_x1, x1_image_at(i));
-                end
-            end
-            
-            % generate cropped image from x2
-            if ~exist(x2_image_at(i), 'file')
+            if ~exist(image_at_800_flip(i), 'file')
                 im_ori = imread(image_at(i));
-                im = imresize(im_ori, 2);
-                %[x1 y1 w h]
+                im = imresize(im_ori, sfactor);
                 box_ = tmpboxdb.image_boxes{i};
-                box_(:,1) = (box_(:,1) - 1) * 2 + 1;
-                box_(:,2) = (box_(:,2) - 1) * 2 + 1;
-                box_(:,3) = box_(:,3) * 2;
-                box_(:,4) = box_(:,4) * 2;
-                [im_crop_x2, final_bbox_x2] = cropImg_getNewbox(im, box_);
+                %0309: scale the boxes
+                box_(:,1) = (box_(:,1) - 1) * sfactor + 1;
+                box_(:,2) = (box_(:,2) - 1) * sfactor + 1;
+                box_(:,3) = box_(:,3) * sfactor;
+                box_(:,4) = box_(:,4) * sfactor;
+                [im_crop_800_flip, final_bbox_800_flip] = cropImg_getNewbox(im, box_);
+                %0120 added
+                box_rec = final_bbox_800_flip;
+                im = im_crop_800_flip;
+                if ~isempty(box_rec) 
+                    box_ = box_rec;
+                    box_rec = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+                    [hei, wid, ~] = size(im);
+                    switch flip_type_pool(i)
+                        case {1, 2, 3, 4, 5}
+                            im_crop_800_flip = fliplr(im);
+                            box_rec(:, [1, 3]) = wid + 1 - box_rec(:, [3, 1]); %width - [right left]
+                        case 6
+                            im_crop_800_flip = flipud(im);
+                            box_rec(:, [2, 4]) = hei + 1 - box_rec(:, [4, 2]); %height - [bottom top]
+                        case 7
+                            im_crop_800_flip = rot90(im);
+                            tmp_rec = box_rec(:, [2 1 4 3]);
+                            tmp_rec(:, [2, 4]) = wid + 1 - box_rec(:, [3, 1]);
+                            box_rec = tmp_rec;
+                        case 8
+                            im_crop_800_flip = fliplr(rot90(im));
+                            box_rec = repmat([hei wid hei wid], size(box_rec, 1),1) - box_rec(:, [4 3 2 1]);
+                        otherwise
+                            disp('Unknown flip type.')
+                    end
+                else
+                    switch flip_type_pool(i)
+                        case {1, 2, 3, 4, 5}
+                            im_crop_800_flip = fliplr(im);
+                        case 6
+                            im_crop_800_flip = flipud(im);
+                        case 7
+                            im_crop_800_flip = rot90(im);
+                        case 8
+                            im_crop_800_flip = fliplr(rot90(im));
+                        otherwise
+                            disp('Unknown flip type.')
+                    end
+                end
+                final_bbox_800_flip = box_rec;
+                % 0309 important: [x1, y1, x2, y2]->[x1, y1, w, h]
+                final_bbox_800_flip(:, 3) = final_bbox_800_flip(:, 3) - final_bbox_800_flip(:, 1) + 1;
+                final_bbox_800_flip(:, 4) = final_bbox_800_flip(:, 4) - final_bbox_800_flip(:, 2) + 1;
+                
                 if show_debug
                 %show new bbox and new image
-                bbs_show = final_bbox_x2;
-                figure(3), clf;
-                imshow(im_crop_x2);
+                bbs_show = final_bbox_800_flip;
+                figure(2), clf;
+                imshow(im_crop_800_flip);
                 hold on
                 if ~isempty(bbs_show)
                     %bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
@@ -190,19 +211,18 @@ catch
                 end
                 hold off
                 end
-                %save new bbox and new image
+                %save new bbox and new image only when not debugging
                 if ~show_debug
-                tmpboxdb.image_boxes_x2{i} = final_bbox_x2;
-                imwrite(im_crop_x2, x2_image_at(i)); 
+                tmpboxdb.image_boxes_800_flip{i} = final_bbox_800_flip;
+                imwrite(im_crop_800_flip, image_at_800_flip(i));
                 end
             end
         end
-        img_num = length(imdb.image_ids)*3; %4
+        img_num = length(imdb.image_ids)*2; %4
         image_ids = imdb.image_ids;
         %imdb.image_ids(1:4:img_num) = image_ids;
-        imdb.image_ids(1:3:img_num) = cellfun(@(x) [x, '_x05'], image_ids, 'UniformOutput', false);
-        imdb.image_ids(2:3:img_num) = cellfun(@(x) [x, '_x1'], image_ids, 'UniformOutput', false);
-        imdb.image_ids(3:3:img_num) = cellfun(@(x) [x, '_x2'], image_ids, 'UniformOutput', false);
+        imdb.image_ids(1:2:img_num) = cellfun(@(x) [x, '_800'], image_ids, 'UniformOutput', false);
+        imdb.image_ids(2:2:img_num) = cellfun(@(x) [x, '_800_flip'], image_ids, 'UniformOutput', false);
         %imdb.image_ids(4:4:img_num) = cellfun(@(x) [x, '_flip512'], image_ids, 'UniformOutput', false);
         %imdb.flip_from = zeros(img_num, 1);
         %imdb.flip_from(4:4:img_num) = 1:4:img_num;
@@ -253,8 +273,8 @@ end  %of function
 function [im_crop, final_bbox] = cropImg_getNewbox(im, box_)
     [im_hei, im_wid, ~] = size(im);
     % at least make 1 as the starting point
-    h_sel_range = max(im_hei - 512 + 1, 1);
-    w_sel_range = max(im_wid - 512 + 1, 1);
+    h_sel_range = max(im_hei - 800 + 1, 1);
+    w_sel_range = max(im_wid - 800 + 1, 1);
     compare_num = 100; %50
     if h_sel_range > compare_num
         h_sel_20 = randperm(h_sel_range,compare_num);
@@ -273,21 +293,21 @@ function [im_crop, final_bbox] = cropImg_getNewbox(im, box_)
     box_st = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
     inside_box_num = zeros(1,compare_num);
     for kk = 1:compare_num
-        sel_idx = (box_st(:,2) >= h_sel_20(kk)) & (box_st(:,4) <= h_sel_20(kk)+511) ...
-                  &(box_st(:,1) >= w_sel_20(kk)) & (box_st(:,3) <= w_sel_20(kk)+511);
+        sel_idx = (box_st(:,2) >= h_sel_20(kk)) & (box_st(:,4) <= h_sel_20(kk)+799) ...
+                  &(box_st(:,1) >= w_sel_20(kk)) & (box_st(:,3) <= w_sel_20(kk)+799);
         inside_box_num(kk) = sum(sel_idx);
     end
     [max_val, max_idx] = max(inside_box_num);
     fprintf('The cropped image contains %d faces\n', max_val);
     y1_pos = h_sel_20(max_idx);
-    y2_pos = min(h_sel_20(max_idx)+511, im_hei);
+    y2_pos = min(h_sel_20(max_idx)+799, im_hei);
     x1_pos = w_sel_20(max_idx);
-    x2_pos = min(w_sel_20(max_idx)+511, im_wid);
+    x2_pos = min(w_sel_20(max_idx)+799, im_wid);
     im_crop = im(y1_pos:y2_pos, x1_pos:x2_pos, :);
     % padding zeros if less than 512 x 512
-    if size(im_crop,1) < 512 || size(im_crop,2) < 512
-        botpad = 512 - size(im_crop,1);
-        rightpad = 512 - size(im_crop,2);
+    if size(im_crop,1) < 800 || size(im_crop,2) < 800
+        botpad = 800 - size(im_crop,1);
+        rightpad = 800 - size(im_crop,2);
         im_crop = imPad(im_crop , [0 botpad 0 rightpad], 0);
     end
     % save box coords if the box center 70% in the cropped image
@@ -312,35 +332,26 @@ end
 % ==========sub-function: build roidb =====================
 function roidb = roidb_from_wider(imdb, tmpboxdb)
     roidb.name = imdb.name;
-    for i = 1:length(imdb.image_ids)/3  %4
+    for i = 1:length(imdb.image_ids)/2  %4
         %bboxes [col(x1) row(y1) width(x2-x1+1) height(y2-y1+1)] -->  [x1 y1 x2 y2]
-        box_ = tmpboxdb.image_boxes_x05{i};
+        box_ = tmpboxdb.image_boxes_800{i};
         % round is because the widerfaces gt boxes are real numbers
         if ~isempty(box_)
-            box_st_x05 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+            box_800 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
         else
-            box_st_x05 = [];
+            box_800 = [];
         end
         %bboxes [col(x1) row(y1) width(x2-x1+1) height(y2-y1+1)] -->  [x1 y1 x2 y2]
-        box_ = tmpboxdb.image_boxes_x1{i};
+        box_ = tmpboxdb.image_boxes_800_flip{i};
         % round is because the widerfaces gt boxes are real numbers
         if ~isempty(box_)
-            box_st_x1 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
+            box_800_flip = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
         else
-            box_st_x1 = [];
-        end
-        %bboxes [col(x1) row(y1) width(x2-x1+1) height(y2-y1+1)] -->  [x1 y1 x2 y2]
-        box_ = tmpboxdb.image_boxes_x2{i};
-        % round is because the widerfaces gt boxes are real numbers
-        if ~isempty(box_)
-            box_st_x2 = round([box_(:,1) box_(:,2) box_(:,1)+box_(:,3)-1 box_(:,2)+box_(:,4)-1]);
-        else
-            box_st_x2 = [];
+            box_800_flip = [];
         end
 
-        roidb.rois(i*3-2) = attach_proposals(box_st_x05, imdb.sizes(i*3-2, :), imdb.class_to_id);
-        roidb.rois(i*3-1) = attach_proposals(box_st_x1, imdb.sizes(i*3-1, :), imdb.class_to_id);
-        roidb.rois(i*3) = attach_proposals(box_st_x2, imdb.sizes(i*3, :), imdb.class_to_id);
+        roidb.rois(i*2-1) = attach_proposals(box_800, imdb.sizes(i*2-1, :), imdb.class_to_id);
+        roidb.rois(i*2) = attach_proposals(box_800_flip, imdb.sizes(i*2, :), imdb.class_to_id);
     end
 end
 
@@ -359,5 +370,4 @@ function rec = attach_proposals(box_rec, im_size, class_to_id)
     rec.boxes = single(all_boxes);
     rec.feat = [];
     rec.class = uint8(ones(num_gt_boxes, 1));
-    
 end

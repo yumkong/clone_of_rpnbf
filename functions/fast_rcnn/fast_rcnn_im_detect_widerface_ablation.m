@@ -75,9 +75,10 @@ function scores = fast_rcnn_im_detect_widerface_ablation(conf, caffe_net, im, bo
     % remove scores and boxes for back-ground
     %pred_boxes = pred_boxes(:, 5:end);
     % *** liu@0307 sth wrong with it? temply changed it
+    % 0308 solu: 1st column is bg prob, the 2nd is face prob
     %scores = scores(:, 2:end);
     if ~isempty(scores)
-        scores = scores(:, 1);
+        scores = scores(:, 2);
     else
         scores = []; 
     end
