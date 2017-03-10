@@ -27,13 +27,13 @@ function conf = proposal_config_widerface_ablation_divanchor(varargin)
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        512,           @isscalar); %960
     % Images per batch, only supports ims_per_batch = 1 currently
-    ip.addParamValue('ims_per_batch',   3,              @isscalar);%0205:2-->3-->1
+    ip.addParamValue('ims_per_batch',   6,              @isscalar);%0205:2-->3-->1
     % Minibatch size  0228: 360 (batch6) -> 240 (batch6)
     %0308 changed to divide 3 paths
     %ip.addParamValue('batch_size',      240,            @isscalar); %original 120,0122: 256(for 1 image)  --> 240 (for 3 images) 
-    ip.addParamValue('batch_size_s4',    48,            @isscalar); %0308: 16(for 1 image)  --> 96 (for 6 images) 
-    ip.addParamValue('batch_size_s8',    72,            @isscalar); %0308: 24(for 1 image)  --> 144 (for 6 images)  
-    ip.addParamValue('batch_size_s16',   24,            @isscalar); %0308: 8(for 1 image)  --> 48 (for 6 images) 
+    ip.addParamValue('batch_size_s4',    96,            @isscalar); %0308: 16(for 1 image)  --> 96 (for 6 images) 
+    ip.addParamValue('batch_size_s8',    144,            @isscalar); %0308: 24(for 1 image)  --> 144 (for 6 images)  
+    ip.addParamValue('batch_size_s16',   48,            @isscalar); %0308: 8(for 1 image)  --> 48 (for 6 images) 
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
     % weight of background samples, when weight of foreground samples is

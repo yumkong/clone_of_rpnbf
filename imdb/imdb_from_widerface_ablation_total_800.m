@@ -7,14 +7,14 @@ switch image_set
         cache_imdb = fullfile(cache_dir, sprintf('train_imdb_%s_%s',model_name_base, data_num_str));  %imdb
         cache_roidb = fullfile(cache_dir, sprintf('train_roidb_%s_%s', model_name_base, data_num_str));  %roidb
         %0205 changed
-        devpath = fullfile('WIDER_train_ablation','images');
+        devpath = fullfile('WIDER_train_final','images');
         doc_dir = fullfile('wider_face_split','wider_face_train');
         name = 'WIDERFACE_train';
     case {'test'}
         data_num_str = 'allevents';
         cache_imdb = fullfile(cache_dir, sprintf('test_imdb_%s_%s',model_name_base, data_num_str));  %imdb
         cache_roidb = fullfile(cache_dir, sprintf('test_roidb_%s_%s', model_name_base, data_num_str));  %roidb
-        devpath = fullfile('WIDER_val_ablation','images');
+        devpath = fullfile('WIDER_val_final','images');
         doc_dir = fullfile('wider_face_split','wider_face_val');
         name = 'WIDERFACE_test';
     otherwise
@@ -86,7 +86,7 @@ catch
     %(5)
     imdb.flip = flip;
     %(6)  1020
-    show_debug = true;
+    show_debug = false;
     if 1
         image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
         image_at_800 = @(i) sprintf('%s%c%s_800.%s', imdb.image_dir,filesep, imdb.image_ids{i}, imdb.extension);
@@ -195,9 +195,10 @@ catch
                 end
                 final_bbox_800_flip = box_rec;
                 % 0309 important: [x1, y1, x2, y2]->[x1, y1, w, h]
-                final_bbox_800_flip(:, 3) = final_bbox_800_flip(:, 3) - final_bbox_800_flip(:, 1) + 1;
-                final_bbox_800_flip(:, 4) = final_bbox_800_flip(:, 4) - final_bbox_800_flip(:, 2) + 1;
-                
+                if ~isempty(final_bbox_800_flip)
+                    final_bbox_800_flip(:, 3) = final_bbox_800_flip(:, 3) - final_bbox_800_flip(:, 1) + 1;
+                    final_bbox_800_flip(:, 4) = final_bbox_800_flip(:, 4) - final_bbox_800_flip(:, 2) + 1;
+                end
                 if show_debug
                 %show new bbox and new image
                 bbs_show = final_bbox_800_flip;
