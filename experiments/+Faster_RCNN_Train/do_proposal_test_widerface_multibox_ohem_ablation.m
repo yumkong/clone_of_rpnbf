@@ -135,7 +135,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
 %             end
             
             face_height = gts(:,4) - gts(:,2) + 1;
-            idx_s4 = (face_height>= start_thresh) & (face_height< 11);
+            idx_s4 = (face_height>= start_thresh) & (face_height< 32);
             gt_num_s4 = sum(idx_s4);
             this_pred_num = min(2*gt_num_s4, size(aboxes_s4{i}, 1));
             if this_pred_num ~= 0
@@ -143,7 +143,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
             else
                 rois_s4 = [];
             end
-            idx_s8 = (face_height>= 11) & (face_height< 128);%65
+            idx_s8 = (face_height>= 32) & (face_height< 300);%65
             gt_num_s8 = sum(idx_s8);
             this_pred_num = min(2*gt_num_s8, size(aboxes_s8{i}, 1));
             if this_pred_num ~= 0
@@ -151,7 +151,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
             else
                 rois_s8 = [];
             end
-            idx_s16 = (face_height>= 128); %65
+            idx_s16 = (face_height>= 300); %65
             gt_num_s16 = sum(idx_s16);
             this_pred_num = min(2*gt_num_s16, size(aboxes_s16{i}, 1));
             if this_pred_num ~= 0
