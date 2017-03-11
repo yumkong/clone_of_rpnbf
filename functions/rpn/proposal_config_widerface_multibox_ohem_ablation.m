@@ -29,7 +29,10 @@ function conf = proposal_config_widerface_multibox_ohem_ablation(varargin)
     % Images per batch, only supports ims_per_batch = 1 currently
     ip.addParamValue('ims_per_batch',   1,              @isscalar);
     % Minibatch size
-    ip.addParamValue('batch_size',      40,            @isscalar); %40/batch
+    %ip.addParamValue('batch_size',      40,            @isscalar); %40/batch
+    ip.addParamValue('batch_size_s4',      40,            @isscalar); %40/batch
+    ip.addParamValue('batch_size_s8',      40,            @isscalar); %40/batch
+    ip.addParamValue('batch_size_s16',     40,            @isscalar); %40/batch
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
     % weight of background samples, when weight of foreground samples is

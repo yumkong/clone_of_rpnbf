@@ -122,7 +122,7 @@ output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ablation_divanchor_ohem(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_multibox_ohem_ablation(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 % 1020: currently do not consider test
 nms_option_test = 3;
