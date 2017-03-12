@@ -189,15 +189,15 @@ function save_model_path = proposal_train_widerface_multibox_ohem_ablation(conf,
         %fprintf('Iter %d, Image %d, %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), sub_db_inds(3), 1/cost_time);
         fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds(1), 1/cost_time);
         fprintf('\n\t');
-        for kkk = [2 5 8 10 11]
+        for kkk = [1 4 7 10 11]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n\t');
-        for kkk = [3 6 9 12 13]
+        for kkk = [2 5 8 12 13]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n\t');  %print conv6
-        for kkk = [1 4 7 14 15]
+        for kkk = [3 6 9 14 15]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
         fprintf('\n');
