@@ -242,7 +242,8 @@ function max_rois_num = check_gpu_memory(conf, caffe_net)
 %%  try to determine the maximum number of rois
 
     max_rois_num = 0;
-    for rois_num = 500:500:5000
+    %for rois_num = 500:500:5000
+    for rois_num = 500:500:2000
         % generate pseudo testing data with max size
         im_blob = single(zeros(conf.max_size, conf.max_size, 3, 1));
         rois_blob = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
