@@ -1250,7 +1250,7 @@ layer {
   bottom: "bbox_targets_conv34"       #[1 28 28 28]
   bottom: "bbox_loss_weights_ohem_conv34"  #[1 28 28 28]
   top: "loss_bbox_conv34"
-  loss_weight: 16  #conv4: 5-->20-->80(1211)
+  loss_weight: 80  #conv4: 5-->20-->80(1211)
 }
 
 #-----------------------output2 (for conv5)------------------------
@@ -1520,5 +1520,5 @@ layer {
   bottom: "bbox_targets_conv6"       #[1 28 7 7]
   bottom: "bbox_loss_weights_ohem_conv6"  #[1 28 7 7]
   top: "loss_bbox_conv6"
-  loss_weight: 30 #5
+  loss_weight: 5
 }
