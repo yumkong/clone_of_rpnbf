@@ -10,9 +10,9 @@ model.feat_stride_s8                              = 8;
 model.feat_stride_s16                             = 16;
 
 %% stage 1 rpn, inited from pre-trained network
-%0302 note that solver_30k40k_final3, and test_final3 are the current best result!!!
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'final_models', 'solver_30k40k_final3.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'final_models', 'test_final3.prototxt');
+%0308: Currently nodivanchor and divanchor share the same prototxt
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'final_models', 'solver_30k40k_final3_nodivanchor_flip.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'final_models', 'test_final3_nodivanchor_flip.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting

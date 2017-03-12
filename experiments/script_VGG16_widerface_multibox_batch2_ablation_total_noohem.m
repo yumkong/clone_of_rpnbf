@@ -14,13 +14,13 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_bn'; %'caffe_faster_rcnn_win_cudnn_final'
+    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_newL1'; %'caffe_faster_rcnn_win_cudnn_bn'
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          ='caffe_faster_rcnn_bn'; %'caffe_faster_rcnn_dilate_ohem';
+    opts.caffe_version          = 'caffe_faster_rcnn_newL1'; %'caffe_faster_rcnn_bn'; 
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -102,7 +102,7 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal          = proposal_config_widerface_ablation_final('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
+conf_proposal          = proposal_config_widerface_ablation_total('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
                                                                     'feat_stride_s8', model.feat_stride_s8, 'feat_stride_s16', model.feat_stride_s16);
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
@@ -116,18 +116,18 @@ output_map_name = 'output_map_conv2';  % output_map_conv4, output_map_conv5
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_s4, conf_proposal.output_height_s4, ...
     conf_proposal.output_width_s8, conf_proposal.output_height_s8, ...
-    conf_proposal.output_width_s16, conf_proposal.output_height_s16] = proposal_calc_output_size_ablation_final(conf_proposal, ...
+    conf_proposal.output_width_s16, conf_proposal.output_height_s16] = proposal_calc_output_size_ablation_total(conf_proposal, ...
                                                                     model.stage1_rpn.test_net_def_file, output_map_save_name);
 % 1209: no need to change: same with all multibox
-[conf_proposal.anchors_s4,conf_proposal.anchors_s8, conf_proposal.anchors_s16] = proposal_generate_anchors_ablation_final(cache_data_this_model_dir, ...
-                         'ratios', [1], 'scales',  2.^[-1:4], 'add_size', [480]);  %[8 16 32 64 128 256 480]
+[conf_proposal.anchors_s4,conf_proposal.anchors_s8, conf_proposal.anchors_s16] = proposal_generate_anchors_ablation_total(cache_data_this_model_dir, ...
+                         'ratios', [1.25 0.8], 'scales',  2.^[-1:4], 'add_size', [480]);  %[8 16 32 64 128 256 480]
 %1009: from 7 to 12 anchors
 %1012: from 12 to 24 anchors
 %conf_proposal.anchors = proposal_generate_24anchors(cache_data_this_model_dir, 'scales', [10 16 24 32 48 64 90 128 180 256 360 512 720]);
         
 %%  train
 fprintf('\n***************\nstage one RPN \n***************\n');
-model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ablation_final(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
+model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_ablation_divanchor(conf_proposal, dataset, model.stage1_rpn, opts.do_val);
 
 % 1020: currently do not consider test
 nms_option_test = 3;
