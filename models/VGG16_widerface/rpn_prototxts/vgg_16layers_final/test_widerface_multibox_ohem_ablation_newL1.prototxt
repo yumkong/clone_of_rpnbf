@@ -402,34 +402,6 @@ layer {
 }
 # ===============end conv4 buffering===========================
 
-#-----------------------layer +-------------------------
-#layer {
-#   name: "conv_proposal1"
-#   type: "Convolution"
-#   bottom: "conv4_3_norm"
-#   top: "conv_proposal1"
-#	param {
-#		lr_mult: 1.0
-#	}
-#	param {
-#		lr_mult: 2.0
-#	}
-#   convolution_param{
-#	   num_output: 512
-#	   kernel_size: 3
-#	   pad: 1
-#	   stride: 1
-#	   weight_filler {
-#		 type: "gaussian"
-#		 std: 0.01
-#	   }
-#	   bias_filler {
-#		 type: "constant"
-#		 value: 0
-#	   }
-#  }
-#}
-
 layer {
     bottom: "conv3_buffer"
     bottom: "conv4_buffer"
@@ -460,7 +432,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 12   # 2(bg/fg) * 3(anchors) 
+	   num_output: 6   # 2(bg/fg) * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -487,7 +459,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 24	# 4 * 3(anchors) 
+	   num_output: 12	# 4 * 3(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -622,8 +594,8 @@ layer {
 	}
    convolution_param{
 	   num_output: 512
-	   kernel_size: 3
-	   pad: 1
+	   kernel_size: 1 #1216: 3-->1
+	   pad: 0
 	   stride: 1
 	   weight_filler {
 		 type: "gaussian"
@@ -757,7 +729,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 24   # 2(bg/fg) * 6(anchors) 
+	   num_output: 10   # 2(bg/fg) * 6(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -784,7 +756,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 48	# 4 * 6(anchors) 
+	   num_output: 20	# 4 * 6(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -923,8 +895,8 @@ layer {
    convolution_param{
 	   num_output: 512
 	   kernel_size: 3
-	   pad: 2 #1
-	   dilation: 2 #stride: 1
+	   pad: 4 #2
+	   dilation: 4 #2
 	   weight_filler {
 		 type: "gaussian"
 		 std: 0.01
@@ -951,8 +923,8 @@ layer {
    convolution_param{
 	   num_output: 512
 	   kernel_size: 3
-	   pad: 4 #1
-	   dilation: 4 #stride: 1
+	   pad: 8 #4
+	   dilation: 8 #4
 	   weight_filler {
 		 type: "gaussian"
 		 std: 0.01
@@ -1029,7 +1001,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 16   # 2(bg/fg) * 4(anchors) 
+	   num_output: 10   # 2(bg/fg) * 4(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
@@ -1056,7 +1028,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 32	# 4 * 4(anchors) 
+	   num_output: 20	# 4 * 4(anchors) 
 	   kernel_size: 1
 	   pad: 0
 	   stride: 1
