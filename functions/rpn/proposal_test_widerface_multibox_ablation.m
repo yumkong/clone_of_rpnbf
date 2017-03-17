@@ -82,7 +82,7 @@ function [aboxes_conv4, aboxes_conv5, aboxes_conv6] = proposal_test_widerface_mu
             im = imread(imdb.image_at(i));
 
             %[boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_multibox(conf, caffe_net, im);
-            [boxes_conv4, scores_conv4, boxes_conv5, scores_conv5, boxes_conv6, scores_conv6] = proposal_im_detect_multibox_happy(conf, caffe_net, im);
+            [boxes_conv4, scores_conv4, boxes_conv5, scores_conv5, boxes_conv6, scores_conv6] = proposal_im_detect_multibox_ablation(conf, caffe_net, im);
             %[boxes, scores] = proposal_im_detect_multibox(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th));  

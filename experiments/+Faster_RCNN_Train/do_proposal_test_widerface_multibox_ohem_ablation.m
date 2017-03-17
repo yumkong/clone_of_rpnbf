@@ -177,7 +177,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
             % segment statistics
             cnt = 0;
             % stride 4
-            for k = start_thresh:thresh_interval:11-1
+            for k = start_thresh:thresh_interval:32-1
                 cnt = cnt + 1;
                 part_idx = (face_height>= k) & (face_height < k + thresh_interval); % eg.:4~14
                 part_gts = gts(part_idx, :);
@@ -193,7 +193,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
                 end
             end
             %0226: stride 8 65-->128
-            for k = 11:thresh_interval:128-1
+            for k = 32:thresh_interval:299-1
                 cnt = cnt + 1;
                 part_idx = (face_height>= k) & (face_height < k + thresh_interval); % eg.:4~14
                 part_gts = gts(part_idx, :);
@@ -209,7 +209,7 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
                 end
             end
             %0226: stride 16 65-->128
-            for k = 128:thresh_interval:thresh_end
+            for k = 299:thresh_interval:thresh_end
                 cnt = cnt + 1;
                 part_idx = (face_height>= k) & (face_height < k + thresh_interval); % eg.:4~14
                 part_gts = gts(part_idx, :);
