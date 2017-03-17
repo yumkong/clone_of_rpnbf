@@ -186,7 +186,7 @@ function save_model_path = proposal_train_widerface_ablation_divanchor(conf, imd
 %         end
 %         fprintf('\n');
         % 0227 for batch 3
-        fprintf('Iter %d, Image %d, %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), sub_db_inds(3), 1/cost_time);
+        fprintf('Iter %d, Image %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), 1/cost_time);
         fprintf('\n\t');
         for kkk = [2 5 8 10 11]
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 

@@ -1504,7 +1504,7 @@ layer {
    bottom: "labels_ohem_conv6"
    bottom: "labels_weights_ohem_conv6"
    top: "loss_cls_conv6"
-   loss_weight: 0.5
+   loss_weight: 1
    loss_param {
         ignore_label: -1
    }
@@ -1520,5 +1520,5 @@ layer {
   bottom: "bbox_targets_conv6"       #[1 28 7 7]
   bottom: "bbox_loss_weights_ohem_conv6"  #[1 28 7 7]
   top: "loss_bbox_conv6"
-  loss_weight: 15 #5
+  loss_weight: 30 #5
 }

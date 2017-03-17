@@ -1,4 +1,4 @@
-function conf = proposal_config_widerface_ablation_divanchor(varargin)
+function conf = proposal_config_widerface_ablation_total(varargin)
 % conf = proposal_config_caltech(varargin)
 % --------------------------------------------------------
 % RPN_BF
@@ -27,13 +27,13 @@ function conf = proposal_config_widerface_ablation_divanchor(varargin)
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        800,           @isscalar); %512
     % Images per batch, only supports ims_per_batch = 1 currently
-    ip.addParamValue('ims_per_batch',   3,              @isscalar);%0312:6->3
+    ip.addParamValue('ims_per_batch',   2,              @isscalar);%0312:6->3
     % Minibatch size  0228: 360 (batch6) -> 240 (batch6)
     %0308 changed to divide 3 paths
     %ip.addParamValue('batch_size',      240,            @isscalar); %original 120,0122: 256(for 1 image)  --> 240 (for 3 images) 
-    ip.addParamValue('batch_size_s4',    96,            @isscalar); %0312: 96 (for 6 images) ->48 (for 3 images)
-    ip.addParamValue('batch_size_s8',    144,            @isscalar); %0312:144 (for 6 images) ->96 (for 3 images)
-    ip.addParamValue('batch_size_s16',   48,            @isscalar); %0312: 48 (for 6 images) -> 24 (for 3 images)
+    ip.addParamValue('batch_size_s4',    32,            @isscalar); %0312: 96 (for 6 images) ->48 (for 3 images)
+    ip.addParamValue('batch_size_s8',    64,            @isscalar); %0312:144 (for 6 images) ->96 (for 3 images)
+    ip.addParamValue('batch_size_s16',   16,            @isscalar); %0312: 48 (for 6 images) -> 24 (for 3 images)
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
     % weight of background samples, when weight of foreground samples is
