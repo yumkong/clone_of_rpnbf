@@ -65,7 +65,7 @@ function save_model_path = proposal_train_widerface_ablation_divanchor(conf, imd
     %caffe_solver.net.copy_from(opts.net_file);
     %0316 changed
     caffe_solver.net.copy_from(fullfile(pwd, 'output', 'VGG16_widerface_multibox_ablation_total_noohem', ...
-        'rpn_cachedir','rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_60000_1st'));
+        'rpn_cachedir','rpn_widerface_VGG16_stage1_rpn', 'WIDERFACE_train', 'iter_56000_2nd'));
     
     % init log
     timestamp = datestr(datevec(now()), 'yyyymmdd_HHMMSS');
