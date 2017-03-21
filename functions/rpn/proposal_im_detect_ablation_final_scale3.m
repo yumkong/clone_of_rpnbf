@@ -22,13 +22,13 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
     scores_s8_all = cell(1, numel(im_blob_all));
     pred_boxes_s16_all = cell(1, numel(im_blob_all));
     scores_s16_all = cell(1, numel(im_blob_all));
-    
+    unit_size = 1024; %2048
     for i = 1:numel(im_blob_all)
         %0124 send an individual image and scaled size here
         im_blob = im_blob_all{i};
         scaled_im_size = scaled_im_size_all(i,:);
         % 0124 added. treat small and medium size images as a whole
-        if (size(im_blob, 1) <= 1024) && (size(im_blob, 2) <= 1024)
+        if (size(im_blob, 1) <= unit_size) && (size(im_blob, 2) <= unit_size)
             % permute data into caffe c++ memory, thus [num, channels, height, width]
             im_blob = im_blob(:, :, [3, 2, 1], :); % from rgb to brg
             im_blob = permute(im_blob, [2, 1, 3, 4]);
@@ -233,8 +233,8 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
             wid_im = size(im_blob, 2);
             %hei_middle = round(hei_im/2);
             %wid_middle = round(wid_im/2);
-            h_part_num = ceil(hei_im / 1024);
-            w_part_num = ceil(wid_im / 1024);
+            h_part_num = ceil(hei_im / unit_size);
+            w_part_num = ceil(wid_im / unit_size);
             %hei_middle = ceil(hei_im/2/32)*32;
             %wid_middle = ceil(wid_im/2/32)*32;
             hei_middle = ceil(hei_im/h_part_num/32)*32;

@@ -53,7 +53,7 @@ function do_proposal_test_widerface_ablation_final_scale3(conf, model_stage, imd
 
     fprintf('score_threshold s4 = %f, s8 = %f , s16 = %f\n', score_thresh_s4, score_thresh_s8, score_thresh_s16);
     % drop the boxes which scores are lower than the threshold
-    show_image = true;
+    show_image = false;
     save_result = false;
     
     % 1122 added to save combined results of conv4 and conv5
