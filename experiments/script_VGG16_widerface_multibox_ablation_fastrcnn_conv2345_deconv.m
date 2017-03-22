@@ -1,4 +1,4 @@
-function script_VGG16_widerface_multibox_ablation_fastrcnn_conv2345()
+function script_VGG16_widerface_multibox_ablation_fastrcnn_conv2345_dec()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -37,7 +37,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_multibox_ablation_fastrcnn_conv2345(exp_name);
+model                       = Model.VGG16_for_multibox_ablation_fastrcnn_conv2345_deconv(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
