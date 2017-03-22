@@ -105,7 +105,8 @@ function do_proposal_test_widerface_ablation_final_scale3(conf, model_stage, imd
         
         %1006 added to do NPD-style nms
         time = tic;
-        aboxes_nms{i} = pseudoNMS_v8_twopath(aboxes{i}, nms_option);%4
+        %0321: pseudoNMS_v8_ablation == pseudoNMS_v8_twopath
+        aboxes_nms{i} = pseudoNMS_v8_ablation(aboxes{i}, nms_option);%4
         
         fprintf('PseudoNMS for image %d cost %.1f seconds\n', i, toc(time));
         
