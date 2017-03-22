@@ -25,6 +25,6 @@ model.stage1_rpn.nms.after_nms_topN_s16         = 50;%0304:300
 
 %stage 1 fast rcnn, inited from stage 1 rpn
 % *** 0306: solver_60k80k_stage2_final_tmp is temperarily used here
-model.stage1_fast_rcnn.solver_def_file          = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2','solver_60k80k_stage2_conv2345_normal.prototxt');
-model.stage1_fast_rcnn.test_net_def_file        = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2', 'test_stage2_conv2345_normal.prototxt');
+model.stage1_fast_rcnn.solver_def_file          = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2','solver_60k80k_stage2_conv2345_reddeconv.prototxt');
+model.stage1_fast_rcnn.test_net_def_file        = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2', 'test_stage2_conv2345_reddeconv.prototxt');
 end
