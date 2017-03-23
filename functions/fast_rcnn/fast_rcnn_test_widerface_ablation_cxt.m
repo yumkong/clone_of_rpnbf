@@ -249,8 +249,11 @@ function max_rois_num = check_gpu_memory(conf, caffe_net)
         im_blob = single(zeros(conf.max_size, conf.max_size, 3, 1));
         rois_blob = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
         rois_blob = permute(rois_blob, [3, 4, 1, 2]);
+		%0323 added
+		rois_cxt_blob = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
+        rois_cxt_blob = permute(rois_blob, [3, 4, 1, 2]);
 
-        net_inputs = {im_blob, rois_blob};
+        net_inputs = {im_blob, rois_blob, rois_cxt_blob};
 
         % Reshape net's input blobs
         caffe_net.reshape_as_input(net_inputs);
