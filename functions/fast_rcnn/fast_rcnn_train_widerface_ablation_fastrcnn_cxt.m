@@ -130,11 +130,11 @@ function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf,
         [shuffled_inds, sub_db_inds] = generate_random_minibatch(shuffled_inds, image_roidb_train, conf.ims_per_batch);
         %[im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob] = ...
         %    fast_rcnn_get_minibatch_batch2(conf, image_roidb_train(sub_db_inds));
-        [im_blob, rois_blob, labels_blob] = ...
-            fast_rcnn_get_minibatch_onlycls(conf, image_roidb_train(sub_db_inds));
+        [im_blob, rois_blob, rois_cxt_blob, labels_blob] = ...
+            fast_rcnn_get_minibatch_onlycls_cxt(conf, image_roidb_train(sub_db_inds));
 
         %net_inputs = {im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
-        net_inputs = {im_blob, rois_blob, labels_blob};
+        net_inputs = {im_blob, rois_blob,rois_cxt_blob, labels_blob};
         caffe_solver.net.reshape_as_input(net_inputs);
 
         % one iter SGD update
