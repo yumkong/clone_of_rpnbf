@@ -778,8 +778,8 @@ layer {
 }
 
 layer {
-    bottom: "concat_roi_feat_flat"
-	bottom: "concat_roi_cxt_feat_flat"
+    bottom: "concat_roi_feat"
+	bottom: "concat_roi_cxt_feat"
 	top: "concat_feat"
 	name: "concat_feat"
 	type: "Concat"
