@@ -17,13 +17,6 @@ input_dim: 1 # to be changed on-the-fly to num ROIs
 input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
 input_dim: 1
 input_dim: 1
-
-input: "labels"
-input_dim: 1 # to be changed on-the-fly to match num ROIs
-input_dim: 1
-input_dim: 1
-input_dim: 1
-
 layer {
 	bottom: "data"
 	top: "conv1_1"
@@ -410,46 +403,11 @@ layer {
 	type: "ReLU"
 }
 
-# dim reduce and relu
-layer {
-	name: "conv2_reduce"
-	bottom: "conv2_2"
-	top: "conv2_reduce"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 128
-		pad: 0
-		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
-	}
-}
-
-layer {
-	bottom: "conv2_reduce"
-	top: "conv2_reduce"
-	name: "relu_conv2_reduce"
-	type: "ReLU"
-}
-
 #0320 added normlization
 layer {
   name: "conv2_norm"
   type: "Normalize"
-  bottom: "conv2_reduce"
+  bottom: "conv2_2"
   top: "conv2_norm"
   norm_param {
     across_spatial: false
@@ -487,43 +445,8 @@ layer {
 	}
 }
 
-# dim reduce and relu
 layer {
-	name: "conv3_reduce"
-	bottom: "conv3_3"
-	top: "conv3_reduce"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 256
-		pad: 0
-		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
-	}
-}
-
-layer {
-	bottom: "conv3_reduce"
-	top: "conv3_reduce"
-	name: "relu_conv3_reduce"
-	type: "ReLU"
-}
-
-layer {
-  bottom: "conv3_reduce" 
+  bottom: "conv3_3" 
   top: "conv3_2x"
   name: "conv3_2x" 
   type: "Deconvolution"
@@ -581,51 +504,16 @@ layer {
 	}
 }
 
-# dim reduce and relu
 layer {
-	name: "conv4_reduce"
-	bottom: "conv4_3"
-	top: "conv4_reduce"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 256
-		pad: 0
-		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
-	}
-}
-
-layer {
-	bottom: "conv4_reduce"
-	top: "conv4_reduce"
-	name: "relu_conv4_reduce"
-	type: "ReLU"
-}
-
-layer {
-  bottom: "conv4_reduce" 
+  bottom: "conv4_3" 
   top: "conv4_2x"
   name: "conv4_2x" 
   type: "Deconvolution"
   convolution_param {
     kernel_size: 4 
     stride: 2
-    num_output: 256
-    group: 256
+    num_output: 512
+    group: 512
     pad: 1
     weight_filler: { type: "bilinear" } 
     bias_term: false
@@ -643,7 +531,7 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 16 #16
+      value: 22.6 #16
     }
     channel_shared: false
   }
@@ -675,51 +563,16 @@ layer {
 	}
 }
 
-# dim reduce and relu
 layer {
-	name: "conv5_reduce"
-	bottom: "conv5_3"
-	top: "conv5_reduce"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 256
-		pad: 0
-		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
-	}
-}
-
-layer {
-	bottom: "conv5_reduce"
-	top: "conv5_reduce"
-	name: "relu_conv5_reduce"
-	type: "ReLU"
-}
-
-layer {
-  bottom: "conv5_reduce" 
+  bottom: "conv5_3" 
   top: "conv5_2x"
   name: "conv5_2x" 
   type: "Deconvolution"
   convolution_param {
     kernel_size: 4 
     stride: 2
-    num_output: 256
-    group: 256
+    num_output: 512
+    group: 512
     pad: 1
     weight_filler: { type: "bilinear" } 
     bias_term: false
@@ -737,7 +590,7 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 16 #16
+      value: 22.6 #16
     }
     channel_shared: false
   }
@@ -778,7 +631,7 @@ layer {
 	name: "concat_roi_feat"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels-> 19200
+		axis: 1  #concat along channels-> 1408
 	}
 }
 
@@ -791,27 +644,83 @@ layer {
 	name: "concat_roi_cxt_feat"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels-> 19200
+		axis: 1  #concat along channels-> 1408
+	}
+}
+
+# 0323 added
+layer {
+	name: "conv_concat_self"
+	bottom: "concat_roi_feat"
+	top: "conv_concat_self"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 0
+		kernel_size: 1
 	}
 }
 
 layer {
-    bottom: "concat_roi_feat"
-	top: "concat_roi_feat_flat"
-	name: "concat_roi_feat_flat"
+	bottom: "conv_concat_self"
+	top: "conv_concat_self"
+	name: "relu_conv_concat_self"
+	type: "ReLU"
+}
+
+# 0323 added
+layer {
+	name: "conv_concat_cxt"
+	bottom: "concat_roi_cxt_feat"
+	top: "conv_concat_cxt"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 0
+		kernel_size: 1
+	}
+}
+
+layer {
+	bottom: "conv_concat_cxt"
+	top: "conv_concat_cxt"
+	name: "relu_conv_concat_cxt"
+	type: "ReLU"
+}
+
+layer {
+    bottom: "conv_concat_self"
+	top: "conv_concat_self_flat"
+	name: "conv_concat_self_flat"
 	type: "Flatten"
 }
 
 layer {
-    bottom: "concat_roi_cxt_feat"
-	top: "concat_roi_cxt_feat_flat"
-	name: "concat_roi_cxt_feat_flat"
+    bottom: "conv_concat_cxt"
+	top: "conv_concat_cxt_flat"
+	name: "conv_concat_cxt_flat"
 	type: "Flatten"
 }
 
 layer {
-    bottom: "concat_roi_feat_flat"
-	bottom: "concat_roi_cxt_feat_flat"
+    bottom: "conv_concat_self_flat"
+	bottom: "conv_concat_cxt_flat"
 	top: "concat_feat"
 	name: "concat_feat"
 	type: "Concat"
@@ -834,14 +743,6 @@ layer {
   }
   inner_product_param {
     num_output: 2048
-	weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 layer {
@@ -876,14 +777,6 @@ layer {
   }
   inner_product_param {
     num_output: 512  #1209: 4096-->1024
-	weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 layer {
@@ -920,14 +813,6 @@ layer {
   }
   inner_product_param {
     num_output: 128  
-	weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 layer {
@@ -974,23 +859,11 @@ layer {
   }
 }
 
-#0124 use the same output as faster rcnn does
-layer {
-	name: "loss_cls"
-	type: "SoftmaxWithLoss"
-	bottom: "cls_score"
-	bottom: "labels"
-	top: "loss_cls"
-	loss_param {
-        normalization: VALID
-   }
-	loss_weight: 1
-}
 
+# ============= output ===============
 layer {
-	name: "accuarcy"
-	type: "Accuracy"
-	bottom: "cls_score"
-	bottom: "labels"
-	top: "accuarcy"
+   name: "cls_prob"
+   type: "Softmax"
+   bottom: "cls_score"
+   top: "cls_prob"
 }
