@@ -49,7 +49,7 @@ function save_model_path = fast_rcnn_train_widerface_ablation_ohem(conf, imdb_tr
     caffe_solver = caffe.Solver(opts.solver_def_file);
     %0324 changed
     %caffe_solver.net.copy_from(opts.net_file);
-    caffe_solver.net.copy_from(fullfile(pwd, 'output','VGG16_widerface_multibox_ablation_final_fastrcnn','fast_rcnn_cachedir',...
+    caffe_solver.net.copy_from(fullfile(pwd, 'output',conf.exp_name,'fast_rcnn_cachedir',...
                                              'rpn_widerface_VGG16_stage1_fast_rcnn','WIDERFACE_train', 'iter_26000_1st'));
 
     % init log

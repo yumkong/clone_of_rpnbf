@@ -1,4 +1,4 @@
-function [im_blob, rois_blob,rois_cxt_blob, labels_blob] = fast_rcnn_get_minibatch_onlycls_cxt_ohem(conf, image_roidb)
+function [im_blob, rois_blob, labels_blob] = fast_rcnn_get_minibatch_onlycls_ohem(conf, image_roidb)
 % [im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_blob] ...
 %    = fast_rcnn_get_minibatch(conf, image_roidb)
 % --------------------------------------------------------
@@ -25,8 +25,6 @@ function [im_blob, rois_blob,rois_cxt_blob, labels_blob] = fast_rcnn_get_minibat
     
     % build the region of interest and label blobs
     rois_blob = zeros(0, 5, 'single');
-    %0322 added
-    rois_cxt_blob = zeros(0, 5, 'single');
     labels_blob = zeros(0, 1, 'single');
     
     for i = 1:num_images
@@ -35,14 +33,11 @@ function [im_blob, rois_blob,rois_cxt_blob, labels_blob] = fast_rcnn_get_minibat
         
         % Add to ROIs blob
         %1207: extend to [left, top, right, bottom] = [-0.5 -0.2 0.5 0.8]
-        [feat_rois, feat_cxt_rois] = fast_rcnn_map_im_rois_to_feat_rois_cxt(conf, im_rois, im_scales(i), image_roidb(i).im_size);
+        feat_rois = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scales(i), image_roidb(i).im_size);
         %feat_rois = fast_rcnn_map_im_rois_to_feat_rois(conf, im_rois, im_scales(i));
         batch_ind = i * ones(size(feat_rois, 1), 1);
         rois_blob_this_image = [batch_ind, feat_rois];
         rois_blob = [rois_blob; rois_blob_this_image];
-        
-        rois_cxt_blob_this_image = [batch_ind, feat_cxt_rois];
-        rois_cxt_blob = [rois_cxt_blob; rois_cxt_blob_this_image];
         
         % Add to labels, bbox targets, and bbox loss blobs
         labels_blob = [labels_blob; labels];
@@ -53,10 +48,6 @@ function [im_blob, rois_blob,rois_cxt_blob, labels_blob] = fast_rcnn_get_minibat
     im_blob = single(permute(im_blob, [2, 1, 3, 4]));
     rois_blob = rois_blob - 1; % to c's index (start from 0)
     rois_blob = single(permute(rois_blob, [3, 4, 2, 1]));
-    %0322 added
-    rois_cxt_blob = rois_cxt_blob - 1; % to c's index (start from 0)
-    rois_cxt_blob = single(permute(rois_cxt_blob, [3, 4, 2, 1]));
-    
     labels_blob = single(permute(labels_blob, [3, 4, 2, 1]));
     
     assert(~isempty(im_blob));
@@ -94,7 +85,6 @@ function [labels, overlaps, rois] = ...
     
     % Select foreground ROIs as those with >= FG_THRESH overlap
     fg_inds = find(overlaps >= conf.fg_thresh);
-    %0324 added to avoid too much fg rois
     if length(fg_inds) > 50
         fg_inds = fg_inds(randperm(length(fg_inds), 50));
     end
@@ -108,9 +98,8 @@ function [labels, overlaps, rois] = ...
     
     % Select background ROIs as those within [BG_THRESH_LO, BG_THRESH_HI)
     bg_inds = find(overlaps < conf.bg_thresh_hi & overlaps >= conf.bg_thresh_lo);
-    %0324 added to avoid too much bg rois
     if length(bg_inds) > 200
-        bg_inds = bg_inds(randperm(length(bg_inds), 200));
+        bg_inds = bg_inds(randperm(length(bg_inds), 250));
     end
     % Compute number of background ROIs to take from this image (guarding
     % against there being fewer than desired)

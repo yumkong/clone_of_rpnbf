@@ -96,7 +96,7 @@ function [labels, overlaps, rois] = ...
     fg_inds = find(overlaps >= conf.fg_thresh);
     %0324 added to avoid too much fg rois
     if length(fg_inds) > 50
-        fg_inds = fg_inds(randperm(length(fg_inds), 50));
+        fg_inds = fg_inds(randperm(length(fg_inds), 200));
     end
     % Guard against the case when an image has fewer than fg_rois_per_image
     % foreground ROIs
@@ -110,7 +110,7 @@ function [labels, overlaps, rois] = ...
     bg_inds = find(overlaps < conf.bg_thresh_hi & overlaps >= conf.bg_thresh_lo);
     %0324 added to avoid too much bg rois
     if length(bg_inds) > 200
-        bg_inds = bg_inds(randperm(length(bg_inds), 200));
+        bg_inds = bg_inds(randperm(length(bg_inds), 300));
     end
     % Compute number of background ROIs to take from this image (guarding
     % against there being fewer than desired)
