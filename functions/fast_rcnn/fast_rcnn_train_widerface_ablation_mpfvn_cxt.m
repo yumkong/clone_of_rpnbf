@@ -15,10 +15,10 @@ function save_model_path = fast_rcnn_train_widerface_ablation_mpfvn_cxt(conf, im
     ip.addParamValue('do_val',          true,          @isscalar);
     ip.addParamValue('imdb_val',        struct(),       @isstruct);
     ip.addParamValue('roidb_val',       struct(),       @isstruct);
-    ip.addParamValue('val_iters',       500,            @isscalar); %100
-    ip.addParamValue('val_interval',    2000,           @isscalar); %1000
+    ip.addParamValue('val_iters',       500,            @isscalar); %500
+    ip.addParamValue('val_interval',    1000,           @isscalar); %2000
     ip.addParamValue('snapshot_interval',...
-                                        2000,          @isscalar); %1000
+                                        1000,          @isscalar); %2000
     ip.addParamValue('solver_def_file', fullfile(pwd, 'models', 'Zeiler_conv5', 'solver.prototxt'), ...
                                                         @isstr);
     ip.addParamValue('net_file',        fullfile(pwd, 'models', 'Zeiler_conv5', 'Zeiler_conv5'), ...
@@ -147,7 +147,7 @@ function save_model_path = fast_rcnn_train_widerface_ablation_mpfvn_cxt(conf, im
         %rst = check_error(rst, caffe_solver);
         
         %format long
-        fprintf('Iter %d, Image %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), 1/cost_time);
+        fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds(1), 1/cost_time);
         for kkk = 1:length(rst)
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
@@ -174,7 +174,14 @@ function save_model_path = fast_rcnn_train_widerface_ablation_mpfvn_cxt(conf, im
                     caffe_solver.net.forward(net_inputs);
                     
                     rst = caffe_solver.net.get_output();
-                     val_results = parse_rst(val_results, rst);
+                    %0326 added for debug
+%                     bb = caffe_solver.net.blobs('cls_score').get_data(); 
+%                     bb = bb';
+%                     if (~isempty(bb)) && any(bb(:,1) <= bb(:,2))
+%                         fprintf('flip happens!!!\n');
+%                     end
+                    
+                    val_results = parse_rst(val_results, rst);
                 end
             end
             
