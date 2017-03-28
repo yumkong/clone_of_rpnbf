@@ -79,6 +79,7 @@ function [data_blob, rois_s4, rois_cxt_s4, rois_s8, rois_cxt_s8, rois_s16, rois_
         rois_s4 = [];
         rois_s8 = [];
         rois_s16 = [];
+        ind_inv = [];
     end
     if ~isempty(rois_s4)
         score_mask = cat(1, score_mask, ones(size(rois_s4, 1), 1));
