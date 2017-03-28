@@ -965,7 +965,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 2048
+    num_output: 512
   }
 }
 layer {
@@ -999,7 +999,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 2048  #1209: 4096-->1024
+    num_output: 512  #1209: 4096-->1024
   }
 }
 layer {

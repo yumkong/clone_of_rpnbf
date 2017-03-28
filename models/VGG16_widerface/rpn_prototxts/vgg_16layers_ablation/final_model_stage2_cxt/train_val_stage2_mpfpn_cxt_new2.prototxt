@@ -1006,7 +1006,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 2048
+    num_output: 512
 	weight_filler {
       type: "xavier"
     }
@@ -1047,7 +1047,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 2048  #0326: 512-->2048
+    num_output: 512  #0326: 512-->2048
 	weight_filler {
       type: "xavier"
     }
