@@ -7,7 +7,7 @@ function scores = fast_rcnn_im_detect_widerface_mpfvn(conf, caffe_net, im, boxes
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------
 
-    [im_blob, rois_s4, rois_cxt_s4, rois_s8, rois_cxt_s8, rois_s16, rois_cxt_s16, ~, score_mask, ind_inv] = get_blobs(conf, im, boxes);
+    [im_blob, rois_s4, rois_cxt_s4, rois_s8, rois_cxt_s8, rois_s16, rois_cxt_s16, ~, score_mask] = get_blobs(conf, im, boxes);
     
     % permute data into caffe c++ memory, thus [num, channels, height, width]
     im_blob = im_blob(:, :, [3, 2, 1], :); % from rgb to brg
@@ -50,8 +50,6 @@ function scores = fast_rcnn_im_detect_widerface_mpfvn(conf, caffe_net, im, boxes
         scores = scores(:, 2);
         %0326 added
         scores = scores(score_mask>0, :);
-        % reverse the original order
-        scores = scores(ind_inv, :);
     else
         scores = []; 
     end
