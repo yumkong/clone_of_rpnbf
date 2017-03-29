@@ -1,4 +1,4 @@
-function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt()
+function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt_ohem()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -15,13 +15,13 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_newL1'; %'caffe_faster_rcnn_win_cudnn_bn'
+    opts.caffe_version          = 'caffe_faster_rcnn_win_bn_plus'; % 'caffe_faster_rcnn_win_cudnn_bn';
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_newL1'; %'caffe_faster_rcnn_bn'; 
+    opts.caffe_version          = 'caffe_faster_rcnn_bn_plus'; %'caffe_faster_rcnn_bn';
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -37,7 +37,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_ablation_fastrcnn_mpfpn_cxt_friend1(exp_name);
+model                       = Model.VGG16_for_ablation_fastrcnn_mpfpn_cxt_ohem(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -52,7 +52,7 @@ mkdir_if_missing(cache_data_root);
 % ###3/5### CHANGE EACH TIME*** use this to name intermediate data's mat files
 model_name_base = 'VGG16_multibox_ablation';  % ZF, vgg16_conv5
 %1009 change exp here for output
-exp_name = 'VGG16_widerface_mpfpn_final_fastrcnn_new1';
+exp_name = 'VGG16_widerface_mpfpn_final_fastrcnn';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cachedir');
 mkdir_if_missing(cache_data_this_model_dir);
@@ -149,7 +149,7 @@ model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % ini
 %unshared
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 %0125 added: training with score feat map
-model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_ablation_mpfvn_cxt(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_ablation_mpfvn_ohem(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
 % test
 Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_mpfvn_cxt(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
 end
