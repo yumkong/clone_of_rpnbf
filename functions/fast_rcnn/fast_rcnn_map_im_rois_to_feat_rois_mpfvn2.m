@@ -61,16 +61,16 @@ function [outbox, outbox_cxt] = get_output_box(boxes, boxes_cxt, height, width)
     
     % 0322 added
     % ================== for contextual box
-    leftright_ratio = 1;  %1
+    leftright_ratio = 0.5;  %1
     boxes_width_change = (boxes_cxt(:,3)-boxes_cxt(:,1) + 1) * leftright_ratio;
     boxes_cxt(:,1) = round(boxes_cxt(:,1) - boxes_width_change);
     boxes_cxt(:,3) = round(boxes_cxt(:,3) + boxes_width_change);
     
-    top_ratio = 0;%0.2
+    top_ratio = 0.5;%0.2
     boxes_top_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * top_ratio;
     boxes_cxt(:,2) = round(boxes_cxt(:,2) - boxes_top_change);
     
-    bottom_ratio = 2; %2
+    bottom_ratio = 0.5; %2
     boxes_bottom_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * bottom_ratio;
     boxes_cxt(:,4) = round(boxes_cxt(:,4) + boxes_bottom_change);
     

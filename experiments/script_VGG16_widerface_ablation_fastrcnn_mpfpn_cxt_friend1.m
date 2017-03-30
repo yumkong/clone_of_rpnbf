@@ -1,4 +1,4 @@
-function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt()
+function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt_friend1()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
