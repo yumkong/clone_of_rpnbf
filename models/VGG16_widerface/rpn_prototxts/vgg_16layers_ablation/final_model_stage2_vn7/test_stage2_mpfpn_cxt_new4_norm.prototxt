@@ -45,11 +45,6 @@ input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
 input_dim: 1
 input_dim: 1
 
-input: "labels"
-input_dim: 3 # to be changed on-the-fly to match num ROIs
-input_dim: 1
-input_dim: 1
-input_dim: 1
 
 layer {
 	bottom: "data"
@@ -417,13 +412,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -559,13 +548,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -671,13 +654,7 @@ layer {
 		num_output: 1024
 		pad: 1
 		kernel_size: 3
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -705,13 +682,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -775,8 +746,8 @@ layer {
 	name: "roi_pool_conv23"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4
+		pooled_h: 4
 		spatial_scale: 0.25  #0325: stride 4
 	}
 }
@@ -798,13 +769,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -838,8 +803,8 @@ layer {
 	name: "roi_pool_cxt_conv23"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4
+		pooled_h: 4
 		spatial_scale: 0.25  #0325: stride 4
 	}
 }
@@ -861,13 +826,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -912,10 +871,26 @@ layer {
 	name: "roi_pool_conv345"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4
+		pooled_h: 4
 		spatial_scale: 0.125  #0325: stride 8
 	}
+}
+
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv345_norm"
+  type: "Normalize"
+  bottom: "roi_pool_conv345"
+  top: "roi_pool_conv345_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
 }
 
 layer {
@@ -925,15 +900,31 @@ layer {
 	name: "roi_pool_cxt_conv345"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4
+		pooled_h: 4
 		spatial_scale: 0.125  #0325: stride 8
 	}
 }
 
+#0325 normlize 3x3 roi feat
 layer {
-	bottom: "roi_pool_conv345"
-	bottom: "roi_pool_cxt_conv345"
+  name: "roi_pool_cxt_conv345_norm"
+  type: "Normalize"
+  bottom: "roi_pool_cxt_conv345"
+  top: "roi_pool_cxt_conv345_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "roi_pool_conv345_norm"
+	bottom: "roi_pool_cxt_conv345_norm"
 	top: "concat_roi_conv345"
 	type: "Concat"
 	concat_param {
@@ -949,10 +940,26 @@ layer {
 	name: "roi_pool_conv56"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4
+		pooled_h: 4
 		spatial_scale: 0.0625  #0325: stride 16
 	}
+}
+
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv56_norm"
+  type: "Normalize"
+  bottom: "roi_pool_conv56"
+  top: "roi_pool_conv56_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
 }
 
 layer {
@@ -962,15 +969,31 @@ layer {
 	name: "roi_pool_cxt_conv56"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3
-		pooled_h: 3
+		pooled_w: 4
+		pooled_h: 4
 		spatial_scale: 0.0625  #0325: stride 16
 	}
 }
 
+#0325 normlize 3x3 roi feat
 layer {
-	bottom: "roi_pool_conv56"
-	bottom: "roi_pool_cxt_conv56"
+  name: "roi_pool_cxt_conv56_norm"
+  type: "Normalize"
+  bottom: "roi_pool_cxt_conv56"
+  top: "roi_pool_cxt_conv56_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "roi_pool_conv56_norm"
+	bottom: "roi_pool_cxt_conv56_norm"
 	top: "concat_roi_conv56"
 	type: "Concat"
 	concat_param {
@@ -1008,13 +1031,6 @@ layer {
   }
   inner_product_param {
     num_output: 2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 layer {
@@ -1048,14 +1064,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 2048  #0326: 512-->2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+    num_output: 2048  #1209: 4096-->1024
   }
 }
 layer {
@@ -1064,7 +1073,6 @@ layer {
   bottom: "fc7"
   top: "fc7"
 }
-
 layer {
   name: "drop7"
   type: "Dropout"
@@ -1092,33 +1100,14 @@ layer {
   }
   inner_product_param {
     num_output: 2 #21
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 
-#0124 use the same output as faster rcnn does
-layer {
-	name: "loss_cls"
-	type: "SoftmaxWithLoss"
-	bottom: "cls_score"
-	bottom: "labels"
-	top: "loss_cls"
-	loss_param {
-        normalization: VALID
-   }
-	loss_weight: 1
-}
 
+# ============= output ===============
 layer {
-	name: "accuarcy"
-	type: "Accuracy"
-	bottom: "cls_score"
-	bottom: "labels"
-	top: "accuarcy"
+   name: "cls_prob"
+   type: "Softmax"
+   bottom: "cls_score"
+   top: "cls_prob"
 }
