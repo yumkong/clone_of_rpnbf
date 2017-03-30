@@ -45,6 +45,11 @@ input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
 input_dim: 1
 input_dim: 1
 
+input: "labels"
+input_dim: 3 # to be changed on-the-fly to match num ROIs
+input_dim: 1
+input_dim: 1
+input_dim: 1
 
 layer {
 	bottom: "data"
@@ -412,7 +417,13 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
 	}
 }
 
@@ -548,7 +559,13 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
 	}
 }
 
@@ -654,7 +671,13 @@ layer {
 		num_output: 1024
 		pad: 1
 		kernel_size: 3
-
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
 	}
 }
 
@@ -682,7 +705,13 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
 	}
 }
 
@@ -753,6 +782,56 @@ layer {
 }
 
 layer {
+	name: "conv_roi_pool_conv23"
+	bottom: "roi_pool_conv23"
+	top: "conv_roi_pool_conv23"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv_roi_pool_conv23"
+	top: "conv_roi_pool_conv23"
+	name: "relu_conv_roi_pool_conv23"
+	type: "ReLU"
+}
+
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv23_norm"
+  type: "Normalize"
+  bottom: "conv_roi_pool_conv23"
+  top: "roi_pool_conv23_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+layer {
 	bottom: "conv_proposal23_s4"
 	bottom: "rois_cxt_conv23"
 	top: "roi_pool_cxt_conv23"
@@ -766,8 +845,58 @@ layer {
 }
 
 layer {
-	bottom: "roi_pool_conv23"
+	name: "conv_roi_pool_cxt_conv23"
 	bottom: "roi_pool_cxt_conv23"
+	top: "conv_roi_pool_cxt_conv23"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv_roi_pool_cxt_conv23"
+	top: "conv_roi_pool_cxt_conv23"
+	name: "relu_conv_roi_pool_cxt_conv23"
+	type: "ReLU"
+}
+
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_cxt_conv23_norm"
+  type: "Normalize"
+  bottom: "conv_roi_pool_cxt_conv23"
+  top: "roi_pool_cxt_conv23_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "roi_pool_conv23_norm"
+	bottom: "roi_pool_cxt_conv23_norm"
 	top: "concat_roi_conv23"
 	type: "Concat"
 	concat_param {
@@ -789,6 +918,22 @@ layer {
 	}
 }
 
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv345_norm"
+  type: "Normalize"
+  bottom: "roi_pool_conv345"
+  top: "roi_pool_conv345_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
 layer {
 	bottom: "conv_proposal345_s8"
 	bottom: "rois_cxt_conv345"
@@ -802,9 +947,25 @@ layer {
 	}
 }
 
+#0325 normlize 3x3 roi feat
 layer {
-	bottom: "roi_pool_conv345"
-	bottom: "roi_pool_cxt_conv345"
+  name: "roi_pool_cxt_conv345_norm"
+  type: "Normalize"
+  bottom: "roi_pool_cxt_conv345"
+  top: "roi_pool_cxt_conv345_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "roi_pool_conv345_norm"
+	bottom: "roi_pool_cxt_conv345_norm"
 	top: "concat_roi_conv345"
 	type: "Concat"
 	concat_param {
@@ -826,6 +987,22 @@ layer {
 	}
 }
 
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv56_norm"
+  type: "Normalize"
+  bottom: "roi_pool_conv56"
+  top: "roi_pool_conv56_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
 layer {
 	bottom: "conv_proposal56_s16"
 	bottom: "rois_cxt_conv56"
@@ -839,9 +1016,25 @@ layer {
 	}
 }
 
+#0325 normlize 3x3 roi feat
 layer {
-	bottom: "roi_pool_conv56"
-	bottom: "roi_pool_cxt_conv56"
+  name: "roi_pool_cxt_conv56_norm"
+  type: "Normalize"
+  bottom: "roi_pool_cxt_conv56"
+  top: "roi_pool_cxt_conv56_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "roi_pool_conv56_norm"
+	bottom: "roi_pool_cxt_conv56_norm"
 	top: "concat_roi_conv56"
 	type: "Concat"
 	concat_param {
@@ -849,305 +1042,147 @@ layer {
 	}
 }
 
-#-----------------------output for s4------------------------
+# 0325: concat rois from conv23, conv456, conv56 together along the num channel
 layer {
-  name: "fc6_s4"
+	bottom: "concat_roi_conv23"
+	bottom: "concat_roi_conv345"
+	bottom: "concat_roi_conv56"
+	top: "concat_roi"
+	type: "Concat"
+	concat_param {
+		axis: 0  #along num channels
+	}
+}
+
+#-----------------------output for all------------------------
+layer {
+  name: "fc6"
   type: "InnerProduct"
-  bottom: "concat_roi_conv23"
-  top: "fc6_s4"
+  bottom: "concat_roi"
+  top: "fc6"
   param {
-    name: "fc6_w_s4"
+    name: "fc6_w"
     lr_mult: 1
     decay_mult: 1
   }
   param {
-    name: "fc6_b_s4"
+    name: "fc6_b"
     lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
     num_output: 2048
-
+	weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
-  name: "relu6_s4"
+  name: "relu6"
   type: "ReLU"
-  bottom: "fc6_s4"
-  top: "fc6_s4"
+  bottom: "fc6"
+  top: "fc6"
 }
 layer {
-  name: "drop6_s4"
+  name: "drop6"
   type: "Dropout"
-  bottom: "fc6_s4"
-  top: "fc6_s4"
+  bottom: "fc6"
+  top: "fc6"
   dropout_param {
     dropout_ratio: 0.5
   }
 }
 layer {
-  name: "fc7_s4"
+  name: "fc7"
   type: "InnerProduct"
-  bottom: "fc6_s4"
-  top: "fc7_s4"
+  bottom: "fc6"
+  top: "fc7"
   param {
-    name: "fc7_w_s4"
+    name: "fc7_w"
     lr_mult: 1
     decay_mult: 1
   }
   param {
-    name: "fc7_b_s4"
+    name: "fc7_b"
     lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
     num_output: 2048  #0326: 512-->2048
-
+	weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
-  name: "relu7_s4"
+  name: "relu7"
   type: "ReLU"
-  bottom: "fc7_s4"
-  top: "fc7_s4"
+  bottom: "fc7"
+  top: "fc7"
 }
 
 layer {
-  name: "drop7_s4"
+  name: "drop7"
   type: "Dropout"
-  bottom: "fc7_s4"
-  top: "fc7_s4"
+  bottom: "fc7"
+  top: "fc7"
   dropout_param {
     dropout_ratio: 0.5
   }
 }
 
 layer {
-  name: "cls_score_s4"
+  name: "cls_score"
   type: "InnerProduct"
-  bottom: "fc7_s4"
-  top: "cls_score_s4"
+  bottom: "fc7"
+  top: "cls_score"
   param {
-    name: "cls_score_w_s4"
+    name: "cls_score_w"
     lr_mult: 1
     decay_mult: 1
   }
   param {
-    name: "cls_score_b_s4"
+    name: "cls_score_b"
     lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
     num_output: 2 #21
-
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
-
-#-----------------------output for s8------------------------
+#0124 use the same output as faster rcnn does
 layer {
-  name: "fc6_s8"
-  type: "InnerProduct"
-  bottom: "concat_roi_conv345"
-  top: "fc6_s8"
-  param {
-    name: "fc6_w_s8"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc6_b_s8"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2048
-
-  }
-}
-layer {
-  name: "relu6_s8"
-  type: "ReLU"
-  bottom: "fc6_s8"
-  top: "fc6_s8"
-}
-layer {
-  name: "drop6_s8"
-  type: "Dropout"
-  bottom: "fc6_s8"
-  top: "fc6_s8"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  name: "fc7_s8"
-  type: "InnerProduct"
-  bottom: "fc6_s8"
-  top: "fc7_s8"
-  param {
-    name: "fc7_w_s8"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc7_b_s8"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2048  #0326: 512-->2048
-
-  }
-}
-layer {
-  name: "relu7_s8"
-  type: "ReLU"
-  bottom: "fc7_s8"
-  top: "fc7_s8"
+	name: "loss_cls"
+	type: "SoftmaxWithLoss"
+	bottom: "cls_score"
+	bottom: "labels"
+	top: "loss_cls"
+	loss_param {
+        normalization: VALID
+   }
+	loss_weight: 1
 }
 
 layer {
-  name: "drop7_s8"
-  type: "Dropout"
-  bottom: "fc7_s8"
-  top: "fc7_s8"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-
-layer {
-  name: "cls_score_s8"
-  type: "InnerProduct"
-  bottom: "fc7_s8"
-  top: "cls_score_s8"
-  param {
-    name: "cls_score_w_s8"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "cls_score_b_s8"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2 #21
-
-  }
-}
-
-
-#-----------------------output for s16------------------------
-layer {
-  name: "fc6_s16"
-  type: "InnerProduct"
-  bottom: "concat_roi_conv56"
-  top: "fc6_s16"
-  param {
-    name: "fc6_w_s16"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc6_b_s16"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2048
-  }
-}
-layer {
-  name: "relu6_s16"
-  type: "ReLU"
-  bottom: "fc6_s16"
-  top: "fc6_s16"
-}
-layer {
-  name: "drop6_s16"
-  type: "Dropout"
-  bottom: "fc6_s16"
-  top: "fc6_s16"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-layer {
-  name: "fc7_s16"
-  type: "InnerProduct"
-  bottom: "fc6_s16"
-  top: "fc7_s16"
-  param {
-    name: "fc7_w_s16"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc7_b_s16"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2048  #1209: 4096-->1024
-  }
-}
-layer {
-  name: "relu7_s16"
-  type: "ReLU"
-  bottom: "fc7_s16"
-  top: "fc7_s16"
-}
-layer {
-  name: "drop7_s16"
-  type: "Dropout"
-  bottom: "fc7_s16"
-  top: "fc7_s16"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-
-layer {
-  name: "cls_score_s16"
-  type: "InnerProduct"
-  bottom: "fc7_s16"
-  top: "cls_score_s16"
-  param {
-    name: "cls_score_w_s16"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "cls_score_b_s16"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2 #21
-  }
-}
-
-
-# ============= output ===============
-layer {
-   name: "cls_prob_s4"
-   type: "Softmax"
-   bottom: "cls_score_s4"
-   top: "cls_prob_s4"
-}
-
-layer {
-   name: "cls_prob_s8"
-   type: "Softmax"
-   bottom: "cls_score_s8"
-   top: "cls_prob_s8"
-}
-
-layer {
-   name: "cls_prob_s16"
-   type: "Softmax"
-   bottom: "cls_score_s16"
-   top: "cls_prob_s16"
+	name: "accuarcy"
+	type: "Accuracy"
+	bottom: "cls_score"
+	bottom: "labels"
+	top: "accuarcy"
 }
