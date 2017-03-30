@@ -828,3 +828,17 @@ For all scales: gt recall rate = 39885 / 69489 = 0.5740
 0321
 for mprpn all test res (on wider val 800x800 2sizes/image):
 For all scales: gt recall rate = 36882 / 55416 = 0.6655
+
+==============
+0329
+mpfpn_cxt (new4):
+rpn all scales: gt recall rate = 42547 / 69489 = 0.6123
+fastrcnn all scales: gt recall rate = 39980 / 69489 = 0.5753
+2rpn_1fastrcnn all scales: gt recall rate = 41633 / 69489 = 0.5991
+1rpn_1fastrcnn all scales: gt recall rate = 41380 / 69489 = 0.5955
+
+mpfpn_cxt_friend1 (new3):
+rpn all scales: gt recall rate = 39894 / 69489 = 0.5741
+fastrcnn all scales: gt recall rate = 38452 / 69489 = 0.5534
+2rpn_1fastrcnn all scales: gt recall rate = 39578 / 69489 = 0.5696
+1rpn_1fastrcnn all scales: gt recall rate = 39409 / 69489 = 0.5671
