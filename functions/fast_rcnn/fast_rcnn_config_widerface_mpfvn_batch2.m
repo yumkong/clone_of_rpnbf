@@ -19,12 +19,12 @@ function conf = fast_rcnn_config_widerface_mpfvn_batch2(varargin)
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        512,            @isscalar); %1000--1500--512
     % Images per batch
-    ip.addParamValue('ims_per_batch',  1,              @isscalar); %2-->1
+    ip.addParamValue('ims_per_batch',  2,              @isscalar); %2-->1
     % Minibatch size
     %ip.addParamValue('batch_size',      64,            @isscalar); %128-->160-->80(for 2 images)->64(2 images)
-    ip.addParamValue('batch_size_s4',    8,            @isscalar); %0325: 32 (for 2 images)
-    ip.addParamValue('batch_size_s8',    12,            @isscalar); %0325: 48 (for 2 images)
-    ip.addParamValue('batch_size_s16',   4,            @isscalar); %0325: 16 (for 2 images)
+    ip.addParamValue('batch_size_s4',    16,            @isscalar); %0325: 32 (for 2 images)
+    ip.addParamValue('batch_size_s8',    24,            @isscalar); %0325: 48 (for 2 images)
+    ip.addParamValue('batch_size_s16',   8,            @isscalar); %0325: 16 (for 2 images)
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0.25 0325 changed for more balanced training
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)

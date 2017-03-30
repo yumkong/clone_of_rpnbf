@@ -2,9 +2,9 @@ net: "./models/VGG16_widerface/rpn_prototxts/vgg_16layers_ablation/final_model_s
 base_lr: 0.0005  #0125: 0.001-->0.0001, just for fine-tuning 
 lr_policy: "step"
 gamma: 0.1
-stepsize: 6000 #12000(batch1)
+stepsize: 12000 #24000
 display: 20
-max_iter: 14000 #25000(batch1)
+max_iter: 30000 #30000
 momentum: 0.9
 weight_decay: 0.0005
 # We disable standard caffe solver snapshotting and implement our own snapshot
