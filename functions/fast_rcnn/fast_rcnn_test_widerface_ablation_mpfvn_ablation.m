@@ -166,13 +166,7 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation(conf, imdb, roid
                 [~, scores_ind] = sort(aboxes_new{i}(:,5), 'descend');
                 aboxes_new{i} = aboxes_new{i}(scores_ind, :);
             end
-            
-            % 0310: for 2rpn + 1fastrcnn
-            aboxes_2old_1new{i} = pseudoNMS_v8_twopath(aboxes_2old_1new{i}, 3);%nms_option=3
-            if ~isempty(aboxes_2old_1new{i})
-                [~, scores_ind] = sort(aboxes_2old_1new{i}(:,5), 'descend');
-                aboxes_2old_1new{i} = aboxes_2old_1new{i}(scores_ind, :);
-            end
+
             
             %0329 added
             aboxes_2old_1new_pno{i} = pseudoNMS_v8_twopath(aboxes_2old_1new_pno{i}, 3);%nms_option=3
