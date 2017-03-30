@@ -237,11 +237,7 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation(conf, imdb, roid
     
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_new, start_thresh,thresh_interval,thresh_end);
     save(fullfile(cache_dir,'recall_vector_fastrcnn.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
-    fprintf('fastrcnn all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
-    
-    [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_2old_1new, start_thresh,thresh_interval,thresh_end);
-    save(fullfile(cache_dir,'recall_vector_2rpn_1fastrcnn.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
-    fprintf('2rpn_1fastrcnn all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
+    fprintf('fastrcnn all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all
     
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_2old_1new_pno, start_thresh,thresh_interval,thresh_end);
     save(fullfile(cache_dir,'recall_vector_2rpn_1fastrcnn_pno.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
