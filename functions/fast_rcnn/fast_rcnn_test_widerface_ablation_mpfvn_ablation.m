@@ -40,8 +40,6 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation(conf, imdb, roid
         ld = load(save_file);%'aboxes_old', 'aboxes_new','score_ind_old', 'score_ind_new'
         aboxes_old = ld.aboxes_old;
         aboxes_new = ld.aboxes_new;
-        aboxes_2old_1new = ld.aboxes_2old_1new;
-        aboxes_1old_1new = ld.aboxes_1old_1new;
     catch    
 %%      testing 
         % init caffe net
@@ -166,7 +164,6 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation(conf, imdb, roid
                 [~, scores_ind] = sort(aboxes_new{i}(:,5), 'descend');
                 aboxes_new{i} = aboxes_new{i}(scores_ind, :);
             end
-
             
             %0329 added
             aboxes_2old_1new_pno{i} = pseudoNMS_v8_twopath(aboxes_2old_1new_pno{i}, 3);%nms_option=3
@@ -237,7 +234,7 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation(conf, imdb, roid
     
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_new, start_thresh,thresh_interval,thresh_end);
     save(fullfile(cache_dir,'recall_vector_fastrcnn.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
-    fprintf('fastrcnn all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all
+    fprintf('fastrcnn all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
     
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_2old_1new_pno, start_thresh,thresh_interval,thresh_end);
     save(fullfile(cache_dir,'recall_vector_2rpn_1fastrcnn_pno.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
