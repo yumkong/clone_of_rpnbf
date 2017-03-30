@@ -842,3 +842,15 @@ rpn all scales: gt recall rate = 39894 / 69489 = 0.5741
 fastrcnn all scales: gt recall rate = 38452 / 69489 = 0.5534
 2rpn_1fastrcnn all scales: gt recall rate = 39578 / 69489 = 0.5696
 1rpn_1fastrcnn all scales: gt recall rate = 39409 / 69489 = 0.5671
+
+mpfpn_cxt_friend1 (new6):
+rpn all scales: gt recall rate = 39894 / 69489 = 0.5741
+fastrcnn all scales: gt recall rate = 38743 / 69489 = 0.5575
+2rpn_1fastrcnn all scales: gt recall rate = 39646 / 69489 = 0.5705
+1rpn_1fastrcnn all scales: gt recall rate = 39496 / 69489 = 0.5684
+
+mpfpn_cxt_ohem_4x4 (new4_ohem)
+rpn all scales: gt recall rate = 39894 / 69489 = 0.5741
+fastrcnn all scales: gt recall rate = 38986 / 69489 = 0.5610
+2rpn_1fastrcnn all scales: gt recall rate = 39791 / 69489 = 0.5726
+1rpn_1fastrcnn all scales: gt recall rate = 39664 / 69489 = 0.5708
