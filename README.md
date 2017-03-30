@@ -854,3 +854,19 @@ rpn all scales: gt recall rate = 39894 / 69489 = 0.5741
 fastrcnn all scales: gt recall rate = 38986 / 69489 = 0.5610
 2rpn_1fastrcnn all scales: gt recall rate = 39791 / 69489 = 0.5726
 1rpn_1fastrcnn all scales: gt recall rate = 39664 / 69489 = 0.5708
+
+0330
+realmp
+rpn all scales: gt recall rate = 42527 / 69489 = 0.6120
+fastrcnn all scales: gt recall rate = 37404 / 69489 = 0.5383
+pno all scales: gt recall rate = 39930 / 69489 = 0.5746
+p9 all scales: gt recall rate = 45180 / 69489 = 0.6502
+p8 all scales: gt recall rate = 45176 / 69489 = 0.6501
+p7 all scales: gt recall rate = 45167 / 69489 = 0.6500
+p6 all scales: gt recall rate = 45107 / 69489 = 0.6491
+p5 all scales: gt recall rate = 45029 / 69489 = 0.6480
+p4 all scales: gt recall rate = 44959 / 69489 = 0.6470
+p3 all scales: gt recall rate = 44899 / 69489 = 0.6461
+p2 all scales: gt recall rate = 44829 / 69489 = 0.6451
+p1 all scales: gt recall rate = 44786 / 69489 = 0.6445
+
