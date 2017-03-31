@@ -123,9 +123,9 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation2(conf, imdb, roi
                 aboxes_2old_1new_p6{i} = [rpn_boxes (0.6*rpn_score+0.4*fastrcnn_score_p8)];
                 aboxes_2old_1new_p5{i} = [rpn_boxes (0.5*rpn_score+0.5*fastrcnn_score_p8)];
                 aboxes_2old_1new_p4{i} = [rpn_boxes (0.4*rpn_score+0.6*fastrcnn_score_p8)];
-                aboxes_2old_1new_p3{i} = [rpn_boxes (0.3*rpn_score+0.7*fastrcnn_score_p8)];
-                aboxes_2old_1new_p2{i} = [rpn_boxes (0.2*rpn_score+0.8*fastrcnn_score_p8)];
-                aboxes_2old_1new_p1{i} = [rpn_boxes (0.1*rpn_score+0.9*fastrcnn_score_p8)];
+                aboxes_2old_1new_p3{i} = [rpn_boxes (0.3*rpn_score+0.1*fastrcnn_score_p8)];
+                aboxes_2old_1new_p2{i} = [rpn_boxes (0.9*rpn_score+0.1*fastrcnn_score_p8)];
+                aboxes_2old_1new_p1{i} = [rpn_boxes (0.9*rpn_score+0.1*fastrcnn_score_p8)];
             else
                 aboxes_old{i} = [];
                 aboxes_new{i} = [];
@@ -155,6 +155,11 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation2(conf, imdb, roi
             end
             
             %0329 added
+            aboxes_2old_1new_pno{i} = pseudoNMS_v8_twopath(aboxes_2old_1new_pno{i}, 3);%nms_option=3
+            if ~isempty(aboxes_2old_1new_pno{i})
+                [~, scores_ind] = sort(aboxes_2old_1new_pno{i}(:,5), 'descend');
+                aboxes_2old_1new_pno{i} = aboxes_2old_1new_pno{i}(scores_ind, :);
+            end
             aboxes_2old_1new_p9{i} = pseudoNMS_v8_twopath(aboxes_2old_1new_p9{i}, 3);%nms_option=3
             if ~isempty(aboxes_2old_1new_p9{i})
                 [~, scores_ind] = sort(aboxes_2old_1new_p9{i}(:,5), 'descend');
@@ -219,6 +224,10 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation2(conf, imdb, roi
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_new, start_thresh,thresh_interval,thresh_end);
     save(fullfile(cache_dir,'recall_vector_fastrcnn.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
     fprintf('fastrcnn all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
+    
+    [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_2old_1new_pno, start_thresh,thresh_interval,thresh_end);
+    save(fullfile(cache_dir,'recall_vector_2rpn_1fastrcnn_pno.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
+    fprintf('pno all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
     
     [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes_2old_1new_p9, start_thresh,thresh_interval,thresh_end);
     save(fullfile(cache_dir,'recall_vector_2rpn_1fastrcnn_p9.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
