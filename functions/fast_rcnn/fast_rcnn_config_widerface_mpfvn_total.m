@@ -1,4 +1,4 @@
-function conf = fast_rcnn_config_widerface(varargin)
+function conf = fast_rcnn_config_widerface_mpfvn_total(varargin)
 % conf = fast_rcnn_config(varargin)
 % Fast R-CNN configuration
 % --------------------------------------------------------
@@ -22,9 +22,9 @@ function conf = fast_rcnn_config_widerface(varargin)
     ip.addParamValue('ims_per_batch',   1,              @isscalar); %2-->1
     % Minibatch size
     %ip.addParamValue('batch_size',      64,            @isscalar); %128-->160-->80(for 2 images)->64(2 images)
-    ip.addParamValue('batch_size_s4',    16,            @isscalar); %0325: 32 (for 2 images)
+    ip.addParamValue('batch_size_s4',    12,            @isscalar); %0325: 32 (for 2 images)
     ip.addParamValue('batch_size_s8',    24,            @isscalar); %0325: 48 (for 2 images)
-    ip.addParamValue('batch_size_s16',   8,            @isscalar); %0325: 16 (for 2 images)
+    ip.addParamValue('batch_size_s16',   6,            @isscalar); %0325: 16 (for 2 images)
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0.25 0325 changed for more balanced training
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)

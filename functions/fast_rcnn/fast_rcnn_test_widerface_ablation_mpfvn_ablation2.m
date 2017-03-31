@@ -117,15 +117,15 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_ablation2(conf, imdb, roi
             if ~isempty(rpn_boxes)
                 aboxes_old{i} = [rpn_boxes rpn_score];
                 aboxes_new{i} = [rpn_boxes fastrcnn_score_pno];
-                aboxes_2old_1new_p9{i} = [rpn_boxes (0.9*rpn_score+0.1*fastrcnn_score_p8)];
-                aboxes_2old_1new_p8{i} = [rpn_boxes (0.8*rpn_score+0.2*fastrcnn_score_p8)];
-                aboxes_2old_1new_p7{i} = [rpn_boxes (0.7*rpn_score+0.3*fastrcnn_score_p8)];
-                aboxes_2old_1new_p6{i} = [rpn_boxes (0.6*rpn_score+0.4*fastrcnn_score_p8)];
-                aboxes_2old_1new_p5{i} = [rpn_boxes (0.5*rpn_score+0.5*fastrcnn_score_p8)];
-                aboxes_2old_1new_p4{i} = [rpn_boxes (0.4*rpn_score+0.6*fastrcnn_score_p8)];
-                aboxes_2old_1new_p3{i} = [rpn_boxes (0.3*rpn_score+0.7*fastrcnn_score_p8)];
-                aboxes_2old_1new_p2{i} = [rpn_boxes (0.2*rpn_score+0.8*fastrcnn_score_p8)];
-                aboxes_2old_1new_p1{i} = [rpn_boxes (0.1*rpn_score+0.9*fastrcnn_score_p8)];
+                aboxes_2old_1new_p9{i} = [rpn_boxes (rpn_score+0.9*fastrcnn_score_p8)];
+                aboxes_2old_1new_p8{i} = [rpn_boxes (rpn_score+0.8*fastrcnn_score_p8)];
+                aboxes_2old_1new_p7{i} = [rpn_boxes (rpn_score+0.7*fastrcnn_score_p8)];
+                aboxes_2old_1new_p6{i} = [rpn_boxes (rpn_score+0.6*fastrcnn_score_p8)];
+                aboxes_2old_1new_p5{i} = [rpn_boxes (rpn_score+0.5*fastrcnn_score_p8)];
+                aboxes_2old_1new_p4{i} = [rpn_boxes (rpn_score+0.4*fastrcnn_score_p8)];
+                aboxes_2old_1new_p3{i} = [rpn_boxes (rpn_score+0.3*fastrcnn_score_p8)];
+                aboxes_2old_1new_p2{i} = [rpn_boxes (rpn_score+0.2*fastrcnn_score_p8)];
+                aboxes_2old_1new_p1{i} = [rpn_boxes (rpn_score+0.1*fastrcnn_score_p8)];
             else
                 aboxes_old{i} = [];
                 aboxes_new{i} = [];

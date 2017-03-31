@@ -108,7 +108,7 @@ conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_total('image_mean
 % generate anchors and pre-calculate output size of rpn network 
 
 conf_proposal.exp_name = exp_name;
-conf_fast_rcnn.exp_name = exp_name;
+%conf_fast_rcnn.exp_name = exp_name;
 %[conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                            = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
