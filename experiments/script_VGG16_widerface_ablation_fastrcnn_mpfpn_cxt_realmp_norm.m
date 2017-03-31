@@ -1,4 +1,4 @@
-function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt_friend1_vn7()
+function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt_realmp_norm()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -37,7 +37,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_ablation_fastrcnn_mpfpn_cxt_friend1_vn7(exp_name);
+model                       = Model.VGG16_for_ablation_fastrcnn_mpfpn_cxt_realmp_norm(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -106,7 +106,7 @@ end
 conf_proposal          = proposal_config_widerface_mpfvn('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
                                                                     'feat_stride_s8', model.feat_stride_s8, 'feat_stride_s16', model.feat_stride_s16);
 %conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn('image_means', model.mean_image);
-conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_batch2('image_means', model.mean_image);
+conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_batch1('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
 conf_proposal.exp_name = exp_name;
@@ -149,8 +149,7 @@ model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % ini
 %unshared
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 %0125 added: training with score feat map
-model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_ablation_mpfvn_cxt(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_ablation_mpfvn_cxt_realmp(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
 % test
-%Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_mpfvn_ablation(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
-Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_mpfvn_ablation2(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_mpfvn_cxt_realmp(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
 end
