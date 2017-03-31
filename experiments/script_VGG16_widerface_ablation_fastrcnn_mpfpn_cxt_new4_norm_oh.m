@@ -1,4 +1,4 @@
-function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt_new4_norm()
+function script_VGG16_widerface_ablation_fastrcnn_mpfpn_cxt_new4_norm_oh()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -15,13 +15,13 @@ run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
 %% -------------------- CONFIG --------------------
 %0930 change caffe folder according to platform
 if ispc
-    opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_newL1'; %'caffe_faster_rcnn_win_cudnn_bn'
+    opts.caffe_version          = 'caffe_faster_rcnn_win_bn_plus'; % 'caffe_faster_rcnn_win_cudnn_bn';
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_faster_rcnn_newL1'; %'caffe_faster_rcnn_bn'; 
+    opts.caffe_version          = 'caffe_faster_rcnn_bn_plus'; %'caffe_faster_rcnn_bn';
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = auto_select_gpu;
@@ -37,7 +37,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_ablation_fastrcnn_mpfpn_cxt_new4_norm(exp_name);
+model                       = Model.VGG16_for_ablation_fastrcnn_mpfpn_cxt_new4_norm_oh(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -106,7 +106,7 @@ end
 conf_proposal          = proposal_config_widerface_mpfvn('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
                                                                     'feat_stride_s8', model.feat_stride_s8, 'feat_stride_s16', model.feat_stride_s16);
 %conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn('image_means', model.mean_image);
-conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_batch2('image_means', model.mean_image);
+conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_batch1('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
 conf_proposal.exp_name = exp_name;

@@ -16,9 +16,9 @@ function save_model_path = fast_rcnn_train_widerface_ablation_mpfvn_cxt(conf, im
     ip.addParamValue('imdb_val',        struct(),       @isstruct);
     ip.addParamValue('roidb_val',       struct(),       @isstruct);
     ip.addParamValue('val_iters',       500,            @isscalar); %500
-    ip.addParamValue('val_interval',    1000,           @isscalar); %2000
+    ip.addParamValue('val_interval',    2000,           @isscalar); %2000
     ip.addParamValue('snapshot_interval',...
-                                        1000,          @isscalar); %2000
+                                        2000,          @isscalar); %2000
     ip.addParamValue('solver_def_file', fullfile(pwd, 'models', 'Zeiler_conv5', 'solver.prototxt'), ...
                                                         @isstr);
     ip.addParamValue('net_file',        fullfile(pwd, 'models', 'Zeiler_conv5', 'Zeiler_conv5'), ...

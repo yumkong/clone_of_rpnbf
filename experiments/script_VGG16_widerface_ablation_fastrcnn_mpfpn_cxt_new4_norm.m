@@ -106,7 +106,7 @@ end
 conf_proposal          = proposal_config_widerface_mpfvn('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
                                                                     'feat_stride_s8', model.feat_stride_s8, 'feat_stride_s16', model.feat_stride_s16);
 %conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn('image_means', model.mean_image);
-conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_batch2('image_means', model.mean_image);
+conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_batch1('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
 conf_proposal.exp_name = exp_name;
