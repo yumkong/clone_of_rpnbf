@@ -60,7 +60,8 @@ function mAP = fast_rcnn_test_widerface_ablation_cxt_0401(conf, imdb, roidb, var
         end             
 
         % determine the maximum number of rois in testing 
-        max_rois_num_in_gpu = check_gpu_memory(conf, caffe_net);
+        %max_rois_num_in_gpu = check_gpu_memory(conf, caffe_net);
+        max_rois_num_in_gpu = 1000;
 
         disp('opts:');
         disp(opts);
@@ -102,7 +103,7 @@ function mAP = fast_rcnn_test_widerface_ablation_cxt_0401(conf, imdb, roidb, var
                 rpn_score = rpn_score(1:max_rois_num_in_gpu, :);
             end
             %[boxes, scores] = fast_rcnn_im_detect_widerface_ablation(conf, caffe_net, im, d.boxes, max_rois_num_in_gpu);
-            fastrcnn_score = fast_rcnn_im_detect_widerface_ablation_cxt(conf, caffe_net, im, d.boxes, max_rois_num_in_gpu);
+            fastrcnn_score = fast_rcnn_im_detect_widerface_ablation_cxt(conf, caffe_net, im, rpn_boxes, max_rois_num_in_gpu);
 			fastrcnn_score_pno = fastrcnn_score;
             
             if ~isempty(rpn_boxes)
@@ -360,7 +361,7 @@ function max_rois_num = check_gpu_memory(conf, caffe_net)
     max_rois_num = 0;
     %for rois_num = 500:500:5000
     %for rois_num = 500:500:2000
-    for rois_num = 500:500:500  %0320 for conv2
+    for rois_num = 100:100:1000  %0320 for conv2
         % generate pseudo testing data with max size
         im_blob = single(zeros(conf.max_size, conf.max_size, 3, 1));
         rois_blob = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));

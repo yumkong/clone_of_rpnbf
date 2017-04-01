@@ -37,7 +37,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_ablation_fastrcnn_conv2345_deconv_cxt(exp_name);
+model                       = Model.VGG16_for_ablation_fastrcnn_common_0401(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
