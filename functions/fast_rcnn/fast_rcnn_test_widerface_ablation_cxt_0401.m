@@ -1,4 +1,4 @@
-function mAP = fast_rcnn_test_widerface_ablation_mpfvn_realmp2(conf, imdb, roidb, varargin)
+function mAP = fast_rcnn_test_widerface_ablation_cxt_0401(conf, imdb, roidb, varargin)
 % mAP = fast_rcnn_test(conf, imdb, roidb, varargin)
 % --------------------------------------------------------
 % Fast R-CNN
@@ -102,7 +102,7 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_realmp2(conf, imdb, roidb
                 rpn_score = rpn_score(1:max_rois_num_in_gpu, :);
             end
             %[boxes, scores] = fast_rcnn_im_detect_widerface_ablation(conf, caffe_net, im, d.boxes, max_rois_num_in_gpu);
-            fastrcnn_score = fast_rcnn_im_detect_widerface_mpfvn_realmp(conf, caffe_net, im, rpn_boxes);
+            fastrcnn_score = fast_rcnn_im_detect_widerface_ablation_cxt(conf, caffe_net, im, d.boxes, max_rois_num_in_gpu);
 			fastrcnn_score_pno = fastrcnn_score;
             
             if ~isempty(rpn_boxes)
@@ -141,15 +141,15 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_realmp2(conf, imdb, roidb
             aboxes_old{i} = [rpn_boxes rpn_score];
             aboxes_new{i} = [rpn_boxes fastrcnn_score];
             % 1 * rpn + 0.5 * fastrcnn_score is optimal by round 3&4
-            aboxes_v1{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*0.5];
-            aboxes_v2{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)];
-            aboxes_v3{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*1.5];
-            aboxes_v4{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*2];
-            aboxes_v5{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*4];
-            aboxes_v6{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*5];
-            aboxes_v7{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*6];
-            aboxes_v8{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*7];
-            aboxes_v9{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)*8];
+            aboxes_v1{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score)];
+            aboxes_v2{i} = [rpn_boxes (rpn_score + 0.2 * fastrcnn_score)];
+            aboxes_v3{i} = [rpn_boxes (rpn_score + 0.3 * fastrcnn_score)];
+            aboxes_v4{i} = [rpn_boxes (rpn_score + 0.4 * fastrcnn_score)];
+            aboxes_v5{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score)];
+            aboxes_v6{i} = [rpn_boxes (rpn_score + 0.6 * fastrcnn_score)];
+            aboxes_v7{i} = [rpn_boxes (rpn_score + 0.7 * fastrcnn_score)];
+            aboxes_v8{i} = [rpn_boxes (rpn_score + 0.8 * fastrcnn_score)];
+            aboxes_v9{i} = [rpn_boxes (rpn_score + 0.9 * fastrcnn_score)];
         else
             aboxes_old{i} = [];
             aboxes_new{i} = [];
@@ -225,8 +225,7 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn_realmp2(conf, imdb, roidb
             aboxes_v9{i} = aboxes_v9{i}(scores_ind, :);
         end
     end
-    
-    % 0206 added
+% 0206 added
     start_thresh = 5; %5
     thresh_interval = 3;%3
     thresh_end = 500; % 500
@@ -361,28 +360,16 @@ function max_rois_num = check_gpu_memory(conf, caffe_net)
     max_rois_num = 0;
     %for rois_num = 500:500:5000
     %for rois_num = 500:500:2000
-    for rois_num = 100:100:1000  %0320 for conv2
+    for rois_num = 500:500:500  %0320 for conv2
         % generate pseudo testing data with max size
         im_blob = single(zeros(conf.max_size, conf.max_size, 3, 1));
-        rois_blob_s4 = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
-        rois_blob_s4 = permute(rois_blob_s4, [3, 4, 1, 2]);
+        rois_blob = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
+        rois_blob = permute(rois_blob, [3, 4, 1, 2]);
 		%0323 added
-		rois_cxt_blob_s4 = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
-        rois_cxt_blob_s4 = permute(rois_cxt_blob_s4, [3, 4, 1, 2]);
-        
-        rois_blob_s8 = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
-        rois_blob_s8 = permute(rois_blob_s8, [3, 4, 1, 2]);
-		%0323 added
-		rois_cxt_blob_s8 = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
-        rois_cxt_blob_s8 = permute(rois_cxt_blob_s8, [3, 4, 1, 2]);
-        
-        rois_blob_s16 = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
-        rois_blob_s16 = permute(rois_blob_s16, [3, 4, 1, 2]);
-		%0323 added
-		rois_cxt_blob_s16 = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
-        rois_cxt_blob_s16 = permute(rois_cxt_blob_s16, [3, 4, 1, 2]);
+		rois_cxt_blob = single(repmat([0; 0; 0; conf.max_size-1; conf.max_size-1], 1, rois_num));
+        rois_cxt_blob = permute(rois_cxt_blob, [3, 4, 1, 2]);
 
-        net_inputs = {im_blob, rois_blob_s4, rois_cxt_blob_s4, rois_blob_s8, rois_cxt_blob_s8, rois_blob_s16, rois_cxt_blob_s16};
+        net_inputs = {im_blob, rois_blob, rois_cxt_blob};
 
         % Reshape net's input blobs
         caffe_net.reshape_as_input(net_inputs);
