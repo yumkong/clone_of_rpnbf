@@ -1,4 +1,4 @@
-function mAP = fast_rcnn_test_widerface_ablation_mpfvn(conf, imdb, roidb, varargin)
+function mAP = fast_rcnn_test_widerface_ablation_mpfvn_nocxt(conf, imdb, roidb, varargin)
 % mAP = fast_rcnn_test(conf, imdb, roidb, varargin)
 % --------------------------------------------------------
 % Fast R-CNN
@@ -103,7 +103,7 @@ function mAP = fast_rcnn_test_widerface_ablation_mpfvn(conf, imdb, roidb, vararg
                 rpn_score = rpn_score(1:max_rois_num_in_gpu, :);
             end
             %[boxes, scores] = fast_rcnn_im_detect_widerface_ablation(conf, caffe_net, im, d.boxes, max_rois_num_in_gpu);
-            fastrcnn_score = fast_rcnn_im_detect_widerface_mpfvn(conf, caffe_net, im, rpn_boxes);
+            fastrcnn_score = fast_rcnn_im_detect_widerface_mpfvn_nocxt(conf, caffe_net, im, rpn_boxes);
 			fastrcnn_score_pno = fastrcnn_score;
             
             if ~isempty(rpn_boxes)

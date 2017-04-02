@@ -1,4 +1,4 @@
-function model = VGG16_for_multibox_ablation_fastrcnn_singleconv_0401(exp_name, model)
+function model = VGG16_for_ablation_fastrcnn_mpfpn_new4_norm_nocxt(exp_name, model)
 
 
 model.mean_image                                = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'mean_image');
@@ -25,6 +25,7 @@ model.stage1_rpn.nms.after_nms_topN_s16         = 50;%0304:300
 
 %stage 1 fast rcnn, inited from stage 1 rpn
 % *** 0306: solver_60k80k_stage2_final_tmp is temperarily used here
-model.stage1_fast_rcnn.solver_def_file          = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2','solver_60k80k_stage2_conv2345_deconv.prototxt');
-model.stage1_fast_rcnn.test_net_def_file        = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2', 'test_stage2_conv2345_deconv.prototxt');
+%0328 new4.prototxt
+model.stage1_fast_rcnn.solver_def_file          = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2_vn7','solver_60k80k_stage2_mpfpn_cxt_new4_norm_onlycxt.prototxt');
+model.stage1_fast_rcnn.test_net_def_file        = fullfile(pwd, 'models', exp_name,'rpn_prototxts', 'vgg_16layers_ablation', 'final_model_stage2_vn7', 'test_stage2_mpfpn_cxt_new4_norm_onlycxt.prototxt');
 end
