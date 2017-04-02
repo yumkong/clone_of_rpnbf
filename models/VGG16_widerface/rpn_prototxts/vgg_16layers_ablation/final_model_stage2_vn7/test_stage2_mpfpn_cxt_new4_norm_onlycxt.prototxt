@@ -1,0 +1,951 @@
+name: "VGG_ILSVRC_16"
+
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 224
+input_dim: 224
+
+#for conv23
+input: "rois_conv23"
+input_dim: 1 # to be changed on-the-fly to num ROIs
+input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
+input_dim: 1
+input_dim: 1
+
+
+#for conv345
+input: "rois_conv345"
+input_dim: 1 # to be changed on-the-fly to num ROIs
+input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
+input_dim: 1
+input_dim: 1
+
+#for conv56
+input: "rois_conv56"
+input_dim: 1 # to be changed on-the-fly to num ROIs
+input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
+input_dim: 1
+input_dim: 1
+
+
+layer {
+	bottom: "data"
+	top: "conv1_1"
+	name: "conv1_1"
+	type: "Convolution"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_1"
+	name: "relu1_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_2"
+	name: "conv1_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "conv1_2"
+	name: "relu1_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "pool1"
+	name: "pool1"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool1"
+	top: "conv2_1"
+	name: "conv2_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_1"
+	name: "relu2_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_2"
+	name: "conv2_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "conv2_2"
+	name: "relu2_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "pool2"
+	name: "pool2"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+#0205 added norm layer
+layer {
+  name: "conv2_norm_s4"
+  type: "Normalize"
+  bottom: "pool2"
+  top: "conv2_norm_s4"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 12  #0205: 40-->12 
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "pool2"
+	top: "conv3_1"
+	name: "conv3_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_1"
+	name: "relu3_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_2"
+	name: "conv3_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_2"
+	name: "relu3_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_3"
+	name: "conv3_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_3"
+	top: "conv3_3"
+	name: "relu3_3"
+	type: "ReLU"
+}
+# ====================== stride 4 feature maps=======================
+#0205 added norm layer
+layer {
+  name: "conv3_norm_s4"
+  type: "Normalize"
+  bottom: "conv3_3"
+  top: "conv3_norm_s4"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16  #0205: 40-->16 
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+    bottom: "conv2_norm_s4"
+    bottom: "conv3_norm_s4"
+    top: "conv_proposal23_s4"
+    name: "conv_proposal23_s4"
+    type: "Concat"
+    concat_param {
+	axis: 1
+    }
+}
+# =============================================================
+
+# 0208: add a pooling layer to decimate resolution by 2
+layer {
+	bottom: "conv3_3"
+	top: "pool3"
+	name: "pool3"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+#0205 added norm layer (1/8 of the original spatial resolution)
+layer {
+  name: "conv3_norm_s8"
+  type: "Normalize"
+  bottom: "pool3"
+  top: "conv3_norm_s8"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16  #0205: 40-->16 
+    }
+    channel_shared: false
+  }
+}
+
+layer {
+	bottom: "pool3"
+	top: "conv4_1"
+	name: "conv4_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv4_1"
+	top: "conv4_1"
+	name: "relu4_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv4_1"
+	top: "conv4_2"
+	name: "conv4_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv4_2"
+	top: "conv4_2"
+	name: "relu4_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv4_2"
+	top: "conv4_3"
+	name: "conv4_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv4_3"
+	top: "conv4_3"
+	name: "relu4_3"
+	type: "ReLU"
+}
+
+# ============== for conv4 s8====================
+# dim reduce and relu
+layer {
+	name: "conv4_3_reduce"
+	bottom: "conv4_3"
+	top: "conv4_3_reduce"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+
+	}
+}
+
+layer {
+	bottom: "conv4_3_reduce"
+	top: "conv4_3_reduce"
+	name: "relu_conv4_3_reduce"
+	type: "ReLU"
+}
+
+#0208 delete deconv layer
+
+# normalize
+layer {
+  name: "conv4_norm_s8"
+  type: "Normalize"
+  bottom: "conv4_3_reduce"
+  top: "conv4_norm_s8"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16  #0207: 40-->16 
+    }
+    channel_shared: false
+  }
+}
+
+#====================for conv4 s16=============================
+# 0208: add a pooling layer to decimate resolution by 2
+layer {
+	bottom: "conv4_3"
+	top: "pool4"
+	name: "pool4"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool4"
+	top: "conv5_1"
+	name: "conv5_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv5_1"
+	top: "conv5_1"
+	name: "relu5_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv5_1"
+	top: "conv5_2"
+	name: "conv5_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv5_2"
+	top: "conv5_2"
+	name: "relu5_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv5_2"
+	top: "conv5_3"
+	name: "conv5_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv5_3"
+	top: "conv5_3"
+	name: "relu5_3"
+	type: "ReLU"
+}
+
+# dim reduce and relu
+layer {
+	name: "conv5_3_reduce"
+	bottom: "conv5_3"
+	top: "conv5_3_reduce"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+
+	}
+}
+
+layer {
+	bottom: "conv5_3_reduce"
+	top: "conv5_3_reduce"
+	name: "relu_conv5_3_reduce"
+	type: "ReLU"
+}
+
+# =============== proposal conv345 for stride 8 ======================
+#0208 change from deconv 4x to 2x
+layer {
+  bottom: "conv5_3_reduce" 
+  top: "conv5_3_2x"
+  name: "conv5_3_2x" 
+  type: "Deconvolution"
+  convolution_param {
+    kernel_size: 4 
+    stride: 2
+    num_output: 256
+    group: 256
+    pad: 1
+    weight_filler: { type: "bilinear" } 
+    bias_term: false
+  }
+  param { lr_mult: 0 decay_mult: 0 }
+}
+
+# normalize
+layer {
+  name: "conv5_norm_s8"
+  type: "Normalize"
+  bottom: "conv5_3_2x"
+  top: "conv5_norm_s8"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16  #0207: 40-->16 
+    }
+    channel_shared: false
+  }
+}
+
+#elemtwise addition of conv3_norm, conv4_norm and conv5_norm
+layer {
+  name: "eltwise_sum345"
+  type: "Eltwise"
+  bottom: "conv3_norm_s8"
+  bottom: "conv4_norm_s8"
+  bottom: "conv5_norm_s8"
+  top: "conv_proposal345_s8"
+  eltwise_param { operation: SUM }
+}
+# =============== end of proposal conv345 for stride 8 ======================
+
+#0208: remove deconv
+
+# normalize
+layer {
+  name: "conv5_norm_s16"
+  type: "Normalize"
+  bottom: "conv5_3_reduce"
+  top: "conv5_norm_s16"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16  #0207: 40-->16 
+    }
+    channel_shared: false
+  }
+}
+
+# -------------------- for conv6's -----------------------------
+layer {
+	bottom: "conv5_3"
+	top: "pool5"
+	name: "pool5"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	name: "conv6_1"
+	bottom: "pool5"
+	top: "conv6_1"	
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 1024
+		pad: 1
+		kernel_size: 3
+
+	}
+}
+
+layer {
+	bottom: "conv6_1"
+	top: "conv6_1"
+	name: "relu6_1"
+	type: "ReLU"
+}
+
+layer {
+	name: "conv6_reduce"
+	bottom: "conv6_1"
+	top: "conv6_reduce"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+
+	}
+}
+
+layer {
+	bottom: "conv6_reduce"
+	top: "conv6_reduce"
+	name: "relu_conv6_reduce"
+	type: "ReLU"
+}
+
+# deconv
+layer {
+  bottom: "conv6_reduce" 
+  top: "conv6_2x"
+  name: "conv6_2x" 
+  type: "Deconvolution"
+  convolution_param {
+    kernel_size: 4 
+    stride: 2
+    num_output: 256
+    group: 256
+    pad: 1
+    weight_filler: { type: "bilinear" } 
+    bias_term: false
+  }
+  param { lr_mult: 0 decay_mult: 0 }
+}
+
+# normalize
+layer {
+  name: "conv6_norm_s16"
+  type: "Normalize"
+  bottom: "conv6_2x"
+  top: "conv6_norm_s16"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16  #0207: 40-->16 
+    }
+    channel_shared: false
+  }
+}
+
+#elemtwise addition of conv5_norm and conv6_norm
+layer {
+  name: "eltwise_sum56"
+  type: "Eltwise"
+  bottom: "conv5_norm_s16"
+  bottom: "conv6_norm_s16"
+  top: "conv_proposal56_s16"
+  eltwise_param { operation: SUM }
+}
+
+# ----------------------layer for fast rcnn-----------------------------
+#-----------------------layer for s4-------------------------
+layer {
+	bottom: "conv_proposal23_s4"
+	bottom: "rois_conv23"
+	top: "roi_pool_conv23"
+	name: "roi_pool_conv23"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 4
+		pooled_h: 4
+		spatial_scale: 0.25  #0325: stride 4
+	}
+}
+
+layer {
+	name: "conv_roi_pool_conv23"
+	bottom: "roi_pool_conv23"
+	top: "conv_roi_pool_conv23"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 0
+		kernel_size: 1
+
+	}
+}
+
+layer {
+	bottom: "conv_roi_pool_conv23"
+	top: "conv_roi_pool_conv23"
+	name: "relu_conv_roi_pool_conv23"
+	type: "ReLU"
+}
+
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv23_norm"
+  type: "Normalize"
+  bottom: "conv_roi_pool_conv23"
+  top: "roi_pool_conv23_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+#-----------------------layer for s8-------------------------
+layer {
+	bottom: "conv_proposal345_s8"
+	bottom: "rois_conv345"
+	top: "roi_pool_conv345"
+	name: "roi_pool_conv345"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 4
+		pooled_h: 4
+		spatial_scale: 0.125  #0325: stride 8
+	}
+}
+
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv345_norm"
+  type: "Normalize"
+  bottom: "roi_pool_conv345"
+  top: "roi_pool_conv345_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+#-----------------------layer for s16-------------------------
+layer {
+	bottom: "conv_proposal56_s16"
+	bottom: "rois_conv56"
+	top: "roi_pool_conv56"
+	name: "roi_pool_conv56"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 4
+		pooled_h: 4
+		spatial_scale: 0.0625  #0325: stride 16
+	}
+}
+
+#0325 normlize 3x3 roi feat
+layer {
+  name: "roi_pool_conv56_norm"
+  type: "Normalize"
+  bottom: "roi_pool_conv56"
+  top: "roi_pool_conv56_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+
+# 0325: concat rois from conv23, conv456, conv56 together along the num channel
+layer {
+	bottom: "roi_pool_conv23_norm"
+	bottom: "roi_pool_conv345_norm"
+	bottom: "roi_pool_conv56_norm"
+	top: "concat_roi"
+	type: "Concat"
+	concat_param {
+		axis: 0  #along num channels
+	}
+}
+
+#-----------------------output for all------------------------
+layer {
+  name: "fc6"
+  type: "InnerProduct"
+  bottom: "concat_roi"
+  top: "fc6"
+  param {
+    name: "fc6_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc6_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 2048
+  }
+}
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "fc6"
+  top: "fc6"
+}
+layer {
+  name: "drop6"
+  type: "Dropout"
+  bottom: "fc6"
+  top: "fc6"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "fc7"
+  type: "InnerProduct"
+  bottom: "fc6"
+  top: "fc7"
+  param {
+    name: "fc7_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc7_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 2048  #1209: 4096-->1024
+  }
+}
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "drop7"
+  type: "Dropout"
+  bottom: "fc7"
+  top: "fc7"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+layer {
+  name: "cls_score"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "cls_score"
+  param {
+    name: "cls_score_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "cls_score_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 2 #21
+  }
+}
+
+
+# ============= output ===============
+layer {
+   name: "cls_prob"
+   type: "Softmax"
+   bottom: "cls_score"
+   top: "cls_prob"
+}
