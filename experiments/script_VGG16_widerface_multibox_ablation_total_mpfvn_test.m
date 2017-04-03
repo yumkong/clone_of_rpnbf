@@ -36,7 +36,7 @@ exp_name = 'VGG16_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.VGG16_for_multibox_batch2_ablation_total_test(exp_name);
+model                       = Model.VGG16_for_ablation_total_mpfvn_test(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -104,11 +104,11 @@ end
 % conf
 conf_proposal          = proposal_config_widerface_ablation_total('image_means', model.mean_image, 'feat_stride_s4', model.feat_stride_s4,...
                                                                     'feat_stride_s8', model.feat_stride_s8, 'feat_stride_s16', model.feat_stride_s16);
-%conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
+conf_fast_rcnn              = fast_rcnn_config_widerface_mpfvn_total('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
 conf_proposal.exp_name = exp_name;
-%conf_fast_rcnn.exp_name = exp_name;
+conf_fast_rcnn.exp_name = exp_name;
 %[conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                            = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
@@ -131,11 +131,29 @@ model.stage1_rpn            = Faster_RCNN_Train.do_proposal_train_widerface_abla
 
 % 1020: currently do not consider test
 nms_option_test = 3;
+
+% 1207: use rpn's result to update roidb_train and roidb_test
+%dataset.roidb_train         = cellfun(@(x, y) Faster_RCNN_Train.do_proposal_test_widerface_ablation_fastrcnn_flip(conf_proposal, model.stage1_rpn, x, y), ...
+%                                                                            dataset.imdb_train, dataset.roidb_train, 'UniformOutput', false);
+%dataset.roidb_test = Faster_RCNN_Train.do_proposal_test_widerface_ablation_fastrcnn_flip(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+
+% liu@0816 masked --> not necessary currently
+%%  fast rcnn train
+fprintf('\n***************\nstage one fast rcnn\n***************\n');
+% train
+%shared
+model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % init with trained rpn model
+%unshared
+%0106 use all test set for final evaluation: dataset.imdb_realtest
+%0125 added: training with score feat map
+model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_ablation_mpfvn_cxt(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
 % 0129: use full-size validation images instead of 512x512
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
 %Faster_RCNN_Train.do_proposal_test_widerface_ablation_final(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
-Faster_RCNN_Train.do_proposal_test_widerface_ablation_final_scale3(conf_proposal, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+%0402: use do_proposal_test_widerface_ablation_final_draw to see fp and fns
+
+Faster_RCNN_Train.do_proposal_test_widerface_ablation_final_mpfvn(conf_proposal,conf_fast_rcnn,  model.stage1_rpn,model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 
 %dataset                     = Dataset.widerface_all(dataset, 'realtest', false, event_num, cache_data_this_model_dir, model_name_base);
