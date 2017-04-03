@@ -1,4 +1,4 @@
-function scores = fast_rcnn_im_detect_widerface_mpfvn2(conf, caffe_net, im, boxes)
+function scores = fast_rcnn_im_detect_widerface_mpfvn_0402(conf, caffe_net, im, boxes)
 % [pred_boxes, scores] = fast_rcnn_im_detect(conf, caffe_net, im, boxes, max_rois_num_in_gpu)
 % --------------------------------------------------------
 % Fast R-CNN
@@ -105,9 +105,10 @@ function [data_blob, rois_s4, rois_cxt_s4, rois_s8, rois_cxt_s8, rois_s16, rois_
 end
 
 function [blob, im_scales] = get_image_blob(conf, im)
-    [ims, im_scales] = arrayfun(@(x) prep_im_for_blob(im, conf.image_means, x, conf.test_max_size), conf.test_scales, 'UniformOutput', false);
-    im_scales = cell2mat(im_scales);
-    blob = im_list_to_blob(ims);    
+    %[ims, im_scales] = arrayfun(@(x) prep_im_for_blob(im, conf.image_means, x, conf.test_max_size), conf.test_scales, 'UniformOutput', false);
+    [blob, im_scales] = prep_im_for_blob_keepsize(im, conf.image_means, 1, conf.min_test_length, conf.max_test_length);
+    %im_scales = cell2mat(im_scales);
+    %blob = im_list_to_blob(ims);    
 end
 
 function [rois_blob_s4, rois_cxt_blob_s4, rois_blob_s8, rois_cxt_blob_s8, rois_blob_s16, rois_cxt_blob_s16] = get_rois_blob(conf, ...
@@ -175,16 +176,16 @@ function [outbox, outbox_cxt] = get_output_box(boxes, boxes_cxt, height, width)
     
     % 0322 added
     % ================== for contextual box
-    leftright_ratio = 1;  %1
+    leftright_ratio = 0.5;  %1
     boxes_width_change = (boxes_cxt(:,3)-boxes_cxt(:,1) + 1) * leftright_ratio;
     boxes_cxt(:,1) = round(boxes_cxt(:,1) - boxes_width_change);
     boxes_cxt(:,3) = round(boxes_cxt(:,3) + boxes_width_change);
     
-    top_ratio = 0;%0
+    top_ratio = 0;%0.2
     boxes_top_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * top_ratio;
     boxes_cxt(:,2) = round(boxes_cxt(:,2) - boxes_top_change);
     
-    bottom_ratio = 2; %2
+    bottom_ratio = 1; %2
     boxes_bottom_change = (boxes_cxt(:,4)-boxes_cxt(:,2) + 1) * bottom_ratio;
     boxes_cxt(:,4) = round(boxes_cxt(:,4) + boxes_bottom_change);
     
