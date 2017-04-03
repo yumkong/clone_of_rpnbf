@@ -135,16 +135,16 @@ end
 
 function [outbox] = get_output_box(boxes, height, width)
 % ============================= for original box
-    leftright_ratio = 0.5;  %0
+    leftright_ratio = 0;  %1207: 1--> 0.5
     boxes_width_change = (boxes(:,3)-boxes(:,1) + 1) * leftright_ratio;
     boxes(:,1) = round(boxes(:,1) - boxes_width_change);
     boxes(:,3) = round(boxes(:,3) + boxes_width_change);
     
-    top_ratio = 0;%0
+    top_ratio = 0;
     boxes_top_change = (boxes(:,4)-boxes(:,2) + 1) * top_ratio;
     boxes(:,2) = round(boxes(:,2) - boxes_top_change);
     
-    bottom_ratio = 1; %0
+    bottom_ratio = 0; %1207: 1.8--> 0.8
     boxes_bottom_change = (boxes(:,4)-boxes(:,2) + 1) * bottom_ratio;
     boxes(:,4) = round(boxes(:,4) + boxes_bottom_change);
     
