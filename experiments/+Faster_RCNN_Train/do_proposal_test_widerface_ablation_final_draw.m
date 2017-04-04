@@ -1,4 +1,4 @@
-function do_proposal_test_widerface_ablation_final_mpfvn(conf, model_stage, imdb, roidb, nms_option)
+function do_proposal_test_widerface_ablation_final_draw(conf, model_stage, imdb, roidb, nms_option)
     % share the test with final3 for they have the same test network struct
     %[aboxes_res23, aboxes_res45]  = proposal_test_widerface_twopath_happy_flip(conf, imdb, ...
     %0129 added scale3 version
@@ -76,7 +76,7 @@ function do_proposal_test_widerface_ablation_final_mpfvn(conf, model_stage, imdb
         aboxes_s16{i} = aboxes_s16{i}(aboxes_s16{i}(:, end) > 0.99, :);%0.99
         aboxes{i} = cat(1, aboxes_s4{i}, aboxes_s8{i}, aboxes_s16{i});
         
-        if show_image
+        if 0 %show_image
             img = imread(imdb.image_at(i));  
             %draw before NMS
             bbs_conv4 = aboxes_s4{i};
@@ -130,10 +130,12 @@ function do_proposal_test_widerface_ablation_final_mpfvn(conf, model_stage, imdb
             if ~isempty(bbs_all)
                   bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
                   bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
-                  bbApply('draw',bbs_all,'g');
+                  %bbApply('draw',bbs_all,'g');
+                  bbApply_noscore('draw',bbs_all,'g');
             end
             if ~isempty(bbs_gt)
-              bbApply('draw',bbs_gt,'r');
+                %bbApply('draw',bbs_gt,'r');
+                bbApply_noscore('draw',bbs_gt,'r');
             end
             hold off
             % 1121: save result
