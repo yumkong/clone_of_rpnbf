@@ -147,7 +147,7 @@ function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn(conf, imd
         %rst = check_error(rst, caffe_solver);
         
         %format long
-        fprintf('Iter %d, Image %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), 1/cost_time);
+        fprintf('Iter %d, Image %d: %.1f Hz, ', iter_, sub_db_inds(1), 1/cost_time);
         for kkk = 1:length(rst)
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end
