@@ -1,4 +1,4 @@
-function script_VGG16_widerface_ablation_mpfvn_total_conv2345_test()
+function script_VGG16_widerface_ablation_mpfvn_total_conv2345_realtest()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
