@@ -45,23 +45,6 @@ input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
 input_dim: 1
 input_dim: 1
 
-input: "labels_s4"
-input_dim: 1 # to be changed on-the-fly to match num ROIs
-input_dim: 1
-input_dim: 1
-input_dim: 1
-
-input: "labels_s8"
-input_dim: 1 # to be changed on-the-fly to match num ROIs
-input_dim: 1
-input_dim: 1
-input_dim: 1
-
-input: "labels_s16"
-input_dim: 1 # to be changed on-the-fly to match num ROIs
-input_dim: 1
-input_dim: 1
-input_dim: 1
 
 layer {
 	bottom: "data"
@@ -429,13 +412,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -571,13 +548,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -683,13 +654,7 @@ layer {
 		num_output: 1024
 		pad: 1
 		kernel_size: 3
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -717,13 +682,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -810,13 +769,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+
 	}
 }
 
@@ -873,13 +826,7 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
+		
 	}
 }
 
@@ -993,8 +940,8 @@ layer {
 	name: "roi_pool_conv56"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 5 #4
-		pooled_h: 5 #4
+		pooled_w: 6 #4
+		pooled_h: 6 #4
 		spatial_scale: 0.0625  #0325: stride 16
 	}
 }
@@ -1022,8 +969,8 @@ layer {
 	name: "roi_pool_cxt_conv56"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 5 #4
-		pooled_h: 5 #4
+		pooled_w: 6 #4
+		pooled_h: 6 #4
 		spatial_scale: 0.0625  #0325: stride 16
 	}
 }
@@ -1071,14 +1018,8 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096 #2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+    num_output: 4096
+
   }
 }
 layer {
@@ -1112,14 +1053,8 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096 #2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+    num_output: 4096  #0326: 512-->2048
+
   }
 }
 layer {
@@ -1156,35 +1091,8 @@ layer {
   }
   inner_product_param {
     num_output: 2 #21
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+
   }
-}
-
-#0124 use the same output as faster rcnn does
-layer {
-	name: "loss_cls_s4"
-	type: "SoftmaxWithLoss"
-	bottom: "cls_score_s4"
-	bottom: "labels_s4"
-	top: "loss_cls_s4"
-	loss_param {
-        normalization: VALID
-   }
-	loss_weight: 1
-}
-
-layer {
-	name: "accuarcy_s4"
-	type: "Accuracy"
-	bottom: "cls_score_s4"
-	bottom: "labels_s4"
-	top: "accuarcy_s4"
 }
 
 
@@ -1205,14 +1113,8 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096 #2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+    num_output: 4096
+
   }
 }
 layer {
@@ -1246,14 +1148,8 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096 #2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+    num_output: 4096  #0326: 512-->2048
+
   }
 }
 layer {
@@ -1290,35 +1186,8 @@ layer {
   }
   inner_product_param {
     num_output: 2 #21
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+
   }
-}
-
-#0124 use the same output as faster rcnn does
-layer {
-	name: "loss_cls_s8"
-	type: "SoftmaxWithLoss"
-	bottom: "cls_score_s8"
-	bottom: "labels_s8"
-	top: "loss_cls_s8"
-	loss_param {
-        normalization: VALID
-   }
-	loss_weight: 1
-}
-
-layer {
-	name: "accuarcy_s8"
-	type: "Accuracy"
-	bottom: "cls_score_s8"
-	bottom: "labels_s8"
-	top: "accuarcy_s8"
 }
 
 
@@ -1339,14 +1208,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096 #2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+    num_output: 4096
   }
 }
 layer {
@@ -1380,14 +1242,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096 #2048
-	weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
+    num_output: 4096  #1209: 4096-->1024
   }
 }
 layer {
@@ -1396,7 +1251,6 @@ layer {
   bottom: "fc7_s16"
   top: "fc7_s16"
 }
-
 layer {
   name: "drop7_s16"
   type: "Dropout"
@@ -1424,33 +1278,28 @@ layer {
   }
   inner_product_param {
     num_output: 2 #21
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 
-#0124 use the same output as faster rcnn does
+
+# ============= output ===============
 layer {
-	name: "loss_cls_s16"
-	type: "SoftmaxWithLoss"
-	bottom: "cls_score_s16"
-	bottom: "labels_s16"
-	top: "loss_cls_s16"
-	loss_param {
-        normalization: VALID
-   }
-	loss_weight: 1
+   name: "cls_prob_s4"
+   type: "Softmax"
+   bottom: "cls_score_s4"
+   top: "cls_prob_s4"
 }
 
 layer {
-	name: "accuarcy_s16"
-	type: "Accuracy"
-	bottom: "cls_score_s16"
-	bottom: "labels_s16"
-	top: "accuarcy_s16"
+   name: "cls_prob_s8"
+   type: "Softmax"
+   bottom: "cls_score_s8"
+   top: "cls_prob_s8"
+}
+
+layer {
+   name: "cls_prob_s16"
+   type: "Softmax"
+   bottom: "cls_score_s16"
+   top: "cls_prob_s16"
 }
