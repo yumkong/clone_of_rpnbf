@@ -19,21 +19,21 @@ function [feat_rois_s4, feat_cxt_rois_s4, feat_rois_s8, feat_cxt_rois_s8, feat_r
     boxes = feat_rois_s4;
     %0322 added
     boxes_cxt = feat_rois_s4;
-    [feat_rois_s4, feat_cxt_rois_s4] = get_output_box(boxes, boxes_cxt, height, width, 1, 1, 1);
+    [feat_rois_s4, feat_cxt_rois_s4] = get_output_box(boxes, boxes_cxt, height, width, 1, 0.2, 2);
     
     % =======================================================for s8
     feat_rois_s8 = (im_rois_s8 - 1) * im_scale_factor + 1;
     boxes = feat_rois_s8;
     %0322 added
     boxes_cxt = feat_rois_s8;
-    [feat_rois_s8, feat_cxt_rois_s8] = get_output_box(boxes, boxes_cxt, height, width, 0.75, 0.75, 0.75);
+    [feat_rois_s8, feat_cxt_rois_s8] = get_output_box(boxes, boxes_cxt, height, width, 1, 0.2, 2);
     
     % =======================================================for s16
     feat_rois_s16 = (im_rois_s16 - 1) * im_scale_factor + 1;
     boxes = feat_rois_s16;
     %0322 added
     boxes_cxt = feat_rois_s16;
-    [feat_rois_s16, feat_cxt_rois_s16] = get_output_box(boxes, boxes_cxt, height, width, 0.5, 0.5, 0.5);
+    [feat_rois_s16, feat_cxt_rois_s16] = get_output_box(boxes, boxes_cxt, height, width, 1, 0.2, 2);
 
 end
 

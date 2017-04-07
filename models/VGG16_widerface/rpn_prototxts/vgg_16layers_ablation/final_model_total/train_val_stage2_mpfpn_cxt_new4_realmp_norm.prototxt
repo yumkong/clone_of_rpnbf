@@ -787,8 +787,8 @@ layer {
 	name: "roi_pool_conv23"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3 #4
-		pooled_h: 3 #4
+		pooled_w: 5 #4
+		pooled_h: 5 #4
 		spatial_scale: 0.25  #0325: stride 4
 	}
 }
@@ -850,8 +850,8 @@ layer {
 	name: "roi_pool_cxt_conv23"
 	type: "ROIPooling"
 	roi_pooling_param {
-		pooled_w: 3 #4
-		pooled_h: 3 #4
+		pooled_w: 5 #4
+		pooled_h: 5 #4
 		spatial_scale: 0.25  #0325: stride 4
 	}
 }

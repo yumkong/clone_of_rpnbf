@@ -142,15 +142,15 @@ function [feat_rois_s4, feat_rois_cxt_s4,feat_rois_s8, feat_rois_cxt_s8,feat_roi
     
     boxes = feat_rois_s4;
     boxes_cxt = feat_rois_s4;
-    [feat_rois_s4, feat_rois_cxt_s4] = get_output_box(boxes, boxes_cxt, height, width, 1, 1, 1);
+    [feat_rois_s4, feat_rois_cxt_s4] = get_output_box(boxes, boxes_cxt, height, width, 1, 0.2, 2);
     
     boxes = feat_rois_s8;
     boxes_cxt = feat_rois_s8;
-    [feat_rois_s8, feat_rois_cxt_s8] = get_output_box(boxes, boxes_cxt, height, width, 0.75, 0.75, 0.75);
+    [feat_rois_s8, feat_rois_cxt_s8] = get_output_box(boxes, boxes_cxt, height, width, 1, 0.2, 2);
     
     boxes = feat_rois_s16;
     boxes_cxt = feat_rois_s16;
-    [feat_rois_s16, feat_rois_cxt_s16] = get_output_box(boxes, boxes_cxt, height, width, 0.5, 0.5, 0.5);
+    [feat_rois_s16, feat_rois_cxt_s16] = get_output_box(boxes, boxes_cxt, height, width, 1, 0.2, 2);
 end
 
 function [outbox, outbox_cxt] = get_output_box(boxes, boxes_cxt, height, width, lr_rto, top_rto, bot_rto)
