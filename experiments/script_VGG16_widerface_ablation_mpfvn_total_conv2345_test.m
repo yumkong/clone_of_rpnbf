@@ -154,6 +154,7 @@ dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, 
 %0402: use do_proposal_test_widerface_ablation_final_draw to see fp and fns
 % test
 %Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_fastrcnn(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+%0404: local norm use: do_proposal_test_widerface_ablation_total_2345_localnorm
 Faster_RCNN_Train.do_proposal_test_widerface_ablation_total_2345(conf_proposal,conf_fast_rcnn,  model.stage1_rpn,model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 
