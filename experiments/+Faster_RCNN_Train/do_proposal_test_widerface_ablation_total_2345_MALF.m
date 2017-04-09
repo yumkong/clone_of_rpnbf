@@ -223,12 +223,12 @@ function do_proposal_test_widerface_ablation_total_2345_MALF(conf,conf_fast_rcnn
         %0409 added
         numFaces = size(bbs_all, 1);
         %fprintf(fout, '%s\n%d\n', fileList{i}, numFaces);
-        fprintf(fout, '%s\n%d\n', sprintf('%04d.jpg', i), numFaces);
+        %fprintf(fout, '%s\n%d\n', sprintf('%04d.jpg', i), numFaces);
         %fprintf(fid1, '%d\n', size(bbs_all, 1));
         if ~isempty(bbs_all)
             for j = 1:numFaces
                 %each row: [x1 y1 w h score]
-                fprintf(fout, '%d %d %d %d %f\n', round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
+                fprintf(fout, '%s %d %d %d %d %f\n', sprintf('%04d.jpg', i), round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
             end
         end
 
