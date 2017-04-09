@@ -22,7 +22,7 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
     scores_s8_all = cell(1, numel(im_blob_all));
     pred_boxes_s16_all = cell(1, numel(im_blob_all));
     scores_s16_all = cell(1, numel(im_blob_all));
-    unit_size = 1024; %2048
+    unit_size = 1504; %2048 1024
     for i = 1:numel(im_blob_all)
         %0124 send an individual image and scaled size here
         im_blob = im_blob_all{i};
