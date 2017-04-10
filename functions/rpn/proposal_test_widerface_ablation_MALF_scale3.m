@@ -109,7 +109,7 @@ function [aboxes_s4, aboxes_s8, aboxes_s16] = proposal_test_widerface_ablation_M
             im = imread(imgFile);
 
             %[boxes, scores, abox_deltas{i}, aanchors{i}, ascores{i}] = proposal_im_detect_multibox(conf, caffe_net, im);
-            [boxes_s4, scores_s4, boxes_s8, scores_s8, boxes_s16, scores_s16] = proposal_im_detect_ablation_final_scale3(conf, caffe_net, im);
+            [boxes_s4, scores_s4, boxes_s8, scores_s8, boxes_s16, scores_s16] = proposal_im_detect_ablation_final_scale3_MALF(conf, caffe_net, im);
             %[boxes, scores] = proposal_im_detect_multibox(conf, caffe_net, im);
             
             fprintf(' time: %.3fs\n', toc(th)); 
