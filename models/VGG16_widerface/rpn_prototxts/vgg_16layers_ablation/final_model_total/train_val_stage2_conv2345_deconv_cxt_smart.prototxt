@@ -629,18 +629,18 @@ layer {
 	}
 }
 
-layer {
-	bottom: "roi_pool2"
-	bottom: "roi_pool3"
-	bottom: "roi_pool4_3"
-	bottom: "roi_pool5_3"
-	top: "concat_roi_face"
-	name: "concat_roi_face"
-	type: "Concat"
-	concat_param {
-		axis: 1  #concat along channels: 128+256+512+512=1408
-	}
-}
+#layer {
+#	bottom: "roi_pool2"
+#	bottom: "roi_pool3"
+#	bottom: "roi_pool4_3"
+#	bottom: "roi_pool5_3"
+#	top: "concat_roi_face"
+#	name: "concat_roi_face"
+#	type: "Concat"
+#	concat_param {
+#		axis: 1  #concat along channels: 128+256+512+512=1408
+#	}
+#}
 
 layer {
 	bottom: "roi_pool2_cxt"
@@ -707,9 +707,23 @@ layer {
 }
 
 layer {
+	bottom: "roi_pool2"
+	bottom: "roi_pool3"
+	bottom: "roi_pool4_3"
+	bottom: "roi_pool5_3"
+	bottom: "cxt_norm"
+	top: "concat_roi_overall"
+	name: "concat_roi_overall"
+	type: "Concat"
+	concat_param {
+		axis: 1  #concat along channels: face 1408 + cxt 256= 1664
+	}
+}
+
+layer {
   name: "fc6"
   type: "InnerProduct"
-  bottom: "conv_concat_self"  #"concat_roi_feat"
+  bottom: "concat_roi_overall" #"conv_concat_self"
   top: "fc6"
   param {
     name: "fc6_w"

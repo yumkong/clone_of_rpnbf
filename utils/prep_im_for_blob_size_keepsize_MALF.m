@@ -23,6 +23,7 @@ function im_scale = prep_im_for_blob_size_keepsize_MALF(im_size, input_scale, mi
     end
     %0410 added
     if im_size(1)*im_size(2)*im_scale*im_scale > 9e5
-        im_scale = im_scale * 0.9;
+        %im_scale = im_scale * 0.9;
+        im_scale = im_scale * sqrt(9e5/im_size(1)/im_size(2)/im_scale/im_scale);
     end
 end
