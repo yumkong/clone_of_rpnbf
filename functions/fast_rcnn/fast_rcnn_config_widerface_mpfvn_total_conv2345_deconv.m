@@ -17,7 +17,7 @@ function conf = fast_rcnn_config_widerface_mpfvn_total_conv2345_deconv(varargin)
     % Image scales -- the short edge of input image       
     % 0123 added for min and max test image size
     ip.addParamValue('min_test_length', 100,           @isscalar);%64
-    ip.addParamValue('max_test_length', 1600,           @isscalar); %3008
+    ip.addParamValue('max_test_length', 1120,           @isscalar); %1600
     ip.addParamValue('scales',          800,            @ismatrix); %600
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        800,           @isscalar);  %1000

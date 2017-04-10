@@ -14,7 +14,11 @@ model.feat_stride_s16                             = 16;
 model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'final_models', 'solver_30k40k_final3_nodivanchor_flip.prototxt'); 
 model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_16layers_ablation', 'final_models', 'test_final3_nodivanchor_flip.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
-model.stage1_rpn.data_dir                       = fullfile(pwd, '..', 'datasets', 'MALF');
+if ispc
+    model.stage1_rpn.data_dir                       = fullfile(pwd, '..', 'datasets', 'MALF');
+elseif isunix
+    model.stage1_rpn.data_dir                       = '/usr/local/data/yuguang/dataset/MALF';
+end
 
 % rpn test setting
 % 0224: same settings for conv3 4 and 5
