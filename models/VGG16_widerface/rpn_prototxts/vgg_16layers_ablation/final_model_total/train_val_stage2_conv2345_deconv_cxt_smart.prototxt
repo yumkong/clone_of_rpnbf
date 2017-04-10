@@ -634,23 +634,32 @@ layer {
 	bottom: "roi_pool3"
 	bottom: "roi_pool4_3"
 	bottom: "roi_pool5_3"
+	top: "concat_roi_face"
+	name: "concat_roi_face"
+	type: "Concat"
+	concat_param {
+		axis: 1  #concat along channels: 128+256+512+512=1408
+	}
+}
+
+layer {
 	bottom: "roi_pool2_cxt"
 	bottom: "roi_pool3_cxt"
 	bottom: "roi_pool4_cxt"
 	bottom: "roi_pool5_cxt"
-	top: "concat_roi_feat"
-	name: "concat_roi_feat"
+	top: "concat_roi_cxt"
+	name: "concat_roi_cxt"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels=2716
+		axis: 1  #concat along channels: 128+256+512+512=1408
 	}
 }
 
 # 0323 added
 layer {
-	name: "conv_concat_self"
-	bottom: "concat_roi_feat"
-	top: "conv_concat_self"
+	name: "conv_concat_cxt"
+	bottom: "concat_roi_cxt"
+	top: "conv_concat_cxt"
 	param {
 		lr_mult: 1.0
 		decay_mult: 1.0
@@ -661,7 +670,7 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 1024
+		num_output: 256
 		pad: 0
 		kernel_size: 1
 		weight_filler {
@@ -675,10 +684,26 @@ layer {
 }
 
 layer {
-	bottom: "conv_concat_self"
-	top: "conv_concat_self"
-	name: "relu_conv_concat_self"
+	bottom: "conv_concat_cxt"
+	top: "conv_concat_cxt"
+	name: "relu_conv_concat_cxt"
 	type: "ReLU"
+}
+
+#1207 added normlization
+layer {
+  name: "cxt_norm"
+  type: "Normalize"
+  bottom: "conv_concat_cxt"
+  top: "cxt_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
 }
 
 layer {

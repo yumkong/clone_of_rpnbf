@@ -580,7 +580,7 @@ layer {
 	name: "concat_roi_feat"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels-> 19200
+		axis: 1  #concat along channels: 128+256+512+512=1408
 	}
 }
 
