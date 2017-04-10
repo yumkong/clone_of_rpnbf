@@ -143,7 +143,7 @@ function do_proposal_test_widerface_ablation_total_2345_MALF(conf,conf_fast_rcnn
             end
             %0404 changed from mpfvn to conv2345
             %fastrcnn_score = fast_rcnn_im_detect_widerface_mpfvn_0402(conf_fast_rcnn, caffe_net, im, rpn_boxes);
-            fastrcnn_score = fast_rcnn_im_detect_widerface_total_conv2345_nocxt(conf_fast_rcnn, caffe_net, im, rpn_boxes, max_rois_num_in_gpu);
+            fastrcnn_score = fast_rcnn_im_detect_widerface_total_conv2345_MALF(conf_fast_rcnn, caffe_net, im, rpn_boxes, max_rois_num_in_gpu);
 			fastrcnn_score_pno = fastrcnn_score;
             
             if ~isempty(rpn_boxes)
