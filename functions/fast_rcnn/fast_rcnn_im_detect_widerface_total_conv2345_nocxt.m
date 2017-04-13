@@ -91,7 +91,9 @@ end
 
 function [blob, im_scales] = get_image_blob(conf, im)
     %[ims, im_scales] = arrayfun(@(x) prep_im_for_blob(im, conf.image_means, x, conf.test_max_size), conf.test_scales, 'UniformOutput', false);
-    [blob, im_scales] = prep_im_for_blob_keepsize(im, conf.image_means, 1, conf.min_test_length, conf.max_test_length);
+    %[blob, im_scales] = prep_im_for_blob_keepsize(im, conf.image_means, 1, conf.min_test_length, conf.max_test_length);
+    %0412: tempararily used this
+    [blob, im_scales] = prep_im_for_blob_keepsize_MALF(im, conf.image_means, 1, conf.min_test_length, conf.max_test_length);
     %im_scales = cell2mat(im_scales);
     %blob = im_list_to_blob(ims);    
 end
