@@ -191,7 +191,9 @@ function do_proposal_test_widerface_ablation_total_2345_FDDB(conf,conf_fast_rcnn
             aboxes_old{i} = [rpn_boxes rpn_score];
             aboxes_new{i} = [rpn_boxes fastrcnn_score];
             % 1 * rpn + 0.5 * fastrcnn_score is optimal by round 3&4
-            aboxes_v1{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score1)];
+            % 0410 changed: 
+            %aboxes_v1{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score1)];
+            aboxes_v1{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score1 - 0.1)];
         else
             aboxes_old{i} = [];
             aboxes_new{i} = [];
@@ -209,15 +211,10 @@ function do_proposal_test_widerface_ablation_total_2345_FDDB(conf,conf_fast_rcnn
     aboxes_v1 = boxes_filter(aboxes_v1, -1, 0.33, -1, conf.use_gpu); %0.5
     
     for i = 1:length(aboxes_s4)
-        % draw boxes after 'naive' thresholding
-%         sstr = strsplit(imdb.image_ids{i}, filesep);
-%         event_name = sstr{1};
-%         event_dir1 = fullfile(SUBMIT_cachedir1, event_name);
-%         mkdir_if_missing(event_dir1);
-%         fid1 = fopen(fullfile(event_dir1, [sstr{2} '.txt']), 'w');
-%         fprintf(fid1, '%s\n', [imdb.image_ids{i} '.jpg']);
         
         bbs_all = aboxes_v1{i};
+        %0410 added for removing face in face
+        bbs_all = pseudoNMS_v8_MALF(bbs_all);
         %0409 added
         numFaces = size(bbs_all, 1);
         fprintf(fout, '%s\n%d\n', fileList{i}, numFaces);
@@ -231,7 +228,7 @@ function do_proposal_test_widerface_ablation_total_2345_FDDB(conf,conf_fast_rcnn
 
         fprintf('Done with saving image %d bboxes.\n', i);
         
-        if 1      
+        if 0      
             %1121 also draw gt boxes
             %0409 changed
             imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
@@ -243,11 +240,11 @@ function do_proposal_test_widerface_ablation_total_2345_FDDB(conf,conf_fast_rcnn
             hold on
             if ~isempty(bbs_all)
                 % 0406:for displaying 'clean' image
-                bbs_all = bbs_all(bbs_all(:,5)>=1.097,:);
+                bbs_all = bbs_all(bbs_all(:,5)>=0.997,:);%1.097
             end
             if ~isempty(bbs_all)
                   % 0406:for displaying score <= 1
-                  bbs_all(:, 5) = bbs_all(:, 5) - 0.1; 
+                  bbs_all(:, 5) = bbs_all(:, 5); 
                   bbs_all(:, 3) = bbs_all(:, 3) - bbs_all(:, 1) + 1;
                   bbs_all(:, 4) = bbs_all(:, 4) - bbs_all(:, 2) + 1;
                   bbApply('draw',bbs_all,'g');
