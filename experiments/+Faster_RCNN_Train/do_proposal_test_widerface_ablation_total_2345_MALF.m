@@ -216,12 +216,37 @@ function do_proposal_test_widerface_ablation_total_2345_MALF(conf,conf_fast_rcnn
         bbs_all = aboxes_v1{i};
         %0410 added for removing face in face
         bbs_all = pseudoNMS_v8_MALF(bbs_all);
+        %0410 evening added: a final thresholding 0.989
+        bbs_all = bbs_all(bbs_all(:,5)>=0.989, :);
+        %bbs_all(:,1:4) = round(bbs_all(:,1:4));
+        
         %0409 added
         numFaces = size(bbs_all, 1);
         if ~isempty(bbs_all)
             for j = 1:numFaces
-                %each row: [x1 y1 w h score]
-                fprintf(fout, '%s %d %d %d %d %f\n', sprintf('%04d', i), round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
+                %each row: [x y w h score]
+                face_w = bbs_all(j,3) - bbs_all(j,1) + 1;
+                face_h = bbs_all(j,4) - bbs_all(j,2) + 1;
+                if face_h >= face_w
+                    diff_w = (face_h - face_w)/2;
+                    x_new = max(round(bbs_all(j,1) - diff_w), 1);
+                    y_new = round(bbs_all(j,2));
+                    len_new = round(face_h);
+                    bbs_all(j,1) = x_new;
+                    bbs_all(j,2) = y_new;
+                    bbs_all(j,3) = x_new + len_new - 1;
+                    bbs_all(j,4) = y_new + len_new - 1;
+                else
+                    diff_h = (face_w - face_h)/2;
+                    x_new = round(bbs_all(j,1));
+                    y_new = max(round(bbs_all(j,2) - diff_h), 1);
+                    len_new = round(face_w);
+                    bbs_all(j,1) = x_new;
+                    bbs_all(j,2) = y_new;
+                    bbs_all(j,3) = x_new + len_new - 1;
+                    bbs_all(j,4) = y_new + len_new - 1;
+                end
+                fprintf(fout, '%s %d %d %d %d %f\n', sprintf('%04d', i), ([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
             end
         end
 
@@ -238,10 +263,11 @@ function do_proposal_test_widerface_ablation_total_2345_MALF(conf,conf_fast_rcnn
             figure(6); 
             imshow(img);  %im(img)
             hold on
-            if ~isempty(bbs_all)
-                % 0406:for displaying 'clean' image
-                bbs_all = bbs_all(bbs_all(:,5)>=0.98,:); %1.097, 1.092
-            end
+            %0410 evening masked
+            %if ~isempty(bbs_all)
+            %    % 0406:for displaying 'clean' image
+            %    bbs_all = bbs_all(bbs_all(:,5)>=0.97,:); %1.097, 1.092
+            %end
             if ~isempty(bbs_all)
                   % 0406:for displaying score <= 1
                   bbs_all(:, 5) = bbs_all(:, 5); 
