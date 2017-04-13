@@ -1,4 +1,4 @@
-function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_rcnn, model_stage,model_stage_fast, imdb, roidb, nms_option)
+function do_proposal_test_widerface_ablation_total_2345_WIDER_fn2(conf,conf_fast_rcnn, model_stage,model_stage_fast, imdb, roidb, nms_option)
     % share the test with final3 for they have the same test network struct
     %[aboxes_res23, aboxes_res45]  = proposal_test_widerface_twopath_happy_flip(conf, imdb, ...
     %0129 added scale3 version
@@ -183,6 +183,20 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
     end
     aboxes_v1 = boxes_filter(aboxes_v1, -1, 0.33, -1, conf.use_gpu); %0.5
     
+    ld = load('wider_hard_val.mat');
+    face_bbx_list = ld.face_bbx_list;
+    gt_list = ld.gt_list;
+    gt_boxes_all = cell(length(aboxes_s4), 1);
+    cnt = 0;
+    for k = 1:length(gt_list)
+        gt_event_list = gt_list{k};
+        face_bbx_event_list = face_bbx_list{k};
+        for kk = 1:length(gt_event_list)
+            cnt = cnt + 1;
+            gt_boxes_all{cnt} = face_bbx_event_list{kk}(gt_event_list{kk}, :);
+        end
+    end
+    
     hard_fn_mat = [];
     try
         ld = load('hard_fn_mat');
@@ -241,11 +255,14 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
 
             %0412 added keep hard fps
             if 1      
-                %1121 also draw gt boxes
-                bbs_gt = roidb.rois(i).boxes;
+                %0413 changed, bbs_gt is in [x y w h]
+                bbs_gt = gt_boxes_all{cnt};
+                %bbs_gt = roidb.rois(i).boxes;
                 bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
-                bbs_gt_w = bbs_gt(:, 3) - bbs_gt(:, 1) + 1;
-                bbs_gt_h = bbs_gt(:, 4) - bbs_gt(:, 2) + 1;
+                bbs_gt_w = bbs_gt(:, 3); % - bbs_gt(:, 1) + 1;
+                bbs_gt_h = bbs_gt(:, 4); % - bbs_gt(:, 2) + 1;
+                bbs_gt(:, 3) = bbs_gt(:, 1) + bbs_gt(:, 3) - 1; % w->x2
+                bbs_gt(:, 4) = bbs_gt(:, 2) + bbs_gt(:, 4) - 1; % h->y2
                 % if a box has only 1 pixel in either size, remove it
                 invalid_idx = (bbs_gt_w <= 1) | (bbs_gt_h <= 1);
                 bbs_gt(invalid_idx, :) = [];
@@ -287,7 +304,7 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
     end
     hard_fn_num = size(hard_fn_mat, 1);
     fprintf('Total fn num: %d\n',hard_fn_num);
-    if 1
+    if 0
     for j = 1:hard_fn_num
         im_idx = hard_fn_mat(j, 1);
         img = imread(imdb.image_at(im_idx));  
