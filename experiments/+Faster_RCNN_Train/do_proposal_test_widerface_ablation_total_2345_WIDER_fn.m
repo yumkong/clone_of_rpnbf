@@ -213,7 +213,6 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
         disp(fopts);
         disp('conf:');
         disp(conf_fast_rcnn);
-        
         for i = 1:length(aboxes_s4)
             % draw boxes after 'naive' thresholding
             sstr = strsplit(imdb.image_ids{i}, filesep);
@@ -251,7 +250,7 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
                 invalid_idx = (bbs_gt_w <= 1) | (bbs_gt_h <= 1);
                 bbs_gt(invalid_idx, :) = [];
                 % only show high-score faces for cropping
-                idx_tmp = []; % each time set it as empty
+                %idx_tmp = []; % each time set it as empty
                 if ~isempty(bbs_gt)
                     if ~isempty(bbs_all)
                         overlaps = boxoverlap(bbs_gt, bbs_all(:,1:4));  
@@ -274,7 +273,7 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
                         bbs_hard_fn = bbs_hard_fn(1:3,:);
                         fastrcnn_score = fastrcnn_score(1:3,:);
                     end
-                    hard_fn_mat = cat(1, hard_fn_mat, [i*ones(sum(idx_tmp), 1) bbs_hard_fn fastrcnn_score]);
+                    hard_fn_mat = cat(1, hard_fn_mat, [i*ones(size(bbs_hard_fn, 1), 1) bbs_hard_fn fastrcnn_score]);
                 end
             end
         end	
@@ -287,6 +286,8 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
         rng(prev_rng);
     end
     hard_fn_num = size(hard_fn_mat, 1);
+    fprintf('Total fn num: %d\n',hard_fn_num);
+    if 0
     for j = 1:hard_fn_num
         im_idx = hard_fn_mat(j, 1);
         img = imread(imdb.image_at(im_idx));  
@@ -299,6 +300,7 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf,conf_fast_
         bbs_tmp(:, 5) = bbs_tmp(:, 5) - 0.1;
         bbApply('draw',bbs_tmp,'c');
         hold off
+    end
     end
 end
 
