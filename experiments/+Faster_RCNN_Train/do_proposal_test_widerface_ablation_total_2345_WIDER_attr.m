@@ -1,4 +1,4 @@
-function do_proposal_test_widerface_ablation_total_2345_WIDER_fn2(conf,conf_fast_rcnn, model_stage,model_stage_fast, imdb, roidb, nms_option)
+function do_proposal_test_widerface_ablation_total_2345_WIDER_attr(conf,conf_fast_rcnn, model_stage,model_stage_fast, imdb, roidb, nms_option)
     % share the test with final3 for they have the same test network struct
     %[aboxes_res23, aboxes_res45]  = proposal_test_widerface_twopath_happy_flip(conf, imdb, ...
     %0129 added scale3 version
@@ -186,78 +186,63 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn2(conf,conf_fast
     ld = load('wider_hard_val.mat');
     face_bbx_list = ld.face_bbx_list;
     gt_list = ld.gt_list;
+    %blur_label_list = ld.blur_label_list;
+    expression_label_list = ld.expression_label_list;
+    gt_boxes_special = cell(length(aboxes_s4), 1);
     gt_boxes_all = cell(length(aboxes_s4), 1);
     cnt = 0;
     for k = 1:length(gt_list)
         gt_event_list = gt_list{k};
         face_bbx_event_list = face_bbx_list{k};
+        %blur_label_event_list = blur_label_list{k};
+        expression_label_event_list = expression_label_list{k};
         for kk = 1:length(gt_event_list)
             cnt = cnt + 1;
-            gt_boxes_all{cnt} = face_bbx_event_list{kk}(gt_event_list{kk}, :);
+            gt_hard_idx = false(size(face_bbx_event_list{kk}, 1), 1);
+            gt_hard_idx(gt_event_list{kk},:) = true;
+            % ****** change character attributes here ******
+            %final_idx = (blur_label_event_list{kk}==2) & gt_hard_idx;
+            final_idx = (expression_label_event_list{kk}==0) & gt_hard_idx;
+            gt_boxes_special{cnt} = face_bbx_event_list{kk}(final_idx, :);
+            gt_boxes_all{cnt} = face_bbx_event_list{kk};
         end
     end
-    
-    hard_fn_mat = [];
-    try
-        ld = load('hard_fn_mat');
-        hard_fn_mat = ld.hard_fn_mat;
-    catch
-        % init caffe net
-        caffe_log_file_base = fullfile(cache_dir, 'caffe_log');
-        caffe.init_log(caffe_log_file_base);
-        caffe_net = caffe.Net(fopts.net_def_file, 'test');
-        caffe_net.copy_from(fopts.net_file);
+    nPosAll = 0;
+    label_global = [];
+    conf_global = [];
+    for i = 1:length(aboxes_s4)
+        % draw boxes after 'naive' thresholding
+        sstr = strsplit(imdb.image_ids{i}, filesep);
+        event_name = sstr{1};
+        event_dir1 = fullfile(SUBMIT_cachedir1, event_name);
+        mkdir_if_missing(event_dir1);
+        fid1 = fopen(fullfile(event_dir1, [sstr{2} '.txt']), 'w');
+        fprintf(fid1, '%s\n', [imdb.image_ids{i} '.jpg']);
 
-        % set random seed
-        prev_rng = seed_rand(conf_fast_rcnn.rng_seed);
-        caffe.set_random_seed(conf_fast_rcnn.rng_seed);
+        bbs_all = aboxes_v1{i};
+        %0410 added for removing face in face
+        %bbs_all(:,5) = bbs_all(:,5) - 0.1;
+        %bbs_all = pseudoNMS_v8_MALF(bbs_all);
+        %0410 evening added: a final thresholding 0.989
+        %bbs_all = bbs_all(bbs_all(:,5)>=0.989, :);
 
-        % set gpu/cpu
-        if conf_fast_rcnn.use_gpu
-            caffe.set_mode_gpu();
-        else
-            caffe.set_mode_cpu();
-        end             
-
-        % determine the maximum number of rois in testing 
-        %max_rois_num_in_gpu = check_gpu_memory(conf, caffe_net);
-        max_rois_num_in_gpu = 1000;
-
-        disp('opts:');
-        disp(fopts);
-        disp('conf:');
-        disp(conf_fast_rcnn);
-        for i = 1:length(aboxes_s4)
-            % draw boxes after 'naive' thresholding
-            sstr = strsplit(imdb.image_ids{i}, filesep);
-            event_name = sstr{1};
-            event_dir1 = fullfile(SUBMIT_cachedir1, event_name);
-            mkdir_if_missing(event_dir1);
-            fid1 = fopen(fullfile(event_dir1, [sstr{2} '.txt']), 'w');
-            fprintf(fid1, '%s\n', [imdb.image_ids{i} '.jpg']);
-
-            bbs_all = aboxes_v1{i};
-            %0410 added for removing face in face
-            %bbs_all(:,5) = bbs_all(:,5) - 0.1;
-            %bbs_all = pseudoNMS_v8_MALF(bbs_all);
-            %0410 evening added: a final thresholding 0.989
-            %bbs_all = bbs_all(bbs_all(:,5)>=0.989, :);
-
-            fprintf(fid1, '%d\n', size(bbs_all, 1));
-            if ~isempty(bbs_all)
-                for j = 1:size(bbs_all,1)
-                    %each row: [x1 y1 w h score]
-                    fprintf(fid1, '%d %d %d %d %f\n', round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
-                end
+        fprintf(fid1, '%d\n', size(bbs_all, 1));
+        if ~isempty(bbs_all)
+            for j = 1:size(bbs_all,1)
+                %each row: [x1 y1 w h score]
+                fprintf(fid1, '%d %d %d %d %f\n', round([bbs_all(j,1) bbs_all(j,2) bbs_all(j,3)-bbs_all(j,1)+1 bbs_all(j,4)-bbs_all(j,2)+1]), bbs_all(j, 5));
             end
-            fclose(fid1);  %0409: for WIDER, each img saved in 1 file
-            fprintf('Done with saving image %d bboxes.\n', i);
+        end
+        fclose(fid1);  %0409: for WIDER, each img saved in 1 file
+        fprintf('Done with saving image %d bboxes.\n', i);
 
-            %0412 added keep hard fps
-            if 1      
-                %0413 changed, bbs_gt is in [x y w h]
-                bbs_gt = gt_boxes_all{i};
-                %bbs_gt = roidb.rois(i).boxes;
+        %0412 added keep hard fps
+        if 1      
+            %0413 changed, bbs_gt is in [x y w h]
+            bbs_gt = gt_boxes_special{i};
+            bbs_gt_all = gt_boxes_all{i};
+            %bbs_gt = roidb.rois(i).boxes;
+            if ~isempty(bbs_gt)
                 bbs_gt = max(bbs_gt, 1); % if any elements <=0, raise it to 1
                 bbs_gt_w = bbs_gt(:, 3); % - bbs_gt(:, 1) + 1;
                 bbs_gt_h = bbs_gt(:, 4); % - bbs_gt(:, 2) + 1;
@@ -266,59 +251,70 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn2(conf,conf_fast
                 % if a box has only 1 pixel in either size, remove it
                 invalid_idx = (bbs_gt_w <= 1) | (bbs_gt_h <= 1);
                 bbs_gt(invalid_idx, :) = [];
-                % only show high-score faces for cropping
-                %idx_tmp = []; % each time set it as empty
-                if ~isempty(bbs_gt)
-                    if ~isempty(bbs_all)
-                        overlaps = boxoverlap(bbs_gt, bbs_all(:,1:4));  
-                        max_per_predict_ols = max(overlaps, [], 2);
-                        %hard fn index
-                        idx_tmp = (max_per_predict_ols <= 0.2); %0.3
-                        bbs_hard_fn = bbs_gt(idx_tmp,:);
+            end
+            if ~isempty(bbs_gt_all)
+                bbs_gt_all = max(bbs_gt_all, 1); % if any elements <=0, raise it to 1
+                bbs_gt_w = bbs_gt_all(:, 3); % - bbs_gt(:, 1) + 1;
+                bbs_gt_h = bbs_gt_all(:, 4); % - bbs_gt(:, 2) + 1;
+                bbs_gt_all(:, 3) = bbs_gt_all(:, 1) + bbs_gt_all(:, 3) - 1; % w->x2
+                bbs_gt_all(:, 4) = bbs_gt_all(:, 2) + bbs_gt_all(:, 4) - 1; % h->y2
+                % if a box has only 1 pixel in either size, remove it
+                invalid_idx = (bbs_gt_w <= 1) | (bbs_gt_h <= 1);
+                bbs_gt_all(invalid_idx, :) = [];
+            end
+            %0410 evening added: a final thresholding 0.989
+            if ~isempty(bbs_all)
+                bbs_all = bbs_all(bbs_all(:,5)>=1.089, :);
+            end
+            % only show high-score faces for cropping
+            %idx_tmp = []; % each time set it as empty
+            if ~isempty(bbs_gt_all)
+                if ~isempty(bbs_all)
+                    lbl_num = size(bbs_all, 1);
+                    
+                    overlaps = boxoverlap(bbs_all(:,1:4), double(bbs_gt_all));  
+                    max_per_predict_ols = max(overlaps, [], 2);
+                    %hard fn if this gt has IoU less than 0.2 with any pred
+                    idx_tmp_all = (max_per_predict_ols >= 0.5); %0.3
+                    if ~isempty(bbs_gt)
+                        overlaps_sp = boxoverlap(bbs_all(:,1:4), double(bbs_gt));  
+                        max_per_predict_ols_sp = max(overlaps_sp, [], 2);
+                        %hard fn if this gt has IoU less than 0.2 with any pred
+                        idx_tmp_special = (max_per_predict_ols_sp >= 0.5); %0.3
                     else
-                        bbs_hard_fn = bbs_gt;
+                        idx_tmp_special = false(lbl_num, 1);
                     end
+                    nPosAll = nPosAll + size(bbs_gt, 1);
+                    % initialize all as negative label
+                    label_local = ones(lbl_num, 1) * (-1);
+                    % assign positive labels
+                    label_local(idx_tmp_special, :) = 1;
+                    % assign ignore labels
+                    label_local(idx_tmp_all & (~idx_tmp_special), :) = 0;
+                    % conf score of this image
+                    conf_local = bbs_all(:,5);
+                else
+                    label_local = [];
+                    conf_local = [];
                 end
-                if ~isempty(bbs_hard_fn)
-                    im = imread(imdb.image_at(i));  
-                    %fastrcnn_score = fast_rcnn_im_detect_widerface_mpfvn_0402(conf_fast_rcnn, caffe_net, im, rpn_boxes);
-                    fastrcnn_score = fast_rcnn_im_detect_widerface_total_conv2345_nocxt(conf_fast_rcnn, caffe_net, im, bbs_hard_fn, max_rois_num_in_gpu);
-                    [~, scores_ind] = sort(fastrcnn_score, 'ascend');
-                    bbs_hard_fn = bbs_hard_fn(scores_ind, :);
-                    fastrcnn_score = fastrcnn_score(scores_ind, :);
-                    if length(fastrcnn_score) > 3
-                        bbs_hard_fn = bbs_hard_fn(1:3,:);
-                        fastrcnn_score = fastrcnn_score(1:3,:);
-                    end
-                    hard_fn_mat = cat(1, hard_fn_mat, [i*ones(size(bbs_hard_fn, 1), 1) bbs_hard_fn fastrcnn_score]);
+            else
+                if ~isempty(bbs_all)
+                    % if no ground truth, then all boxes are negative
+                    lbl_num = size(bbs_all, 1);
+                    label_local = ones(lbl_num, 1) * (-1);
+                    % conf score of this image
+                    conf_local = bbs_all(:,5);
+                else
+                    label_local = [];
+                    conf_local = [];
                 end
             end
-        end	
-        % the lower the 'face' score, the harder the fn is
-        [~, scores_ind] = sort(hard_fn_mat(:,6), 'ascend');
-        hard_fn_mat = hard_fn_mat(scores_ind, :);
-        save('hard_fn_mat','hard_fn_mat');
-        
-        caffe.reset_all(); 
-        rng(prev_rng);
-    end
-    hard_fn_num = size(hard_fn_mat, 1);
-    fprintf('Total fn num: %d\n',hard_fn_num);
-    if 0
-    for j = 1:hard_fn_num
-        im_idx = hard_fn_mat(j, 1);
-        img = imread(imdb.image_at(im_idx));  
-        figure(6),clf; 
-        imshow(img);  %im(img)
-        hold on
-        bbs_tmp = hard_fn_mat(j, 2:end);
-        bbs_tmp(:, 3) = bbs_tmp(:, 3) - bbs_tmp(:, 1) + 1;
-        bbs_tmp(:, 4) = bbs_tmp(:, 4) - bbs_tmp(:, 2) + 1;
-        bbs_tmp(:, 5) = bbs_tmp(:, 5);
-        bbApply('draw',bbs_tmp,'c');
-        hold off
-    end
-    end
+            label_global = cat(1, label_global, label_local);
+            conf_global = cat(1, conf_global, conf_local);
+        end
+    end	
+    % is 10000 good?
+    res = averagePrecisionNormalized(conf_global, label_global, nPosAll, 13300);    
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)

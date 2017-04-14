@@ -160,5 +160,6 @@ dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, 
 %Faster_RCNN_Train.do_proposal_test_widerface_ablation_total_2345_WIDER(conf_proposal,conf_fast_rcnn,  model.stage1_rpn,model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 %Faster_RCNN_Train.do_proposal_test_widerface_ablation_total_2345_WIDER_fn(conf_proposal,conf_fast_rcnn,  model.stage1_rpn,model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 Faster_RCNN_Train.do_proposal_test_widerface_ablation_total_2345_WIDER_fn2(conf_proposal,conf_fast_rcnn,  model.stage1_rpn,model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+%Faster_RCNN_Train.do_proposal_test_widerface_ablation_total_2345_WIDER_attr(conf_proposal,conf_fast_rcnn,  model.stage1_rpn,model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 
 end
