@@ -290,7 +290,9 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn2(conf,conf_fast
                         bbs_hard_fn = bbs_hard_fn(1:3,:);
                         fastrcnn_score = fastrcnn_score(1:3,:);
                     end
-                    hard_fn_mat = cat(1, hard_fn_mat, [i*ones(size(bbs_hard_fn, 1), 1) bbs_hard_fn fastrcnn_score]);
+                    %fix a bug, if not convert bbs_hard_fn from int32 to
+                    %double, all will be int32, score are either 0 or 1
+                    hard_fn_mat = cat(1, hard_fn_mat, [i*ones(size(bbs_hard_fn, 1), 1) double(bbs_hard_fn) fastrcnn_score]);
                 end
             end
         end	

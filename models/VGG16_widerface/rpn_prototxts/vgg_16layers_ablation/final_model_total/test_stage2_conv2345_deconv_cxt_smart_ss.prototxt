@@ -17,13 +17,6 @@ input_dim: 1 # to be changed on-the-fly to num ROIs
 input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
 input_dim: 1
 input_dim: 1
-
-input: "labels"
-input_dim: 1 # to be changed on-the-fly to match num ROIs
-input_dim: 1
-input_dim: 1
-input_dim: 1
-
 layer {
 	bottom: "data"
 	top: "conv1_1"
@@ -629,18 +622,63 @@ layer {
 	}
 }
 
-#layer {
-#	bottom: "roi_pool2"
-#	bottom: "roi_pool3"
-#	bottom: "roi_pool4_3"
-#	bottom: "roi_pool5_3"
-#	top: "concat_roi_face"
-#	name: "concat_roi_face"
-#	type: "Concat"
-#	concat_param {
-#		axis: 1  #concat along channels: 128+256+512+512=1408
-#	}
-#}
+layer {
+	bottom: "roi_pool2"
+	bottom: "roi_pool3"
+	bottom: "roi_pool4_3"
+	bottom: "roi_pool5_3"
+	top: "concat_roi_face"
+	name: "concat_roi_face"
+	type: "Concat"
+	concat_param {
+		axis: 1  #concat along channels: 128+256+512+512=1408
+	}
+}
+
+# 0323 added
+layer {
+	name: "conv_concat_face"
+	bottom: "concat_roi_face"
+	top: "conv_concat_face"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 512
+		pad: 0
+		kernel_size: 1
+
+	}
+}
+
+layer {
+	bottom: "conv_concat_face"
+	top: "conv_concat_face"
+	name: "relu_conv_concat_face"
+	type: "ReLU"
+}
+
+#1207 added normlization
+layer {
+  name: "face_norm"
+  type: "Normalize"
+  bottom: "conv_concat_face"
+  top: "face_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 22.6
+    }
+    channel_shared: false
+  }
+}
 
 layer {
 	bottom: "roi_pool2_cxt"
@@ -670,16 +708,9 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 256
+		num_output: 128
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
 	}
 }
 
@@ -700,23 +731,20 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 16
+      value: 11.3
     }
     channel_shared: false
   }
 }
 
 layer {
-	bottom: "roi_pool2"
-	bottom: "roi_pool3"
-	bottom: "roi_pool4_3"
-	bottom: "roi_pool5_3"
+	bottom: "face_norm"
 	bottom: "cxt_norm"
 	top: "concat_roi_overall"
 	name: "concat_roi_overall"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels: face 1408 + cxt 256= 1664
+		axis: 1  #concat along channels: face 1024 + cxt 256= 1280
 	}
 }
 
@@ -737,14 +765,6 @@ layer {
   }
   inner_product_param {
     num_output: 2048
-	weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 layer {
@@ -779,14 +799,6 @@ layer {
   }
   inner_product_param {
     num_output: 512  #1209: 4096-->1024
-	weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 layer {
@@ -823,14 +835,6 @@ layer {
   }
   inner_product_param {
     num_output: 128  
-	weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
   }
 }
 layer {
@@ -877,23 +881,11 @@ layer {
   }
 }
 
-#0124 use the same output as faster rcnn does
-layer {
-	name: "loss_cls"
-	type: "SoftmaxWithLoss"
-	bottom: "cls_score"
-	bottom: "labels"
-	top: "loss_cls"
-	loss_param {
-        normalization: VALID
-   }
-	loss_weight: 1
-}
 
+# ============= output ===============
 layer {
-	name: "accuarcy"
-	type: "Accuracy"
-	bottom: "cls_score"
-	bottom: "labels"
-	top: "accuarcy"
+   name: "cls_prob"
+   type: "Softmax"
+   bottom: "cls_score"
+   top: "cls_prob"
 }
