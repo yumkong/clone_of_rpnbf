@@ -1,4 +1,4 @@
-function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf, imdb_train, roidb_train, varargin)
+function save_model_path = fast_rcnn_train_widerface_total_realmp_finegrain(conf, imdb_train, roidb_train, varargin)
 % save_model_path = fast_rcnn_train(conf, imdb_train, roidb_train, varargin)
 % --------------------------------------------------------
 % Fast R-CNN
@@ -15,10 +15,10 @@ function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf,
     ip.addParamValue('do_val',          true,          @isscalar);
     ip.addParamValue('imdb_val',        struct(),       @isstruct);
     ip.addParamValue('roidb_val',       struct(),       @isstruct);
-    ip.addParamValue('val_iters',       500,            @isscalar); %100
-    ip.addParamValue('val_interval',    2000,           @isscalar); %1000
+    ip.addParamValue('val_iters',       500,            @isscalar); %500
+    ip.addParamValue('val_interval',    2000,           @isscalar); %2000
     ip.addParamValue('snapshot_interval',...
-                                        2000,          @isscalar); %1000
+                                        2000,          @isscalar); %2000
     ip.addParamValue('solver_def_file', fullfile(pwd, 'models', 'Zeiler_conv5', 'solver.prototxt'), ...
                                                         @isstr);
     ip.addParamValue('net_file',        fullfile(pwd, 'models', 'Zeiler_conv5', 'Zeiler_conv5'), ...
@@ -118,7 +118,7 @@ function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf,
     
     % 0927 added to record plot info
     modelFigPath = fullfile(cache_dir, 'net-train.pdf');  % plot save path
-    tmp_struct = struct('loss_bbox', [], 'loss_cls', [], 'accuracy', []);
+    tmp_struct = struct('loss_cls_s4', [], 'accuracy_s4', [], 'loss_cls_s8', [], 'accuracy_s8', [], 'loss_cls_s16', [], 'accuracy_s16', []);
     history_rec = struct('train',tmp_struct,'val',tmp_struct, 'num', 0);
     
     while (iter_ <= max_iter)
@@ -130,11 +130,11 @@ function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf,
         [shuffled_inds, sub_db_inds] = generate_random_minibatch(shuffled_inds, image_roidb_train, conf.ims_per_batch);
         %[im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob] = ...
         %    fast_rcnn_get_minibatch_batch2(conf, image_roidb_train(sub_db_inds));
-        [im_blob, rois_blob, rois_cxt_blob, labels_blob] = ...
-            fast_rcnn_get_minibatch_onlycls_cxt(conf, image_roidb_train(sub_db_inds));
+        [im_blob, rois_blob_s4, rois_cxt_blob_s4, rois_blob_s8, rois_cxt_blob_s8, rois_blob_s16, rois_cxt_blob_s16, lb_s4, lb_s8,lb_s16] = ...
+            fast_rcnn_get_minibatch_total_realmp_finegrain(conf, image_roidb_train(sub_db_inds));
 
         %net_inputs = {im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
-        net_inputs = {im_blob, rois_blob,rois_cxt_blob, labels_blob};
+        net_inputs = {im_blob, rois_blob_s4, rois_cxt_blob_s4, rois_blob_s8, rois_cxt_blob_s8, rois_blob_s16, rois_cxt_blob_s16, lb_s4, lb_s8, lb_s16};
         caffe_solver.net.reshape_as_input(net_inputs);
 
         % one iter SGD update
@@ -163,18 +163,25 @@ function save_model_path = fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf,
                     sub_db_inds = shuffled_inds_val{i};
                     %[im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob] = ...
                     %    fast_rcnn_get_minibatch_batch2(conf, image_roidb_val(sub_db_inds));
-                    [im_blob, rois_blob,rois_cxt_blob, labels_blob] = ...
-                        fast_rcnn_get_minibatch_onlycls_cxt(conf, image_roidb_val(sub_db_inds));
+                    [im_blob, rois_blob_s4, rois_cxt_blob_s4, rois_blob_s8, rois_cxt_blob_s8, rois_blob_s16, rois_cxt_blob_s16, lb_s4, lb_s8,lb_s16] = ...
+                        fast_rcnn_get_minibatch_total_realmp_finegrain(conf, image_roidb_val(sub_db_inds));
 
                     % Reshape net's input blobs
                     %net_inputs = {im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
-                    net_inputs = {im_blob, rois_blob,rois_cxt_blob, labels_blob};
+                    net_inputs = {im_blob, rois_blob_s4, rois_cxt_blob_s4, rois_blob_s8, rois_cxt_blob_s8, rois_blob_s16, rois_cxt_blob_s16, lb_s4, lb_s8,lb_s16};
                     caffe_solver.net.reshape_as_input(net_inputs);
                     
                     caffe_solver.net.forward(net_inputs);
                     
                     rst = caffe_solver.net.get_output();
-                     val_results = parse_rst(val_results, rst);
+                    %0326 added for debug
+%                     bb = caffe_solver.net.blobs('cls_score').get_data(); 
+%                     bb = bb';
+%                     if (~isempty(bb)) && any(bb(:,1) <= bb(:,2))
+%                         fprintf('flip happens!!!\n');
+%                     end
+                    
+                    val_results = parse_rst(val_results, rst);
                 end
             end
             
@@ -247,24 +254,36 @@ function check_gpu_memory(conf, caffe_solver, num_classes, do_val)
 
     % generate pseudo training data with max size
     im_blob = single(zeros(max(conf.scales), conf.max_size, 3, conf.ims_per_batch));
-    rois_blob = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size));
-    rois_blob = permute(rois_blob, [3, 4, 1, 2]);
+    rois_blob_s4 = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size_s4));
+    rois_blob_s4 = permute(rois_blob_s4, [3, 4, 1, 2]);
     %0322 added
-    rois_blob_cxt = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size));
-    rois_blob_cxt = permute(rois_blob_cxt, [3, 4, 1, 2]);
+    rois_blob_cxt_s4 = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size_s4));
+    rois_blob_cxt_s4 = permute(rois_blob_cxt_s4, [3, 4, 1, 2]);
     
-    labels_blob = single(ones(conf.batch_size, 1));
-    labels_blob = permute(labels_blob, [3, 4, 2, 1]);
-    %0304 masked
-%     %1208 changed: 8-->4
-%     %bbox_targets_blob = zeros(4 * (num_classes+1), conf.batch_size, 'single');
-%     bbox_targets_blob = zeros(4 * (num_classes), conf.batch_size, 'single');
-%     bbox_targets_blob = single(permute(bbox_targets_blob, [3, 4, 1, 2])); 
-%     bbox_loss_weights_blob = bbox_targets_blob;
+    rois_blob_s8 = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size_s8));
+    rois_blob_s8 = permute(rois_blob_s8, [3, 4, 1, 2]);
+    %0322 added
+    rois_blob_cxt_s8 = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size_s8));
+    rois_blob_cxt_s8 = permute(rois_blob_cxt_s8, [3, 4, 1, 2]);
+    
+    rois_blob_s16 = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size_s16));
+    rois_blob_s16 = permute(rois_blob_s16, [3, 4, 1, 2]);
+    %0322 added
+    rois_blob_cxt_s16 = single(repmat([0; 0; 0; max(conf.scales)-1; conf.max_size-1], 1, conf.batch_size_s16));
+    rois_blob_cxt_s16 = permute(rois_blob_cxt_s16, [3, 4, 1, 2]);
+    
+    labels_s4 = single(ones(conf.batch_size_s4, 1));
+    labels_s4 = permute(labels_s4, [3, 4, 2, 1]);
+    
+    labels_s8 = single(ones(conf.batch_size_s8, 1));
+    labels_s8 = permute(labels_s8, [3, 4, 2, 1]);
+    
+    labels_s16 = single(ones(conf.batch_size_s16, 1));
+    labels_s16 = permute(labels_s16, [3, 4, 2, 1]);
     
     %0304 changed
     %net_inputs = {im_blob, rois_blob, labels_blob, bbox_targets_blob, bbox_loss_weights_blob};
-    net_inputs = {im_blob, rois_blob, rois_blob_cxt, labels_blob};
+    net_inputs = {im_blob, rois_blob_s4, rois_blob_cxt_s4, rois_blob_s8, rois_blob_cxt_s8, rois_blob_s16, rois_blob_cxt_s16, labels_s4, labels_s8, labels_s16};
     
     % Reshape net's input blobs
     caffe_solver.net.reshape_as_input(net_inputs);
@@ -312,29 +331,39 @@ end
 
 function history_rec = show_state(iter, train_results, val_results, history_rec, modelFigPath)
     fprintf('\n------------------------- Iteration %d -------------------------\n', iter);
-    fprintf('Training : error %.3g, loss (cls %.3g)\n', ...
-        1 - mean(train_results.accuarcy.data), ...
-        mean(train_results.loss_cls.data));
+    fprintf('Training : error_s4 %.3g, loss_s4 (cls %.3g), error_s8 %.3g, loss_s8 (cls %.3g), error_s16 %.3g, loss_s16 (cls %.3g)\n', ...
+        1 - mean(train_results.accuarcy_s4.data), mean(train_results.loss_cls_s4.data), ...
+        1 - mean(train_results.accuarcy_s8.data), mean(train_results.loss_cls_s8.data), ...
+        1 - mean(train_results.accuarcy_s16.data), mean(train_results.loss_cls_s16.data));
     if exist('val_results', 'var') && ~isempty(val_results)
-        fprintf('Testing  : error %.3g, loss (cls %.3g)\n', ...
-            1 - mean(val_results.accuarcy.data), ...
-            mean(val_results.loss_cls.data));
+        fprintf('Testing  : error_s4 %.3g, loss_s4 (cls %.3g), error_s8 %.3g, loss_s8 (cls %.3g), error_s16 %.3g, loss_s16 (cls %.3g)\n', ...
+            1 - mean(val_results.accuarcy_s4.data), mean(val_results.loss_cls_s4.data), ...
+            1 - mean(val_results.accuarcy_s8.data), mean(val_results.loss_cls_s8.data), ...
+            1 - mean(val_results.accuarcy_s16.data), mean(val_results.loss_cls_s16.data));
     end
     
     % 1016 added for plot
-    history_rec.train.accuracy = [history_rec.train.accuracy; 1 - mean(train_results.accuarcy.data)];
-    history_rec.train.loss_cls = [history_rec.train.loss_cls; mean(train_results.loss_cls.data)];
+    history_rec.train.accuracy_s4 = [history_rec.train.accuracy_s4; 1 - mean(train_results.accuarcy_s4.data)];
+    history_rec.train.loss_cls_s4 = [history_rec.train.loss_cls_s4; mean(train_results.loss_cls_s4.data)];
+    history_rec.train.accuracy_s8 = [history_rec.train.accuracy_s8; 1 - mean(train_results.accuarcy_s8.data)];
+    history_rec.train.loss_cls_s8 = [history_rec.train.loss_cls_s8; mean(train_results.loss_cls_s8.data)];
+    history_rec.train.accuracy_s16 = [history_rec.train.accuracy_s16; 1 - mean(train_results.accuarcy_s16.data)];
+    history_rec.train.loss_cls_s16 = [history_rec.train.loss_cls_s16; mean(train_results.loss_cls_s16.data)];
     %history_rec.train.loss_bbox = [history_rec.train.loss_bbox; mean(train_results.loss_bbox.data)];
     
-    history_rec.val.accuracy = [history_rec.val.accuracy; 1 - mean(val_results.accuarcy.data)];
-    history_rec.val.loss_cls = [history_rec.val.loss_cls; mean(val_results.loss_cls.data)];
+    history_rec.val.accuracy_s4 = [history_rec.val.accuracy_s4; 1 - mean(val_results.accuarcy_s4.data)];
+    history_rec.val.loss_cls_s4 = [history_rec.val.loss_cls_s4; mean(val_results.loss_cls_s4.data)];
+    history_rec.val.accuracy_s8 = [history_rec.val.accuracy_s8; 1 - mean(val_results.accuarcy_s8.data)];
+    history_rec.val.loss_cls_s8 = [history_rec.val.loss_cls_s8; mean(val_results.loss_cls_s8.data)];
+    history_rec.val.accuracy_s16 = [history_rec.val.accuracy_s16; 1 - mean(val_results.accuarcy_s16.data)];
+    history_rec.val.loss_cls_s16 = [history_rec.val.loss_cls_s16; mean(val_results.loss_cls_s16.data)];
     %history_rec.val.loss_bbox = [history_rec.val.loss_bbox; mean(val_results.loss_bbox.data)];
     
     history_rec.num = history_rec.num + 1;
     % draw it
     figure(1) ; clf ;
     %plots = {'loss_bbox', 'loss_cls', 'accuracy'};
-    plots = {'loss_cls', 'accuracy'};
+    plots = {'loss_cls_s4', 'loss_cls_s8', 'loss_cls_s16', 'accuracy_s4', 'accuracy_s8', 'accuracy_s16'};
     for p = plots
       c_p = char(p) ;
       values = zeros(0, history_rec.num) ;
@@ -348,7 +377,7 @@ function history_rec = show_state(iter, train_results, val_results, history_rec,
           leg{end+1} = c_f;
         end
       end
-      subplot(1,numel(plots),find(strcmp(c_p, plots))) ;
+      subplot(2,numel(plots)/2,find(strcmp(c_p, plots))) ;
       plot(1:history_rec.num, values','o-') ;
       xlabel('epoch') ;
       title(c_p) ;

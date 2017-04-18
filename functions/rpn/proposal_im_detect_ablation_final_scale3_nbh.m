@@ -1,4 +1,4 @@
-function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pred_boxes_s16_all, scores_s16_all] = proposal_im_detect_ablation_final_scale3(conf, caffe_net, im, im_idx)
+function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pred_boxes_s16_all, scores_s16_all] = proposal_im_detect_ablation_final_scale3_nbh(conf, caffe_net, im, im_idx)
 %function [pred_boxes, scores] = proposal_im_detect_multibox_happy(conf, caffe_net, im, im_idx)
 % [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect(conf, im, net_idx)
 % --------------------------------------------------------
@@ -22,7 +22,7 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
     scores_s8_all = cell(1, numel(im_blob_all));
     pred_boxes_s16_all = cell(1, numel(im_blob_all));
     scores_s16_all = cell(1, numel(im_blob_all));
-    unit_size = 1504; %2048 1024
+    unit_size = 1024; %2048
     for i = 1:numel(im_blob_all)
         %0124 send an individual image and scaled size here
         im_blob = im_blob_all{i};
@@ -144,6 +144,23 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
                 % fastest dimension
             scores_s8 = permute(scores_s8, [3, 2, 1]);
 
+            % 1204: spatially decimate anchors by one half (only keep highest scoring boxes out of eight spatial neighbors)
+            % in this way the output boxes should be similar with that of conv4_3
+            % in vertical direction
+            score_mask = false(size(scores_s8));
+            score_mask(:,1,:) = scores_s8(:,1,:) >= scores_s8(:,2,:);
+            for idx = 2:size(scores_s8, 2)-1
+                score_mask(:,idx,:) = (scores_s8(:,idx,:) >= scores_s8(:,idx-1,:)) & (scores_s8(:,idx,:) >= scores_s8(:,idx+1,:));
+            end
+            score_mask(:,end,:) = scores_s8(:,end,:) >= scores_s8(:,end-1,:);
+            % in horizontal direction
+            score_mask(:,:,1) = scores_s8(:,:,1) >= scores_s8(:,:,2);
+            for idx = 2:size(scores_s8, 3)-1
+                score_mask(:,:,idx) = (scores_s8(:,:,idx) >= scores_s8(:,:,idx-1)) & (scores_s8(:,:,idx) >= scores_s8(:,:, idx+1));
+            end
+            score_mask(:,:, end) = scores_s8(:,:, end) >= scores_s8(:,:, end-1);
+            score_mask = score_mask(:);
+            
             scores_s8 = scores_s8(:);
 
             % 1025: decimate anchors by one half (only keep one boxes out of each anchor scale position)
@@ -154,8 +171,11 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
             hw2_score = tmp_scores(1+half_anchor_num:end, :);
             hw1_greater_mask = (hw1_score >= hw2_score);
             greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
-            scores_s8 = scores_s8(greater_mask(:),:);  %new scores
-            pred_boxes_s8 = pred_boxes_s8(greater_mask(:),:);  % new pred_boxes
+            
+            final_mask = greater_mask(:) & score_mask;
+            scores_s8 = scores_s8(final_mask,:);  %new scores
+            %scores_s8 = scores_s8(greater_mask(:),:);  %new scores
+            pred_boxes_s8 = pred_boxes_s8(final_mask,:);  % new pred_boxes
             %====== end of 1025
 
             if conf.test_drop_boxes_runoff_image
@@ -166,7 +186,7 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
 
             % drop too small boxes *** liu@1114: here tempararily set conv5's
             % thresh as 20, may change later (conv5 minimal anchor size is 32)
-            [pred_boxes_s8, scores_s8] = filter_boxes(10, pred_boxes_s8, scores_s8);
+            [pred_boxes_s8, scores_s8] = filter_boxes(12, pred_boxes_s8, scores_s8);
 
             % sort
             [scores_s8, scores_ind] = sort(scores_s8, 'descend');
@@ -198,6 +218,23 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
                 % fastest dimension
             scores_s16 = permute(scores_s16, [3, 2, 1]);
 
+            % 1204: spatially decimate anchors by one half (only keep highest scoring boxes out of eight spatial neighbors)
+            % in this way the output boxes should be similar with that of conv4_3
+            % in vertical direction
+            score_mask = false(size(scores_s16));
+            score_mask(:,1,:) = scores_s16(:,1,:) >= scores_s16(:,2,:);
+            for idx = 2:size(scores_s16, 2)-1
+                score_mask(:,idx,:) = (scores_s16(:,idx,:) >= scores_s16(:,idx-1,:)) & (scores_s16(:,idx,:) >= scores_s16(:,idx+1,:));
+            end
+            score_mask(:,end,:) = scores_s16(:,end,:) >= scores_s16(:,end-1,:);
+            % in horizontal direction
+            score_mask(:,:,1) = scores_s16(:,:,1) >= scores_s16(:,:,2);
+            for idx = 2:size(scores_s16, 3)-1
+                score_mask(:,:,idx) = (scores_s16(:,:,idx) >= scores_s16(:,:,idx-1)) & (scores_s16(:,:,idx) >= scores_s16(:,:, idx+1));
+            end
+            score_mask(:,:, end) = scores_s16(:,:, end) >= scores_s16(:,:, end-1);
+            score_mask = score_mask(:);
+            
             scores_s16 = scores_s16(:);
 
             % 1025: decimate anchors by one half (only keep one boxes out of each anchor scale position)
@@ -208,8 +245,10 @@ function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pr
             hw2_score = tmp_scores(1+half_anchor_num:end, :);
             hw1_greater_mask = (hw1_score >= hw2_score);
             greater_mask = cat(1, hw1_greater_mask, ~hw1_greater_mask);
-            scores_s16 = scores_s16(greater_mask(:),:);  %new scores
-            pred_boxes_s16 = pred_boxes_s16(greater_mask(:),:);  % new pred_boxes
+            final_mask = greater_mask(:) & score_mask;
+            scores_s16 = scores_s16(final_mask,:);  %new scores
+            %scores_s16 = scores_s16(greater_mask(:),:);  %new scores
+            pred_boxes_s16 = pred_boxes_s16(final_mask,:);  % new pred_boxes
             %====== end of 1025
 
             if conf.test_drop_boxes_runoff_image

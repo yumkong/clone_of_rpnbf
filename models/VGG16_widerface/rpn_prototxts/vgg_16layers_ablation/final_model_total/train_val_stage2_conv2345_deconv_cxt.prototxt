@@ -12,6 +12,12 @@ input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
 input_dim: 1
 input_dim: 1
 
+input: "rois_cxt"
+input_dim: 1 # to be changed on-the-fly to num ROIs
+input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
+input_dim: 1
+input_dim: 1
+
 input: "labels"
 input_dim: 1 # to be changed on-the-fly to match num ROIs
 input_dim: 1
@@ -434,6 +440,19 @@ layer {
 }
 
 layer {
+	bottom: "conv2_norm"
+	bottom: "rois_cxt"
+	top: "roi_pool2_cxt"
+	name: "roi_pool2_cxt"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 5
+		pooled_h: 5
+		spatial_scale: 0.5  #0312: stride 4
+	}
+}
+
+layer {
   bottom: "conv3_3" 
   top: "conv3_2x"
   name: "conv3_2x" 
@@ -471,6 +490,19 @@ layer {
 	bottom: "rois"
 	top: "roi_pool3"
 	name: "roi_pool3"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 5
+		pooled_h: 5
+		spatial_scale: 0.5  #0312: stride 4
+	}
+}
+
+layer {
+	bottom: "conv3_norm"
+	bottom: "rois_cxt"
+	top: "roi_pool3_cxt"
+	name: "roi_pool3_cxt"
 	type: "ROIPooling"
 	roi_pooling_param {
 		pooled_w: 5
@@ -526,6 +558,19 @@ layer {
 }
 
 layer {
+	bottom: "conv4_3_norm"
+	bottom: "rois_cxt"
+	top: "roi_pool4_cxt"
+	name: "roi_pool4_cxt"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 5
+		pooled_h: 5
+		spatial_scale: 0.25  #0312: stride 4
+	}
+}
+
+layer {
   bottom: "conv5_3" 
   top: "conv5_2x"
   name: "conv5_2x" 
@@ -572,22 +617,74 @@ layer {
 }
 
 layer {
+	bottom: "conv5_3_norm"
+	bottom: "rois_cxt"
+	top: "roi_pool5_cxt"
+	name: "roi_pool5_cxt"
+	type: "ROIPooling"
+	roi_pooling_param {
+		pooled_w: 5
+		pooled_h: 5
+		spatial_scale: 0.125  #0312: stride 4
+	}
+}
+
+layer {
 	bottom: "roi_pool2"
 	bottom: "roi_pool3"
 	bottom: "roi_pool4_3"
 	bottom: "roi_pool5_3"
+	bottom: "roi_pool2_cxt"
+	bottom: "roi_pool3_cxt"
+	bottom: "roi_pool4_cxt"
+	bottom: "roi_pool5_cxt"
 	top: "concat_roi_feat"
 	name: "concat_roi_feat"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels: 128+256+512+512=1408
+		axis: 1  #concat along channels=2816
 	}
+}
+
+# 0323 added
+layer {
+	name: "conv_concat_self"
+	bottom: "concat_roi_feat"
+	top: "conv_concat_self"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 1024
+		pad: 0
+		kernel_size: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv_concat_self"
+	top: "conv_concat_self"
+	name: "relu_conv_concat_self"
+	type: "ReLU"
 }
 
 layer {
   name: "fc6"
   type: "InnerProduct"
-  bottom: "concat_roi_feat"  #"pool5"
+  bottom: "conv_concat_self"  #"concat_roi_feat"
   top: "fc6"
   param {
     name: "fc6_w"

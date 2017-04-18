@@ -1,4 +1,4 @@
-function conf = fast_rcnn_config_widerface_mpfvn_total(varargin)
+function conf = fast_rcnn_config_widerface_mpfvn_total_conv2345_deconv(varargin)
 % conf = fast_rcnn_config(varargin)
 % Fast R-CNN configuration
 % --------------------------------------------------------
@@ -17,19 +17,21 @@ function conf = fast_rcnn_config_widerface_mpfvn_total(varargin)
     % Image scales -- the short edge of input image       
     % 0123 added for min and max test image size
     ip.addParamValue('min_test_length', 100,           @isscalar);%64
-    ip.addParamValue('max_test_length', 1500,           @isscalar); %3008
+    ip.addParamValue('max_test_length', 1120,           @isscalar); %1600
     ip.addParamValue('scales',          800,            @ismatrix); %600
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        800,           @isscalar);  %1000
     % Images per batch
     ip.addParamValue('ims_per_batch',   1,              @isscalar); %2-->1
     % Minibatch size
-    %ip.addParamValue('batch_size',      64,            @isscalar); %128-->160-->80(for 2 images)->64(2 images)
-    ip.addParamValue('batch_size_s4',    12,            @isscalar); %0325: 32 (for 2 images)
-    ip.addParamValue('batch_size_s8',    24,            @isscalar); %0325: 48 (for 2 images)
-    ip.addParamValue('batch_size_s16',   6,            @isscalar); %0325: 16 (for 2 images)
+    ip.addParamValue('batch_size',      60,            @isscalar); %128-->160-->80(for 2 images)->64(2 images)
     % Fraction of minibatch that is foreground labeled (class > 0)
-    ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0.25 0325 changed for more balanced training
+    ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1207: 32 faces for an average image
+
+    %ip.addParamValue('batch_size_s4',    12,            @isscalar); %0325: 32 (for 2 images)
+    %ip.addParamValue('batch_size_s8',    24,            @isscalar); %0325: 48 (for 2 images)
+    %ip.addParamValue('batch_size_s16',   6,            @isscalar); %0325: 16 (for 2 images)
+
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)
     ip.addParamValue('fg_thresh',       0.5,            @isscalar);
     % Overlap threshold for a ROI to be considered background (class = 0 if

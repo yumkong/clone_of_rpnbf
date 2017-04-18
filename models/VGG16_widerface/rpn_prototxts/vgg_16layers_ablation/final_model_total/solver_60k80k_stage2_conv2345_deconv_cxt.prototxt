@@ -1,0 +1,13 @@
+net: "./models/VGG16_widerface/rpn_prototxts/vgg_16layers_ablation/final_model_total/train_val_stage2_conv2345_deconv_cxt.prototxt"
+base_lr: 0.0005  #0.001
+lr_policy: "step"
+gamma: 0.1
+stepsize: 25000 #24000
+display: 20
+max_iter: 60000 #100000
+momentum: 0.9
+weight_decay: 0.0005
+# We disable standard caffe solver snapshotting and implement our own snapshot
+snapshot: 0
+#debug_info: true
+

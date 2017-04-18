@@ -1,4 +1,4 @@
-function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pred_boxes_s16_all, scores_s16_all] = proposal_im_detect_ablation_final_scale3(conf, caffe_net, im, im_idx)
+function [pred_boxes_s4_all, scores_s4_all, pred_boxes_s8_all, scores_s8_all, pred_boxes_s16_all, scores_s16_all] = proposal_im_detect_ablation_final_scale3_MALF(conf, caffe_net, im, im_idx)
 %function [pred_boxes, scores] = proposal_im_detect_multibox_happy(conf, caffe_net, im, im_idx)
 % [pred_boxes, scores, box_deltas_, anchors_, scores_] = proposal_im_detect(conf, im, net_idx)
 % --------------------------------------------------------
@@ -504,6 +504,15 @@ function [data_blob, rois_blob, im_scale_factors] = get_blobs(conf, im, rois)
 end
 
 function [blob, im_scales] = get_image_blob(conf, im)
+    %0410 added: if image ifself is larger than 1504, shrink it to 1504
+    max_siz = max(size(im,1), size(im,2));
+    if max_siz > 1504
+        scale_factor = 1504 / max_siz;
+        im = imresize(im, scale_factor);
+    else
+        scale_factor = 1;
+    end
+    
     if length(conf.test_scale_range) == 1
         %0123 changed
         %[blob, im_scales] = prep_im_for_blob_keepsize(im, conf.image_means, conf.test_scales, conf.test_max_size);
@@ -516,6 +525,8 @@ function [blob, im_scales] = get_image_blob(conf, im)
         %blob = im_list_to_blob(ims); 
         blob = ims;
     end
+    %0410 added
+    im_scales = im_scales * scale_factor;
 end
 
 function [rois_blob] = get_rois_blob(conf, im_rois, im_scale_factors)

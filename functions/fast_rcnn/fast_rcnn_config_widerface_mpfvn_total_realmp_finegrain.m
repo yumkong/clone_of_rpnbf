@@ -1,4 +1,4 @@
-function conf = fast_rcnn_config_widerface_mpfvn_total(varargin)
+function conf = fast_rcnn_config_widerface_mpfvn_total_realmp_finegrain(varargin)
 % conf = fast_rcnn_config(varargin)
 % Fast R-CNN configuration
 % --------------------------------------------------------
