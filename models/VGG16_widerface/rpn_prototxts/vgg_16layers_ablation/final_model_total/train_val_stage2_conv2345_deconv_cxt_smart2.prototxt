@@ -17,6 +17,13 @@ input_dim: 1 # to be changed on-the-fly to num ROIs
 input_dim: 5 # [batch ind, x1, y1, x2, y2] zero-based indexing
 input_dim: 1
 input_dim: 1
+
+input: "labels"
+input_dim: 1 # to be changed on-the-fly to match num ROIs
+input_dim: 1
+input_dim: 1
+input_dim: 1
+
 layer {
 	bottom: "data"
 	top: "conv1_1"
@@ -663,9 +670,16 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 256
+		num_output: 512
 		pad: 0
 		kernel_size: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
 	}
 }
 
@@ -686,7 +700,7 @@ layer {
     across_spatial: false
     scale_filler {
       type: "constant"
-      value: 16
+      value: 22.6
     }
     channel_shared: false
   }
@@ -702,7 +716,7 @@ layer {
 	name: "concat_roi_overall"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels: face 1408 + cxt 256= 1664
+		axis: 1  #concat along channels: face 1408 + cxt 512= 1920
 	}
 }
 
@@ -722,7 +736,15 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 2048
+    num_output: 4096
+	weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
@@ -756,7 +778,15 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 512  #1209: 4096-->1024
+    num_output: 4096  #1209: 4096-->1024
+	weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
@@ -775,46 +805,10 @@ layer {
   }
 }
 
-#1209: newly added
-layer {
-  name: "fc8"
-  type: "InnerProduct"
-  bottom: "fc7"
-  top: "fc8"
-  param {
-    name: "fc8_w"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc8_b"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 128  
-  }
-}
-layer {
-  name: "relu8"
-  type: "ReLU"
-  bottom: "fc8"
-  top: "fc8"
-}
-layer {
-  name: "drop8"
-  type: "Dropout"
-  bottom: "fc8"
-  top: "fc8"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
-
 layer {
   name: "cls_score"
   type: "InnerProduct"
-  bottom: "fc8"
+  bottom: "fc7"
   top: "cls_score"
   param {
     name: "cls_score_w"
@@ -839,11 +833,23 @@ layer {
   }
 }
 
-
-# ============= output ===============
+#0124 use the same output as faster rcnn does
 layer {
-   name: "cls_prob"
-   type: "Softmax"
-   bottom: "cls_score"
-   top: "cls_prob"
+	name: "loss_cls"
+	type: "SoftmaxWithLoss"
+	bottom: "cls_score"
+	bottom: "labels"
+	top: "loss_cls"
+	loss_param {
+        normalization: VALID
+   }
+	loss_weight: 1
+}
+
+layer {
+	name: "accuarcy"
+	type: "Accuracy"
+	bottom: "cls_score"
+	bottom: "labels"
+	top: "accuarcy"
 }
