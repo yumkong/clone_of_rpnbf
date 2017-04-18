@@ -1,4 +1,4 @@
-function script_VGG16_widerface_ablation_mpfvn_total_conv2345_cxt_smart()
+function script_VGG16_widerface_ablation_mpfvn_total_conv2345_cxt_test()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -148,7 +148,10 @@ model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % ini
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 %0125 added: training with score feat map
 model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
-%dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
+dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
+%0402: use do_proposal_test_widerface_ablation_final_draw to see fp and fns
 % test
-Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_fastrcnn_cxt(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+%Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_fastrcnn(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
+%0404: local norm use: do_proposal_test_widerface_ablation_total_2345_localnorm
+Faster_RCNN_Train.do_proposal_test_widerface_ablation_total_2345_cxt(conf_proposal,conf_fast_rcnn,  model.stage1_rpn,model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
 end
