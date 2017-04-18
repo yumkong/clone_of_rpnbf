@@ -183,28 +183,57 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_attr(conf,conf_fas
     end
     aboxes_v1 = boxes_filter(aboxes_v1, -1, 0.33, -1, conf.use_gpu); %0.5
     
-    ld = load('wider_hard_val.mat');
+    ld = load('wider_hard_val_complete.mat'); % wider_hard_val
     face_bbx_list = ld.face_bbx_list;
     gt_list = ld.gt_list;
+    %1: blur, 2: expression, 3:illumination, 4:occlusion, 5: pose, 6:hei, 7:area, 8:hwrto
+    % *************************** every time change the following two vals ************************************
+    attr_type = 8; %1-blur,2-expr,3-illum,4-occl,5-pose, 6-hei, 7-area, 8-hwrto
+    attr_val = 4; %0, 1, 2(optional: [blur] and [occlusion]), 3,4,5 (for [hei], [area], [hwrto])
+    attr_name_pool = {'blur', 'expr', 'illum', 'occl', 'pose', 'hei', 'area', 'hwrto'};
+    % 0414 
+    switch attr_type
+        case 1
+            class_list = ld.blur_label_list;
+        case 2
+            class_list = ld.expression_label_list;
+        case 3
+            class_list = ld.illumination_label_list;
+        case 4
+            class_list = ld.occlusion_label_list;
+        case 5
+            class_list = ld.pose_label_list;
+        case 6
+            class_list = ld.height_label_list;
+        case 7
+            class_list = ld.area_label_list;
+        case 8
+            class_list = ld.hwratio_label_list;
+        otherwise
+            disp('Unknown attribute type.')
+    end
+    res_save_name = sprintf('res_%s_%d', attr_name_pool{attr_type}, attr_val);%'res_blur_0';
     %blur_label_list = ld.blur_label_list;
-    expression_label_list = ld.expression_label_list;
+    %expression_label_list = ld.expression_label_list;
     gt_boxes_special = cell(length(aboxes_s4), 1);
     gt_boxes_all = cell(length(aboxes_s4), 1);
     cnt = 0;
+    
     for k = 1:length(gt_list)
         gt_event_list = gt_list{k};
         face_bbx_event_list = face_bbx_list{k};
-        %blur_label_event_list = blur_label_list{k};
-        expression_label_event_list = expression_label_list{k};
+        class_event_list = class_list{k};
+        %expression_label_event_list = expression_label_list{k};
         for kk = 1:length(gt_event_list)
             cnt = cnt + 1;
             gt_hard_idx = false(size(face_bbx_event_list{kk}, 1), 1);
             gt_hard_idx(gt_event_list{kk},:) = true;
-            % ****** change character attributes here ******
-            %final_idx = (blur_label_event_list{kk}==2) & gt_hard_idx;
-            final_idx = (expression_label_event_list{kk}==0) & gt_hard_idx;
+            % ****************************************************************** change character attributes here ******
+            final_idx = gt_hard_idx & (class_event_list{kk} == attr_val);
+            %final_idx = gt_hard_idx; %& (expression_label_event_list{kk}==0);
             gt_boxes_special{cnt} = face_bbx_event_list{kk}(final_idx, :);
-            gt_boxes_all{cnt} = face_bbx_event_list{kk};
+            %0414 always use hard idx
+            gt_boxes_all{cnt} = face_bbx_event_list{kk}(gt_event_list{kk}, :);
         end
     end
     nPosAll = 0;
@@ -315,6 +344,8 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_attr(conf,conf_fas
     end	
     % is 10000 good?
     res = averagePrecisionNormalized(conf_global, label_global, nPosAll, 13300);    
+    save(res_save_name, 'res');
+    fprintf('For %s: nPos = %d, APn = %.4f\n',res_save_name, nPosAll, res.apn);
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)

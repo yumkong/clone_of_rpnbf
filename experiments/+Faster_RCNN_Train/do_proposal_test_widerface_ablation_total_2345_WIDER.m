@@ -285,7 +285,7 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER(conf,conf_fast_rcn
         save('hard_fp_mat','hard_fp_mat');
     end
     hard_fp_num = size(hard_fp_mat, 1);
-    for j = 1:hard_fp_num
+    for j = 80:hard_fp_num
         im_idx = hard_fp_mat(j, 1);
         img = imread(imdb.image_at(im_idx));  
         figure(6),clf; 
