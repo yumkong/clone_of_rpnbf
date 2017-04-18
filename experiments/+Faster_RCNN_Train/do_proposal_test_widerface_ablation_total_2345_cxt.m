@@ -48,15 +48,15 @@ function do_proposal_test_widerface_ablation_total_2345_cxt(conf,conf_fast_rcnn,
     %1126 added to refresh figure
     close all;
     
-    SUBMIT_cachedir1 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_BP-FPN_cachedir1');
+    SUBMIT_cachedir1 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir1');
     mkdir_if_missing(SUBMIT_cachedir1);
-    SUBMIT_cachedir2 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_BP-FPN_cachedir2');
+    SUBMIT_cachedir2 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir2');
     mkdir_if_missing(SUBMIT_cachedir2);
-    SUBMIT_cachedir3 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_BP-FPN_cachedir3');
+    SUBMIT_cachedir3 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir3');
     mkdir_if_missing(SUBMIT_cachedir3);
-    SUBMIT_cachedir4 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_BP-FPN_cachedir4');
+    SUBMIT_cachedir4 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir4');
     mkdir_if_missing(SUBMIT_cachedir4);
-    SUBMIT_cachedir5 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_BP-FPN_cachedir5');
+    SUBMIT_cachedir5 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir5');
     mkdir_if_missing(SUBMIT_cachedir5);
     try
         ld = load(save_file);%'aboxes_old', 'aboxes_new','score_ind_old', 'score_ind_new'
@@ -170,22 +170,22 @@ function do_proposal_test_widerface_ablation_total_2345_cxt(conf,conf_fast_rcnn,
             %fastrcnn_score = nthroot(fastrcnn_score_raw, 1);
             %fastrcnn_score = nthroot(fastrcnn_score_raw, 1);
             %0328 shrink to [0.8 1] - optimal by round 1
-            fastrcnn_score1 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 1;
-            fastrcnn_score2 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 1;
-            fastrcnn_score3 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 1;
-            fastrcnn_score4 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 1;
-            fastrcnn_score5 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 1;
+            fastrcnn_score1 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 0.9;
+            fastrcnn_score2 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.2 + 0.8;
+            fastrcnn_score3 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.3 + 0.7;
+            fastrcnn_score4 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.4 + 0.6;
+            fastrcnn_score5 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.5 + 0.5;
         end
         
         if ~isempty(rpn_boxes)
             aboxes_old{i} = [rpn_boxes rpn_score];
             aboxes_new{i} = [rpn_boxes fastrcnn_score];
             % 1 * rpn + 0.5 * fastrcnn_score is optimal by round 3&4
-            aboxes_v1{i} = [rpn_boxes (rpn_score .* fastrcnn_score1)];
-            aboxes_v2{i} = [rpn_boxes (rpn_score .* fastrcnn_score2)];
-            aboxes_v3{i} = [rpn_boxes (rpn_score .* fastrcnn_score3)];
-            aboxes_v4{i} = [rpn_boxes (rpn_score .* fastrcnn_score4)];
-            aboxes_v5{i} = [rpn_boxes (rpn_score .* fastrcnn_score5)];
+            aboxes_v1{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score1)];
+            aboxes_v2{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score2)];
+            aboxes_v3{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score3)];
+            aboxes_v4{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score4)];
+            aboxes_v5{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score5)];
         else
             aboxes_old{i} = [];
             aboxes_new{i} = [];
@@ -197,10 +197,10 @@ function do_proposal_test_widerface_ablation_total_2345_cxt(conf,conf_fast_rcnn,
         end
         %0321: pseudoNMS_v8_ablation == pseudoNMS_v8_twopath
         aboxes_v1{i} = pseudoNMS_v8_ablation(aboxes_v1{i}, nms_option);%4
-        aboxes_v2{i} = pseudoNMS_v8_ablation2(aboxes_v2{i}, nms_option);%4
-        aboxes_v3{i} = pseudoNMS_v8_ablation3(aboxes_v3{i}, nms_option);%4
-        aboxes_v4{i} = pseudoNMS_v8_ablation4(aboxes_v4{i}, nms_option);%4
-        aboxes_v5{i} = pseudoNMS_v8_ablation5(aboxes_v5{i}, nms_option);%4
+        aboxes_v2{i} = pseudoNMS_v8_ablation(aboxes_v2{i}, nms_option);%4
+        aboxes_v3{i} = pseudoNMS_v8_ablation(aboxes_v3{i}, nms_option);%4
+        aboxes_v4{i} = pseudoNMS_v8_ablation(aboxes_v4{i}, nms_option);%4
+        aboxes_v5{i} = pseudoNMS_v8_ablation(aboxes_v5{i}, nms_option);%4
         if ~isempty(aboxes_v1{i})
             [~, scores_ind] = sort(aboxes_v1{i}(:,5), 'descend');
             aboxes_v1{i} = aboxes_v1{i}(scores_ind, :);
