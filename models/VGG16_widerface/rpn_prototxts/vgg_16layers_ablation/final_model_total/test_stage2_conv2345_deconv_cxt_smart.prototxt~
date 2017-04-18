@@ -622,63 +622,18 @@ layer {
 	}
 }
 
-layer {
-	bottom: "roi_pool2"
-	bottom: "roi_pool3"
-	bottom: "roi_pool4_3"
-	bottom: "roi_pool5_3"
-	top: "concat_roi_face"
-	name: "concat_roi_face"
-	type: "Concat"
-	concat_param {
-		axis: 1  #concat along channels: 128+256+512+512=1408
-	}
-}
-
-# 0323 added
-layer {
-	name: "conv_concat_face"
-	bottom: "concat_roi_face"
-	top: "conv_concat_face"
-	param {
-		lr_mult: 1.0
-		decay_mult: 1.0
-	}
-	param {
-		lr_mult: 2.0
-		decay_mult: 0
-	}
-	type: "Convolution"
-	convolution_param {
-		num_output: 512
-		pad: 0
-		kernel_size: 1
-
-	}
-}
-
-layer {
-	bottom: "conv_concat_face"
-	top: "conv_concat_face"
-	name: "relu_conv_concat_face"
-	type: "ReLU"
-}
-
-#1207 added normlization
-layer {
-  name: "face_norm"
-  type: "Normalize"
-  bottom: "conv_concat_face"
-  top: "face_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 32
-    }
-    channel_shared: false
-  }
-}
+#layer {
+#	bottom: "roi_pool2"
+#	bottom: "roi_pool3"
+#	bottom: "roi_pool4_3"
+#	bottom: "roi_pool5_3"
+#	top: "concat_roi_face"
+#	name: "concat_roi_face"
+#	type: "Concat"
+#	concat_param {
+#		axis: 1  #concat along channels: 128+256+512+512=1408
+#	}
+#}
 
 layer {
 	bottom: "roi_pool2_cxt"
@@ -738,13 +693,16 @@ layer {
 }
 
 layer {
-	bottom: "face_norm"
+	bottom: "roi_pool2"
+	bottom: "roi_pool3"
+	bottom: "roi_pool4_3"
+	bottom: "roi_pool5_3"
 	bottom: "cxt_norm"
 	top: "concat_roi_overall"
 	name: "concat_roi_overall"
 	type: "Concat"
 	concat_param {
-		axis: 1  #concat along channels: face 1024 + cxt 256= 1280
+		axis: 1  #concat along channels: face 1408 + cxt 256= 1664
 	}
 }
 
