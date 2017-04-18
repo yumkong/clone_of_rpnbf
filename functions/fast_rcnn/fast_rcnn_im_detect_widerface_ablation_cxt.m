@@ -119,7 +119,7 @@ function [feat_rois, feat_rois_cxt, levels] = map_im_rois_to_feat_rois(conf, im_
         heights = im_rois(:, 4) - im_rois(:, 2) + 1;
         
         areas = widths .* heights;
-        scaled_areas = bsxfun(@times, areas(:), scales(:)'.^2);
+        scaled_areas = bsxfun(@times, areas(:), scales(:)'.^2);%'
         [~, levels] = min(abs(scaled_areas - 224.^2), [], 2); 
     else
         levels = ones(size(im_rois, 1), 1);
