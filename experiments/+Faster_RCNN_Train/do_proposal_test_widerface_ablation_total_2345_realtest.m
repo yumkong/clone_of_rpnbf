@@ -308,7 +308,7 @@ function do_proposal_test_widerface_ablation_total_2345_realtest(conf,conf_fast_
 %         fclose(fid5);
         fprintf('Done with saving image %d bboxes.\n', i);
         
-        if 0      
+        if 1      
             %1121 also draw gt boxes
             img = imread(imdb.image_at(i));  
             %bbs_gt = roidb.rois(i).boxes;
@@ -324,7 +324,7 @@ function do_proposal_test_widerface_ablation_total_2345_realtest(conf,conf_fast_
             hold on
             if ~isempty(bbs_all)
                 % 0406:for displaying 'clean' image
-                bbs_all = bbs_all(bbs_all(:,5)>=1.097,:);
+                bbs_all = bbs_all(bbs_all(:,5)>=1.093,:);
             end
             if ~isempty(bbs_all)
                   % 0406:for displaying score <= 1
