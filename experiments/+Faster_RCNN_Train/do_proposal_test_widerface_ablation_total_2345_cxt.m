@@ -170,11 +170,11 @@ function do_proposal_test_widerface_ablation_total_2345_cxt(conf,conf_fast_rcnn,
             %fastrcnn_score = nthroot(fastrcnn_score_raw, 1);
             %fastrcnn_score = nthroot(fastrcnn_score_raw, 1);
             %0328 shrink to [0.8 1] - optimal by round 1
-            fastrcnn_score1 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 0.9;
+            fastrcnn_score1 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.2 + 0.8;
             fastrcnn_score2 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.2 + 0.8;
-            fastrcnn_score3 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.3 + 0.7;
-            fastrcnn_score4 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.4 + 0.6;
-            fastrcnn_score5 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.5 + 0.5;
+            fastrcnn_score3 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.2 + 0.8;
+            fastrcnn_score4 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 0.9;
+            fastrcnn_score5 = (fastrcnn_score - min_all_f)/(max_all_f - min_all_f)*0.1 + 0.9;
         end
         
         if ~isempty(rpn_boxes)
@@ -182,10 +182,10 @@ function do_proposal_test_widerface_ablation_total_2345_cxt(conf,conf_fast_rcnn,
             aboxes_new{i} = [rpn_boxes fastrcnn_score];
             % 1 * rpn + 0.5 * fastrcnn_score is optimal by round 3&4
             aboxes_v1{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score1)];
-            aboxes_v2{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score2)];
-            aboxes_v3{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score3)];
+            aboxes_v2{i} = [rpn_boxes (rpn_score + 0.5 * fastrcnn_score2)];
+            aboxes_v3{i} = [rpn_boxes (rpn_score + 0.9 * fastrcnn_score3)];
             aboxes_v4{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score4)];
-            aboxes_v5{i} = [rpn_boxes (rpn_score + 0.1 * fastrcnn_score5)];
+            aboxes_v5{i} = [rpn_boxes (rpn_score + 0.9 * fastrcnn_score5)];
         else
             aboxes_old{i} = [];
             aboxes_new{i} = [];
