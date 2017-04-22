@@ -1,4 +1,4 @@
-function do_proposal_test_widerface_ablation_total_2345_cxt_real(conf,conf_fast_rcnn, model_stage,model_stage_fast, imdb, roidb, nms_option)
+function do_proposal_test_widerface_ablation_total_2345_cxt_real(conf,conf_fast_rcnn, model_stage,model_stage_fast, imdb, nms_option)
     % share the test with final3 for they have the same test network struct
     %[aboxes_res23, aboxes_res45]  = proposal_test_widerface_twopath_happy_flip(conf, imdb, ...
     %0129 added scale3 version
@@ -48,15 +48,15 @@ function do_proposal_test_widerface_ablation_total_2345_cxt_real(conf,conf_fast_
     %1126 added to refresh figure
     close all;
     
-    SUBMIT_cachedir1 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir1');
+    SUBMIT_cachedir1 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_realtest1');
     mkdir_if_missing(SUBMIT_cachedir1);
-    SUBMIT_cachedir2 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir2');
+    SUBMIT_cachedir2 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_realtest2');
     mkdir_if_missing(SUBMIT_cachedir2);
-    SUBMIT_cachedir3 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir3');
+    SUBMIT_cachedir3 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_realtest3');
     mkdir_if_missing(SUBMIT_cachedir3);
-    SUBMIT_cachedir4 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir4');
+    SUBMIT_cachedir4 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_realtest4');
     mkdir_if_missing(SUBMIT_cachedir4);
-    SUBMIT_cachedir5 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_cachedir5');
+    SUBMIT_cachedir5 = fullfile(pwd, 'output', conf_fast_rcnn.exp_name, 'fast_rcnn_cachedir', 'submit_MPFVN_realtest5');
     mkdir_if_missing(SUBMIT_cachedir5);
     try
         ld = load(save_file);%'aboxes_old', 'aboxes_new','score_ind_old', 'score_ind_new'
@@ -152,7 +152,9 @@ function do_proposal_test_widerface_ablation_total_2345_cxt_real(conf,conf_fast_
     aboxes_v3 = cell(length(imdb.image_ids), 1);
     aboxes_v4 = cell(length(imdb.image_ids), 1);
     aboxes_v5 = cell(length(imdb.image_ids), 1);
-    
+    %0406 added to fix bug: some empty boxes are 'double' type, use the
+    %following to make all cell units 'single'
+    aboxes_new = cellfun(@(x) single(x), aboxes_new, 'UniformOutput', false);
     aa = cell2mat(aboxes_new);
     all_f_score = aa(:,5);
     max_all_f = max(all_f_score);
