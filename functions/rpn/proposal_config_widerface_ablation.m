@@ -29,9 +29,9 @@ function conf = proposal_config_widerface_ablation(varargin)
     % Images per batch, only supports ims_per_batch = 1 currently
     ip.addParamValue('ims_per_batch',   3,              @isscalar);%0205:2-->3
     % Minibatch size
-    ip.addParamValue('batch_size',      240,            @isscalar); %original 120,0122: 256(for 1 image)  --> 240 (for 3 images) 
+    ip.addParamValue('batch_size',      120,            @isscalar); %0424: 240 (for 3 images) -->120
     % Fraction of minibatch that is foreground labeled (class > 0)
-    ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
+    ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0424: 0.25-->0.5
     % weight of background samples, when weight of foreground samples is
     % 1.0
     ip.addParamValue('bg_weight',       1,            @isscalar);
