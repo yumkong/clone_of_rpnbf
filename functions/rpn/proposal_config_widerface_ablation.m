@@ -29,12 +29,12 @@ function conf = proposal_config_widerface_ablation(varargin)
     % Images per batch, only supports ims_per_batch = 1 currently
     ip.addParamValue('ims_per_batch',   3,              @isscalar);%0205:2-->3
     % Minibatch size
-    ip.addParamValue('batch_size',      66,            @isscalar); %0424: 240 (for 3 images) -->120->66
+    ip.addParamValue('batch_size',      120,            @isscalar); %0424: 240 (for 3 images) -->120->66
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0424: 0.25-->0.5
     % weight of background samples, when weight of foreground samples is
     % 1.0
-    ip.addParamValue('bg_weight',       0.5,            @isscalar); %0426:1 --> 0.5
+    ip.addParamValue('bg_weight',       1,            @isscalar); %0426:1 --> 0.5
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)
     ip.addParamValue('fg_thresh',       0.5,            @isscalar);
     % Overlap threshold for a ROI to be considered background (class = 0 if
