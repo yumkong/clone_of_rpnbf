@@ -1,4 +1,4 @@
-function script_RES101_widerface_ablation_res5()
+function script_RES101_widerface_ablation_res5_vn7()
 % script_rpn_face_VGG16_widerface_multibox_ohem()
 % --------------------------------------------------------
 % Yuguang Liu
@@ -36,7 +36,7 @@ exp_name = 'Res50_widerface';
 % do validation, or not 
 opts.do_val                 = true; 
 % model
-model                       = Model.RES101_for_ablation_res5(exp_name);
+model                       = Model.RES101_for_ablation_res5_vn7(exp_name);
 % cache base
 cache_base_proposal         = 'rpn_widerface_RES101';
 %cache_base_fast_rcnn        = '';
@@ -102,7 +102,7 @@ end
 
 % %% -------------------- TRAIN --------------------
 % conf
-conf_proposal          = proposal_config_widerface_ablation('image_means', model.mean_image, 'feat_stride', model.feat_stride);
+conf_proposal          = proposal_config_widerface_ablation_vn7('image_means', model.mean_image, 'feat_stride', model.feat_stride);
 %conf_fast_rcnn              = fast_rcnn_config_widerface('image_means', model.mean_image);
 % generate anchors and pre-calculate output size of rpn network 
 
@@ -111,7 +111,7 @@ conf_proposal.exp_name = exp_name;
 %[conf_proposal.anchors, conf_proposal.output_width_map, conf_proposal.output_height_map] ...
 %                            = proposal_prepare_anchors(conf_proposal, model.stage1_rpn.cache_name, model.stage1_rpn.test_net_def_file);
 % ###4/5### CHANGE EACH TIME*** : name of output map
-output_map_name = 'output_map_res5';  % output_map_conv4, output_map_conv5
+output_map_name = 'output_map_res3';  % output_map_res5 and 4
 output_map_save_name = fullfile(cache_data_this_model_dir, output_map_name);
 [conf_proposal.output_width_map, conf_proposal.output_height_map] = proposal_calc_output_size_ablation(conf_proposal, ...
                                                                     model.stage1_rpn.test_net_def_file, output_map_save_name);
