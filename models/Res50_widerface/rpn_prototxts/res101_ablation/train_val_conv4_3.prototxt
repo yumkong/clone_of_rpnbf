@@ -6314,25 +6314,25 @@ layer {
 }
 
 # normalize
-layer {
-  name: "res4_norm"
-  type: "Normalize"
-  bottom: "res4_reduce"
-  top: "res4_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 16  #0422: 45.3-->32
-    }
-   channel_shared: false
-  }
-}
+#layer {
+#  name: "res4_norm"
+#  type: "Normalize"
+#  bottom: "res4b22"
+#  top: "res4_norm"
+#  norm_param {
+#    across_spatial: false
+#    scale_filler {
+#      type: "constant"
+#      value: 32  #0422: 45.3-->32
+#    }
+#   channel_shared: false
+#  }
+#}
 
 layer {
    name: "res4_proposal"
    type: "Convolution"
-   bottom: "res4_norm"
+   bottom: "res4_reduce"
    top: "res4_proposal"
 	param {
 		lr_mult: 1.0
@@ -6485,9 +6485,6 @@ layer {
    bottom: "labels_weights_reshape"
    top: "loss_cls"
    loss_weight: 1
-   #propagate_down: true
-   #propagate_down: false
-   #propagate_down: false
 }
 
 layer {
@@ -6497,8 +6494,5 @@ layer {
   bottom: "bbox_targets"       #[1 28 7 7]
   bottom: "bbox_loss_weights"  #[1 28 7 7]
   top: "loss_bbox"
-  loss_weight: 1  #0421: 5->1 due to nodivanchor
-  loss_param {
-        normalization: VALID
-  }
+  loss_weight: 5  #0427: 1->5
 }

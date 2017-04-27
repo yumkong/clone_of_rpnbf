@@ -5,30 +5,6 @@ input_dim: 3
 input_dim: 224
 input_dim: 224
 
-input: "labels"
-input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 7        # 7(anchors)     
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 14		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
-input: "labels_weights"
-input_dim: 1 		# to be changed on-the-fly to match input dim
-input_dim: 7        # 7(anchors)        
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
-input: "bbox_targets"
-input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 28  		# 7(anchors) * 4 (coords) 
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
-input: "bbox_loss_weights"
-input_dim: 1  		# to be changed on-the-fly to match input dim
-input_dim: 28  		# 7(anchors) * 4 (coords)
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
-
 layer {
     bottom: "data"
     top: "conv1"
@@ -173,6 +149,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -237,6 +214,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -301,6 +279,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -373,6 +352,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -437,6 +417,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -501,6 +482,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -573,6 +555,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -637,6 +620,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -701,6 +685,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -773,6 +758,7 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -830,6 +816,7 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
+	#engine: CAFFE	
     }
     param {
         lr_mult: 1.0
@@ -894,6 +881,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -958,6 +946,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1030,6 +1019,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1094,6 +1084,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1158,6 +1149,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1230,6 +1222,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1294,6 +1287,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1358,6 +1352,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1430,6 +1425,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1494,6 +1490,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1558,6 +1555,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1630,6 +1628,7 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1687,6 +1686,7 @@ layer {
         pad: 0
         stride: 2
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1751,6 +1751,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1815,6 +1816,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1887,6 +1889,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -1951,6 +1954,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2015,6 +2019,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2087,6 +2092,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2151,6 +2157,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2215,6 +2222,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2287,6 +2295,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2351,6 +2360,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2415,6 +2425,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2487,6 +2498,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2551,6 +2563,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2615,6 +2628,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2687,6 +2701,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2751,6 +2766,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2815,6 +2831,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2887,6 +2904,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -2951,6 +2969,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3015,6 +3034,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3087,6 +3107,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3151,6 +3172,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3215,6 +3237,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3287,6 +3310,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3351,6 +3375,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3415,6 +3440,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3487,6 +3513,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3551,6 +3578,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3615,6 +3643,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3687,6 +3716,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3751,6 +3781,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3815,6 +3846,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3887,6 +3919,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -3951,6 +3984,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4015,6 +4049,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4087,6 +4122,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4151,6 +4187,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4215,6 +4252,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4287,6 +4325,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4351,6 +4390,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4415,6 +4455,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4487,6 +4528,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4551,6 +4593,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4615,6 +4658,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4687,6 +4731,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4751,6 +4796,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4815,6 +4861,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4887,6 +4934,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -4951,6 +4999,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5015,6 +5064,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5087,6 +5137,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5151,6 +5202,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5215,6 +5267,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5287,6 +5340,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5351,6 +5405,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5415,6 +5470,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5487,6 +5543,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5551,6 +5608,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5615,6 +5673,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5687,6 +5746,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5751,6 +5811,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5815,6 +5876,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5887,6 +5949,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -5951,6 +6014,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6015,6 +6079,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6087,6 +6152,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6151,6 +6217,7 @@ layer {
         pad: 1
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6215,6 +6282,7 @@ layer {
         pad: 0
         stride: 1
         bias_term: false
+	#engine: CAFFE
     }
     param {
         lr_mult: 1.0
@@ -6296,13 +6364,6 @@ layer {
 		num_output: 256
 		pad: 0
 		kernel_size: 1
-		weight_filler {
-			type: "xavier"
-		}
-		bias_filler{
-			type: "constant"
-			value: 0
-		}
 	}
 }
 
@@ -6314,25 +6375,25 @@ layer {
 }
 
 # normalize
-layer {
-  name: "res4_norm"
-  type: "Normalize"
-  bottom: "res4_reduce"
-  top: "res4_norm"
-  norm_param {
-    across_spatial: false
-    scale_filler {
-      type: "constant"
-      value: 16  #0422: 45.3-->32
-    }
-   channel_shared: false
-  }
-}
+#layer {
+#  name: "res4_norm"
+#  type: "Normalize"
+#  bottom: "res4b22"
+#  top: "res4_norm"
+#  norm_param {
+#    across_spatial: false
+#    scale_filler {
+#      type: "constant"
+#      value: 32  #0422: 45.3-->32
+#    }
+#   channel_shared: false
+#  }
+#}
 
 layer {
    name: "res4_proposal"
    type: "Convolution"
-   bottom: "res4_norm"
+   bottom: "res4_reduce"
    top: "res4_proposal"
 	param {
 		lr_mult: 1.0
@@ -6353,6 +6414,7 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
+	   #engine: CAFFE
    }
 }
 
@@ -6387,6 +6449,7 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
+	   #engine: CAFFE
    }
 }
 
@@ -6414,6 +6477,7 @@ layer {
 		 type: "constant"
 		 value: 0
 	   }
+	   #engine: CAFFE
    }
 }
 # ========= end of res4 proposal =================
@@ -6437,68 +6501,9 @@ layer {
 }
 
 layer {
-   bottom: "labels"
-   top: "labels_reshape"
-   name: "labels_reshape"
-   type: "Reshape"
-   reshape_param{
-	   shape {
-			dim: 0 
-			dim: 1
-			dim: -1 
-			dim: 0
-		}
-	}
-}
-
-layer {
-   bottom: "labels_weights"
-   top: "labels_weights_reshape"
-   name: "labels_weights_reshape"
-   type: "Reshape"
-   reshape_param{
-	   shape {
-			dim: 0 
-			dim: 1
-			dim: -1 
-			dim: 0
-		}
-	}
-}
-
-#1123 add ignore_label
-# this is the overall accuracy of all fgs (thresh >= 0.5) and bgs (0 <= thresh < 0.3)
-layer {
-   name: "accuarcy"
-   type: "Accuracy"
+   name: "proposal_cls_prob"
+   type: "Softmax"
    bottom: "proposal_cls_score_reshape"
-   bottom: "labels_reshape"
-   top: "accuarcy"
+   top: "proposal_cls_prob"
 }
 
-# final loss cls output 
-layer {
-   name: "loss_cls"
-   type: "SoftmaxWithLoss"
-   bottom: "proposal_cls_score_reshape"
-   bottom: "labels_reshape"
-   bottom: "labels_weights_reshape"
-   top: "loss_cls"
-   loss_weight: 1
-   #propagate_down: true
-   #propagate_down: false
-   #propagate_down: false
-}
-
-layer {
-  name: "loss_bbox"
-  type: "SmoothL1Loss"
-  bottom: "proposal_bbox_pred" #[1 28 7 7]
-  bottom: "bbox_targets"       #[1 28 7 7]
-  bottom: "bbox_loss_weights"  #[1 28 7 7]
-  top: "loss_bbox"
-  loss_weight: 1  #0421: 5->1 due to nodivanchor
-  loss_param {
-        normalization: VALID
-  }
-}
