@@ -27,9 +27,9 @@ function conf = proposal_config_widerface_ablation_vn7(varargin)
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        512,           @isscalar); %960
     % Images per batch, only supports ims_per_batch = 1 currently
-    ip.addParamValue('ims_per_batch',   3,              @isscalar);%3->2
+    ip.addParamValue('ims_per_batch',   2,              @isscalar);%3->2
     % Minibatch size
-    ip.addParamValue('batch_size',      120,            @isscalar); %120-->66
+    ip.addParamValue('batch_size',      60,            @isscalar); %120-->66
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0424: 0.25-->0.5
     % weight of background samples, when weight of foreground samples is
