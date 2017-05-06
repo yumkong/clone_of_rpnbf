@@ -4,7 +4,7 @@ function script_VGG16_widerface_multibox_ablation_conv6_s16()
 % Yuguang Liu
 % 3 layers of loss output
 % --------------------------------------------------------
-
+%0506 for plot
 % ********** liu@1001: run this at root directory !!! *******************************
 
 clc;
