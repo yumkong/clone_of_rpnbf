@@ -252,7 +252,7 @@ function do_proposal_test_widerface_ablation_total_2345_MALF(conf,conf_fast_rcnn
 
         fprintf('Done with saving image %d bboxes.\n', i);
         
-        if 0      
+        if 1      
             %1121 also draw gt boxes
             %0409 changed
             %imgFile = fullfile(imgDir, [fileList{i}, '.jpg']);
