@@ -35,7 +35,7 @@ imdb/cache
 *.jpg
 *.png
 bin/
-
+test_final/model/*
 
 # Windows Installer files
 *.cab
