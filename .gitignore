@@ -33,8 +33,9 @@ imdb/cache
 *.caffemodel
 *.mat
 *.jpg
+*.png
 bin/
-
+test_final/model/*
 
 # Windows Installer files
 *.cab
