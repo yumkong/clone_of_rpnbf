@@ -33,6 +33,7 @@ imdb/cache
 *.caffemodel
 *.mat
 *.jpg
+*.png
 bin/
 
 
