@@ -1,12 +1,12 @@
 function mpfpn_faceHunter()
 clc;
 clear mex;
-if ~ispc
+<<<<<<< HEAD
 cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian/test_final');
-else
+=======
 % first come to work folder
 cd('D:\RPN_BF_master\test_final');
-end
+>>>>>>> c80037cfc1f77a6e15485955fb1a38a2b2ff2d87
 
 clear is_valid_handle;
 run(fullfile(fileparts(fileparts(mfilename('fullpath'))), 'startup'));
@@ -17,11 +17,15 @@ elseif isunix
     opts.caffe_version          = 'caffe_faster_rcnn_newL1'; %'caffe_faster_rcnn_bn'; 
     %cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
-
+<<<<<<< HEAD
 cd('..');
 addpath('test_final');
 addpath(fullfile('test_final','util_funcs'));
-
+=======
+cd('..'); %return to root folder
+%addpath('test_final');
+%addpath(fullfile('test_final','util_funcs'));
+>>>>>>> c80037cfc1f77a6e15485955fb1a38a2b2ff2d87
 opts.gpu_id = auto_select_gpu;
 active_caffe_mex(opts.gpu_id, opts.caffe_version);
 
