@@ -1,14 +1,15 @@
-function aboxes = do_proposal_test_widerface_ablation(conf, model_stage, imdb, roidb, nms_option)
-    aboxes                      = proposal_test_widerface_ablation(conf, imdb, ...
+function aboxes = rpn_test_wrap(conf, model_stage, imdb, roidb, nms_option)
+    cache_dir = fullfile(pwd, 'output2', conf.exp_name, 'rpn_cache', model_stage.cache_name, imdb.name);
+    aboxes                      = helper.rpn_test(conf, imdb, cache_dir, ...
                                         'net_def_file',     model_stage.test_net_def_file, ...
                                         'net_file',         model_stage.output_model_file, ...
                                         'cache_name',       model_stage.cache_name, ...
                                         'three_scales',     false); %0124: root switch of test with 1 scale or 3 scales
-    cache_dir = fullfile(pwd, 'output', conf.exp_name, 'rpn_cachedir', model_stage.cache_name, imdb.name);
+    
 	%cache_dir = fullfile(pwd, 'output', opts.cache_name, imdb.name);
     try
         % try to load cache
-        box_nms_name = fullfile(cache_dir, ['proposal_boxes_afterNMS_' imdb.name]);
+        box_nms_name = fullfile(cache_dir, ['proposal_boxes_pseudonms_' imdb.name]);
         ld = load(box_nms_name);
         aboxes = ld.aboxes;
     catch 
@@ -35,35 +36,30 @@ function aboxes = do_proposal_test_widerface_ablation(conf, model_stage, imdb, r
             % 0206: keep an average of the first 300 boxes
             aboxes{i} = aboxes{i}(aboxes{i}(:, end) >= score_thresh, :);
             % 0206: psudoNms
-            aboxes{i} = pseudoNMS_v8_twopath(aboxes{i}, nms_option);%4
+            aboxes{i} = helper.nms_pseudo(aboxes{i}, nms_option);%4
+            %0226 added: sort by score ()pseudoNMS may make the box
+            %not sorted in descending order of scores
+            if ~isempty(aboxes{i})
+                [~, scores_ind] = sort(aboxes{i}(:,5), 'descend');
+                aboxes{i} = aboxes{i}(scores_ind, :);
+            end
         end
         save(box_nms_name, 'aboxes');
     end
 
     % 0206 added
-    start_thresh = 5;
-    thresh_interval = 10;
-    thresh_end = 300;
-    [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes, start_thresh,thresh_interval,thresh_end);
-    save(fullfile(cache_dir,'recall_vector.mat'),'gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
-    fprintf('For all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
-    h = figure(2);
-    h = sfigure(h, 2.5, 2);
-    rotation_plot(gt_recall_pool./(gt_num_pool+eps), start_thresh, thresh_interval, thresh_end);
-    %save plot here
-    plotSaveName = fullfile(cache_dir,'recall_plot');
-    export_fig(plotSaveName, '-png', '-a1', '-native');
+    thresh_beg = 8; %5
+    thresh_end = 12; % 500
+    [gt_num, recall_num] = get_detector_recall(roidb, aboxes, thresh_beg, thresh_end);
+    fprintf('gt = %d, recall = %d, recall_rate = %.4f\n', gt_num, recall_num, recall_num/gt_num);
 end
 
-function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector_Recall_finegrained(roidb, aboxes, start_thresh,thresh_interval,thresh_end)
-    gt_num_all = 0;
-    gt_recall_all = 0;
-    % 1229 added
-    gt_num_pool = zeros(1, length(start_thresh:thresh_interval:thresh_end)+1);  % 4 ~ 14, 14~24, ...
-    gt_recall_pool = gt_num_pool;
-
-    %0110 added
-    for i = 1:length(roidb.rois)
+function [gt_num, recall_num] = get_detector_recall(roidb, aboxes, thresh_beg, thresh_end)
+    gt_num = 0;
+    recall_num = 0;
+    %0713 changed
+    %for i = 1:length(roidb.rois)
+    for i = 1:length(aboxes)
         gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
         if ~isempty(gts)
             % only leave 2x gt_num detected bboxes
@@ -78,51 +74,19 @@ function [gt_num_all, gt_recall_all, gt_num_pool, gt_recall_pool] = Get_Detector
             
             face_height = gts(:,4) - gts(:,2) + 1;
             % total statistics
-            idx_all = (face_height>= start_thresh);  % all:4-inf
+            idx_all = (face_height >= thresh_beg & face_height <= thresh_end);  % all:4-inf
             gts_all = gts(idx_all, :);
             if ~isempty(gts_all)
-                gt_num_all = gt_num_all + size(gts_all, 1);
+                gt_num = gt_num + size(gts_all, 1);
                 if ~isempty(rois)
                     max_ols = max(boxoverlap(rois, gts_all));
                     if ~isempty(max_ols)
-                        gt_recall_all = gt_recall_all + sum(max_ols >= 0.5);
+                        recall_num = recall_num + sum(max_ols >= 0.5);
                     end
-                end
-            end
-                
-            % segment statistics
-            cnt = 0;
-            for k = start_thresh:thresh_interval:thresh_end
-                cnt = cnt + 1;
-                part_idx = (face_height>= k) & (face_height < k + thresh_interval); % eg.:4~14
-                part_gts = gts(part_idx, :);
-            
-                if ~isempty(part_gts)
-                    gt_num_pool(cnt) = gt_num_pool(cnt) + size(part_gts, 1);
-                    if ~isempty(rois)
-                        max_ols = max(boxoverlap(rois, part_gts));  
-                        if ~isempty(max_ols)
-                            gt_recall_pool(cnt) = gt_recall_pool(cnt) + sum(max_ols >= 0.5);
-                        end
-                    end
-                end
-            end
-            %0206 for 300-inf
-            cnt = cnt + 1;
-            part_idx = (face_height>= k + thresh_interval); % 300~inf
-            part_gts = gts(part_idx, :);
-
-            if (~isempty(part_gts)) && (~isempty(rois))
-                max_ols = max(boxoverlap(rois, part_gts));
-                gt_num_pool(cnt) = gt_num_pool(cnt) + size(part_gts, 1);
-                if ~isempty(max_ols)
-                    gt_recall_pool(cnt) = gt_recall_pool(cnt) + sum(max_ols >= 0.5);
                 end
             end
         end
     end
-    %save('recall_conv2.mat','gt_num_all', 'gt_recall_all', 'gt_num_pool', 'gt_recall_pool');
-    %fprintf('For all scales: gt recall rate = %d / %d = %.4f\n', gt_recall_all, gt_num_all, gt_recall_all/gt_num_all);
 end
 
 function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nms_topN, use_gpu)
@@ -141,12 +105,12 @@ function aboxes = boxes_filter(aboxes, per_nms_topN, nms_overlap_thres, after_nm
         else
             if use_gpu
                 for i = 1:length(aboxes)
-                    tic_toc_print('nms: %d / %d \n', i, length(aboxes));
-                    aboxes{i} = aboxes{i}(nms(aboxes{i}, nms_overlap_thres, use_gpu), :);
+                    helper.tic_toc_print('nms: %d / %d \n', i, length(aboxes));
+                    aboxes{i} = aboxes{i}(helper.nms(aboxes{i}, nms_overlap_thres, use_gpu), :);
                 end
             else
                 parfor i = 1:length(aboxes)
-                    aboxes{i} = aboxes{i}(nms(aboxes{i}, nms_overlap_thres), :);
+                    aboxes{i} = aboxes{i}(helper.nms(aboxes{i}, nms_overlap_thres), :);
                 end
             end
         end

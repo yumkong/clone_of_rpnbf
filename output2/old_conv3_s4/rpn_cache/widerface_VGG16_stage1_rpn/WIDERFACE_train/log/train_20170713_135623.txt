@@ -1,0 +1,152 @@
+conf:
+                      batch_size: 60
+                    bg_thresh_hi: 0.3000
+                    bg_thresh_lo: 0
+                       bg_weight: 1
+         drop_boxes_runoff_image: 1
+                     feat_stride: 4
+                     fg_fraction: 0.5000
+                       fg_thresh: 0.5000
+                     image_means: [1x1x3 single]
+                   ims_per_batch: 2
+                        max_size: 512
+                 max_test_length: 3008
+                 min_test_length: 64
+                        rng_seed: 6
+                          scales: 512
+                  target_only_gt: 1
+                     test_binary: 0
+    test_drop_boxes_runoff_image: 0
+                   test_max_size: 512
+             test_min_box_height: 8
+               test_min_box_size: 8
+                        test_nms: 0.5000
+                test_scale_range: [0.5000 1 2]
+                     test_scales: 512
+                     use_flipped: 0
+                         use_gpu: 1
+                        exp_name: 'old_conv3_s4'
+                output_width_map: [1x1 containers.Map]
+               output_height_map: [1x1 containers.Map]
+                         anchors: [5 5 12 12]
+
+opts:
+                 cache_name: 'widerface_VGG16_stage1_rpn'
+                       conf: [1x1 struct]
+                     do_val: 1
+    empty_image_sample_step: 1
+                   exp_name: 'old_conv3_s4'
+                 imdb_train: {[1x1 struct]}
+                   imdb_val: [1x1 struct]
+                   net_file: 'D:\RPN_BF_master\models\VGG16_widerface\pre_trained_models\vgg_16layers\v…'
+                roidb_train: {[1x1 struct]}
+                  roidb_val: [1x1 struct]
+          snapshot_interval: 2000
+            solver_def_file: 'D:\RPN_BF_master\models\VGG16_widerface\rpn_prototxts\vgg_leave\solver_30…'
+               val_interval: 2000
+                  val_iters: 1000
+
+Preparing training data...Done.
+Preparing validation data...Done.
+Iter 1, Image 3086, 1880: 1.2 Hz, accuarcy = 0.4914, loss_bbox = 0.0000, loss_cls = 0.6940, accuracy_fg = 0.0000, accuracy_bg = 0.4500, 
+Iter 2, Image 2189, 2172: 1.7 Hz, accuarcy = 0.5198, loss_bbox = 0.0000, loss_cls = 0.6909, accuracy_fg = 0.0000, accuracy_bg = 0.5167, 
+Iter 3, Image 5472, 3122: 1.5 Hz, accuarcy = 0.6649, loss_bbox = 0.0000, loss_cls = 0.6836, accuracy_fg = 0.0000, accuracy_bg = 0.6667, 
+Iter 4, Image 265, 6039: 1.6 Hz, accuarcy = 0.7217, loss_bbox = 0.0000, loss_cls = 0.6663, accuracy_fg = 0.0000, accuracy_bg = 0.6833, 
+Iter 5, Image 5589, 7652: 1.6 Hz, accuarcy = 0.8335, loss_bbox = 0.0000, loss_cls = 0.6697, accuracy_fg = 0.0000, accuracy_bg = 0.8000, 
+Iter 6, Image 5334, 6059: 1.6 Hz, accuarcy = 0.9584, loss_bbox = 0.0000, loss_cls = 0.6498, accuracy_fg = 0.0000, accuracy_bg = 0.8833, 
+Iter 7, Image 9721, 1424: 1.8 Hz, accuarcy = 0.9939, loss_bbox = 0.0000, loss_cls = 0.6241, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 8, Image 9997, 5771: 1.6 Hz, accuarcy = 0.9992, loss_bbox = 0.0000, loss_cls = 0.6137, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 9, Image 8540, 9730: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.5942, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 10, Image 2231, 9125: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.5657, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 11, Image 8241, 10858: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.5505, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 12, Image 4846, 584: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.5337, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 13, Image 10624, 10576: 1.5 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.5150, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 14, Image 2829, 1981: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.4741, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 15, Image 7825, 9984: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.4611, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 16, Image 10044, 1232: 1.6 Hz, accuarcy = 0.9997, loss_bbox = 0.0006, loss_cls = 0.5422, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 17, Image 9895, 1272: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.4126, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 18, Image 5398, 3594: 1.9 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.3897, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 19, Image 7465, 7867: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.3886, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 20, Image 10293, 2146: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.3568, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 21, Image 10712, 8330: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.3385, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 22, Image 7742, 4117: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.3097, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 23, Image 1399, 11017: 1.7 Hz, accuarcy = 0.9999, loss_bbox = 0.0001, loss_cls = 0.3394, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 24, Image 5975, 6490: 1.5 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.2881, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 25, Image 2516, 11648: 1.6 Hz, accuarcy = 0.9998, loss_bbox = 0.0005, loss_cls = 0.3982, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 26, Image 5546, 3258: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.2368, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 27, Image 6492, 5666: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.2335, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 28, Image 760, 10533: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.2117, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 29, Image 370, 10098: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.1904, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 30, Image 1303, 4783: 1.6 Hz, accuarcy = 0.9999, loss_bbox = 0.0001, loss_cls = 0.2374, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 31, Image 8286, 4420: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.1685, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 32, Image 3171, 1123: 1.8 Hz, accuarcy = 0.9997, loss_bbox = 0.0007, loss_cls = 0.4197, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 33, Image 9962, 2087: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.1427, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 34, Image 4205, 9052: 1.7 Hz, accuarcy = 0.9999, loss_bbox = 0.0001, loss_cls = 0.2016, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 35, Image 10900, 5869: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.1237, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 36, Image 6291, 1713: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0967, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 37, Image 8328, 1584: 1.9 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.1036, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 38, Image 776, 3430: 2.0 Hz, accuarcy = 0.9997, loss_bbox = 0.0005, loss_cls = 0.4790, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 39, Image 4339, 9733: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0929, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 40, Image 7121, 5797: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0820, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 41, Image 3444, 3281: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0776, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 42, Image 10887, 3335: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0692, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 43, Image 10139, 11558: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0772, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 44, Image 2133, 10912: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.1034, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 45, Image 6364, 10325: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0655, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 46, Image 7666, 11051: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0504, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 47, Image 1589, 9219: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0405, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 48, Image 168, 236: 1.7 Hz, accuarcy = 0.9998, loss_bbox = 0.0003, loss_cls = 0.3458, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 49, Image 7493, 11145: 1.5 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0384, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 50, Image 4802, 2214: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0462, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 51, Image 4529, 6417: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0314, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 52, Image 7120, 8248: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0385, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 53, Image 1620, 352: 1.8 Hz, accuarcy = 0.9995, loss_bbox = 0.0009, loss_cls = 0.7573, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 54, Image 6832, 3817: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0369, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 55, Image 11079, 10593: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0271, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 56, Image 11032, 107: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0392, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 57, Image 10274, 2192: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0332, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 58, Image 6507, 2399: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0316, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 59, Image 2068, 5907: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0286, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 60, Image 4563, 713: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0363, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 61, Image 7057, 4721: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0267, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 62, Image 6940, 6795: 1.5 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0204, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 63, Image 6475, 6315: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0281, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 64, Image 4374, 4411: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0286, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 65, Image 465, 5762: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0223, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 66, Image 1413, 495: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0200, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 67, Image 10843, 7341: 1.5 Hz, accuarcy = 1.0000, loss_bbox = 0.0001, loss_cls = 0.0739, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 68, Image 5359, 1552: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0270, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 69, Image 4383, 4811: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0001, loss_cls = 0.0849, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 70, Image 2764, 9359: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0160, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 71, Image 4046, 6783: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0183, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 72, Image 7566, 5811: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0103, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 73, Image 4672, 11717: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0189, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 74, Image 8020, 8801: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0215, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 75, Image 6162, 10138: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0198, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 76, Image 11506, 5988: 1.5 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0182, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 77, Image 5486, 1016: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0180, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 78, Image 7350, 2579: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0142, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 79, Image 7412, 1334: 1.7 Hz, accuarcy = 0.9998, loss_bbox = 0.0005, loss_cls = 0.4434, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 80, Image 7928, 9369: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0119, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 81, Image 5317, 3058: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0160, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 82, Image 2046, 2588: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0104, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 83, Image 11627, 4377: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0145, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 84, Image 6246, 10941: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0123, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 85, Image 2883, 4994: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0209, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 86, Image 3968, 8976: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0140, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 87, Image 1690, 2269: 1.8 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0124, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 88, Image 6897, 10186: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0158, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 89, Image 9308, 1040: 1.7 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0194, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+Iter 90, Image 9394, 5366: 1.6 Hz, accuarcy = 1.0000, loss_bbox = 0.0000, loss_cls = 0.0142, accuracy_fg = 0.0000, accuracy_bg = 1.0000, 
+{Operation terminated by user during <a href="matlab:matlab.internal.language.introspective.errorDocCallback('caffe.Solver/step', 'D:\RPN_BF_master\external\caffe\matlab\caffe_faster_rcnn\+caffe\Solver.m', 56)" style="font-weight:bold">caffe.Solver/step</a> (<a href="matlab: opentoline('D:\RPN_BF_master\external\caffe\matlab\caffe_faster_rcnn\+caffe\Solver.m',56,0)">line 56</a>)
+
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('helper.rpn_train', 'D:\RPN_BF_master\experiment2\+helper\rpn_train.m', 155)" style="font-weight:bold">helper.rpn_train</a> (<a href="matlab: opentoline('D:\RPN_BF_master\experiment2\+helper\rpn_train.m',155,0)">line 155</a>)
+        caffe_solver.step(1);
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('helper.rpn_train_wrap', 'D:\RPN_BF_master\experiment2\+helper\rpn_train_wrap.m', 8)" style="font-weight:bold">helper.rpn_train_wrap</a> (<a href="matlab: opentoline('D:\RPN_BF_master\experiment2\+helper\rpn_train_wrap.m',8,0)">line 8</a>)
+    model_stage.output_model_file = helper.rpn_train(conf, dataset.imdb_train, dataset.roidb_train, ...
+
+In <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_main', 'D:\RPN_BF_master\experiment2\script_main.m', 110)" style="font-weight:bold">script_main</a> (<a href="matlab: opentoline('D:\RPN_BF_master\experiment2\script_main.m',110,0)">line 110</a>)
+model.stage1_rpn            = helper.rpn_train_wrap(conf_rpn, dataset, model.stage1_rpn, opts.do_val);
+} 

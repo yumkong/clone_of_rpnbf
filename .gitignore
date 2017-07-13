@@ -28,6 +28,7 @@ external/code3.2.1
 datasets/caltech/test
 datasets/caltech/train
 output/
+output2/ #0713 added
 cachedir/
 imdb/cache
 *.caffemodel

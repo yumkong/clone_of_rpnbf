@@ -1,0 +1,878 @@
+Log file created at: 2017/07/13 13:56:22
+Running on machine: LAPTOP-ICI6GEUP
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0713 13:56:22.386909  7504 solver.cpp:32] Initializing solver from parameters: 
+base_lr: 0.0005
+display: 20
+max_iter: 40000
+lr_policy: "step"
+gamma: 0.1
+momentum: 0.9
+weight_decay: 0.0005
+stepsize: 30000
+snapshot: 0
+net: "./models/VGG16_widerface/rpn_prototxts/vgg_leave/train_val_conv3.prototxt"
+I0713 13:56:22.386909  7504 solver.cpp:70] Creating training net from net file: ./models/VGG16_widerface/rpn_prototxts/vgg_leave/train_val_conv3.prototxt
+I0713 13:56:22.386909  7504 net.cpp:42] Initializing net from parameters: 
+name: "VGG_ILSVRC_16"
+input: "data"
+input: "labels"
+input: "labels_weights"
+input: "bbox_targets"
+input: "bbox_loss_weights"
+input_dim: 1
+input_dim: 3
+input_dim: 224
+input_dim: 224
+input_dim: 1
+input_dim: 1
+input_dim: 56
+input_dim: 56
+input_dim: 1
+input_dim: 1
+input_dim: 56
+input_dim: 56
+input_dim: 1
+input_dim: 4
+input_dim: 56
+input_dim: 56
+input_dim: 1
+input_dim: 4
+input_dim: 56
+input_dim: 56
+state {
+  phase: TRAIN
+}
+layer {
+  name: "conv1_1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1_1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  name: "relu1_1"
+  type: "ReLU"
+  bottom: "conv1_1"
+  top: "conv1_1"
+}
+layer {
+  name: "conv1_2"
+  type: "Convolution"
+  bottom: "conv1_1"
+  top: "conv1_2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 64
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  name: "relu1_2"
+  type: "ReLU"
+  bottom: "conv1_2"
+  top: "conv1_2"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1_2"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv2_1"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2_1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  name: "relu2_1"
+  type: "ReLU"
+  bottom: "conv2_1"
+  top: "conv2_1"
+}
+layer {
+  name: "conv2_2"
+  type: "Convolution"
+  bottom: "conv2_1"
+  top: "conv2_2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 128
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  name: "relu2_2"
+  type: "ReLU"
+  bottom: "conv2_2"
+  top: "conv2_2"
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2_2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv3_1"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv3_1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  name: "relu3_1"
+  type: "ReLU"
+  bottom: "conv3_1"
+  top: "conv3_1"
+}
+layer {
+  name: "conv3_2"
+  type: "Convolution"
+  bottom: "conv3_1"
+  top: "conv3_2"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  name: "relu3_2"
+  type: "ReLU"
+  bottom: "conv3_2"
+  top: "conv3_2"
+}
+layer {
+  name: "conv3_3"
+  type: "Convolution"
+  bottom: "conv3_2"
+  top: "conv3_3"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+  }
+}
+layer {
+  name: "relu3_3"
+  type: "ReLU"
+  bottom: "conv3_3"
+  top: "conv3_3"
+}
+layer {
+  name: "conv3_norm"
+  type: "Normalize"
+  bottom: "conv3_3"
+  top: "conv3_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16
+    }
+    channel_shared: false
+  }
+}
+layer {
+  name: "conv_proposal1"
+  type: "Convolution"
+  bottom: "conv3_norm"
+  top: "conv_proposal1"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "relu_proposal1"
+  type: "ReLU"
+  bottom: "conv_proposal1"
+  top: "conv_proposal1"
+}
+layer {
+  name: "proposal_cls_score"
+  type: "Convolution"
+  bottom: "conv_proposal1"
+  top: "proposal_cls_score"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 2
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "proposal_bbox_pred"
+  type: "Convolution"
+  bottom: "conv_proposal1"
+  top: "proposal_bbox_pred"
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 4
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "proposal_cls_score_reshape"
+  type: "Reshape"
+  bottom: "proposal_cls_score"
+  top: "proposal_cls_score_reshape"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 2
+      dim: -1
+      dim: 0
+    }
+  }
+}
+layer {
+  name: "labels_reshape"
+  type: "Reshape"
+  bottom: "labels"
+  top: "labels_reshape"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 1
+      dim: -1
+      dim: 0
+    }
+  }
+}
+layer {
+  name: "labels_weights_reshape"
+  type: "Reshape"
+  bottom: "labels_weights"
+  top: "labels_weights_reshape"
+  reshape_param {
+    shape {
+      dim: 0
+      dim: 1
+      dim: -1
+      dim: 0
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "proposal_cls_score_reshape"
+  bottom: "labels_reshape"
+  bottom: "labels_weights_reshape"
+  top: "loss_cls"
+  loss_weight: 1
+}
+layer {
+  name: "accuarcy"
+  type: "Accuracy"
+  bottom: "proposal_cls_score_reshape"
+  bottom: "labels_reshape"
+  top: "accuarcy"
+}
+layer {
+  name: "loss_bbox"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred"
+  bottom: "bbox_targets"
+  bottom: "bbox_loss_weights"
+  top: "loss_bbox"
+  loss_weight: 20
+}
+I0713 13:56:22.746366  7504 net.cpp:380] Input 0 -> data
+I0713 13:56:22.746366  7504 net.cpp:380] Input 1 -> labels
+I0713 13:56:22.746366  7504 net.cpp:380] Input 2 -> labels_weights
+I0713 13:56:22.746366  7504 net.cpp:380] Input 3 -> bbox_targets
+I0713 13:56:22.746366  7504 net.cpp:380] Input 4 -> bbox_loss_weights
+I0713 13:56:22.746366  7504 layer_factory.hpp:74] Creating layer conv1_1
+I0713 13:56:22.746366  7504 net.cpp:90] Creating Layer conv1_1
+I0713 13:56:22.746366  7504 net.cpp:420] conv1_1 <- data
+I0713 13:56:22.746366  7504 net.cpp:378] conv1_1 -> conv1_1
+I0713 13:56:22.746366  7504 net.cpp:120] Setting up conv1_1
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 64 224 224 (3211264)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer relu1_1
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer relu1_1
+I0713 13:56:22.840085  7504 net.cpp:420] relu1_1 <- conv1_1
+I0713 13:56:22.840085  7504 net.cpp:367] relu1_1 -> conv1_1 (in-place)
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up relu1_1
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 64 224 224 (3211264)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv1_2
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv1_2
+I0713 13:56:22.840085  7504 net.cpp:420] conv1_2 <- conv1_1
+I0713 13:56:22.840085  7504 net.cpp:378] conv1_2 -> conv1_2
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv1_2
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 64 224 224 (3211264)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer relu1_2
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer relu1_2
+I0713 13:56:22.840085  7504 net.cpp:420] relu1_2 <- conv1_2
+I0713 13:56:22.840085  7504 net.cpp:367] relu1_2 -> conv1_2 (in-place)
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up relu1_2
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 64 224 224 (3211264)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer pool1
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer pool1
+I0713 13:56:22.840085  7504 net.cpp:420] pool1 <- conv1_2
+I0713 13:56:22.840085  7504 net.cpp:378] pool1 -> pool1
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up pool1
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 64 112 112 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv2_1
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv2_1
+I0713 13:56:22.840085  7504 net.cpp:420] conv2_1 <- pool1
+I0713 13:56:22.840085  7504 net.cpp:378] conv2_1 -> conv2_1
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv2_1
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 128 112 112 (1605632)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer relu2_1
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer relu2_1
+I0713 13:56:22.840085  7504 net.cpp:420] relu2_1 <- conv2_1
+I0713 13:56:22.840085  7504 net.cpp:367] relu2_1 -> conv2_1 (in-place)
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up relu2_1
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 128 112 112 (1605632)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv2_2
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv2_2
+I0713 13:56:22.840085  7504 net.cpp:420] conv2_2 <- conv2_1
+I0713 13:56:22.840085  7504 net.cpp:378] conv2_2 -> conv2_2
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv2_2
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 128 112 112 (1605632)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer relu2_2
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer relu2_2
+I0713 13:56:22.840085  7504 net.cpp:420] relu2_2 <- conv2_2
+I0713 13:56:22.840085  7504 net.cpp:367] relu2_2 -> conv2_2 (in-place)
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up relu2_2
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 128 112 112 (1605632)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer pool2
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer pool2
+I0713 13:56:22.840085  7504 net.cpp:420] pool2 <- conv2_2
+I0713 13:56:22.840085  7504 net.cpp:378] pool2 -> pool2
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up pool2
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 128 56 56 (401408)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv3_1
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv3_1
+I0713 13:56:22.840085  7504 net.cpp:420] conv3_1 <- pool2
+I0713 13:56:22.840085  7504 net.cpp:378] conv3_1 -> conv3_1
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv3_1
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer relu3_1
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer relu3_1
+I0713 13:56:22.840085  7504 net.cpp:420] relu3_1 <- conv3_1
+I0713 13:56:22.840085  7504 net.cpp:367] relu3_1 -> conv3_1 (in-place)
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up relu3_1
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv3_2
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv3_2
+I0713 13:56:22.840085  7504 net.cpp:420] conv3_2 <- conv3_1
+I0713 13:56:22.840085  7504 net.cpp:378] conv3_2 -> conv3_2
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv3_2
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer relu3_2
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer relu3_2
+I0713 13:56:22.840085  7504 net.cpp:420] relu3_2 <- conv3_2
+I0713 13:56:22.840085  7504 net.cpp:367] relu3_2 -> conv3_2 (in-place)
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up relu3_2
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv3_3
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv3_3
+I0713 13:56:22.840085  7504 net.cpp:420] conv3_3 <- conv3_2
+I0713 13:56:22.840085  7504 net.cpp:378] conv3_3 -> conv3_3
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv3_3
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer relu3_3
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer relu3_3
+I0713 13:56:22.840085  7504 net.cpp:420] relu3_3 <- conv3_3
+I0713 13:56:22.840085  7504 net.cpp:367] relu3_3 -> conv3_3 (in-place)
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up relu3_3
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv3_norm
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv3_norm
+I0713 13:56:22.840085  7504 net.cpp:420] conv3_norm <- conv3_3
+I0713 13:56:22.840085  7504 net.cpp:378] conv3_norm -> conv3_norm
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv3_norm
+I0713 13:56:22.840085  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.840085  7504 layer_factory.hpp:74] Creating layer conv_proposal1
+I0713 13:56:22.840085  7504 net.cpp:90] Creating Layer conv_proposal1
+I0713 13:56:22.840085  7504 net.cpp:420] conv_proposal1 <- conv3_norm
+I0713 13:56:22.840085  7504 net.cpp:378] conv_proposal1 -> conv_proposal1
+I0713 13:56:22.840085  7504 net.cpp:120] Setting up conv_proposal1
+I0713 13:56:22.855710  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.855710  7504 layer_factory.hpp:74] Creating layer relu_proposal1
+I0713 13:56:22.855710  7504 net.cpp:90] Creating Layer relu_proposal1
+I0713 13:56:22.855710  7504 net.cpp:420] relu_proposal1 <- conv_proposal1
+I0713 13:56:22.855710  7504 net.cpp:367] relu_proposal1 -> conv_proposal1 (in-place)
+I0713 13:56:22.855710  7504 net.cpp:120] Setting up relu_proposal1
+I0713 13:56:22.855710  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.855710  7504 layer_factory.hpp:74] Creating layer conv_proposal1_relu_proposal1_0_split
+I0713 13:56:22.855710  7504 net.cpp:90] Creating Layer conv_proposal1_relu_proposal1_0_split
+I0713 13:56:22.855710  7504 net.cpp:420] conv_proposal1_relu_proposal1_0_split <- conv_proposal1
+I0713 13:56:22.855710  7504 net.cpp:378] conv_proposal1_relu_proposal1_0_split -> conv_proposal1_relu_proposal1_0_split_0
+I0713 13:56:22.855710  7504 net.cpp:378] conv_proposal1_relu_proposal1_0_split -> conv_proposal1_relu_proposal1_0_split_1
+I0713 13:56:22.855710  7504 net.cpp:120] Setting up conv_proposal1_relu_proposal1_0_split
+I0713 13:56:22.855710  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.855710  7504 net.cpp:127] Top shape: 1 256 56 56 (802816)
+I0713 13:56:22.855710  7504 layer_factory.hpp:74] Creating layer proposal_cls_score
+I0713 13:56:22.855710  7504 net.cpp:90] Creating Layer proposal_cls_score
+I0713 13:56:22.855710  7504 net.cpp:420] proposal_cls_score <- conv_proposal1_relu_proposal1_0_split_0
+I0713 13:56:22.855710  7504 net.cpp:378] proposal_cls_score -> proposal_cls_score
+I0713 13:56:22.855710  7504 net.cpp:120] Setting up proposal_cls_score
+I0713 13:56:22.855710  7504 net.cpp:127] Top shape: 1 2 56 56 (6272)
+I0713 13:56:22.855710  7504 layer_factory.hpp:74] Creating layer proposal_bbox_pred
+I0713 13:56:22.855710  7504 net.cpp:90] Creating Layer proposal_bbox_pred
+I0713 13:56:22.855710  7504 net.cpp:420] proposal_bbox_pred <- conv_proposal1_relu_proposal1_0_split_1
+I0713 13:56:22.855710  7504 net.cpp:378] proposal_bbox_pred -> proposal_bbox_pred
+I0713 13:56:22.855710  7504 net.cpp:120] Setting up proposal_bbox_pred
+I0713 13:56:22.855710  7504 net.cpp:127] Top shape: 1 4 56 56 (12544)
+I0713 13:56:22.855710  7504 layer_factory.hpp:74] Creating layer proposal_cls_score_reshape
+I0713 13:56:22.855710  7504 net.cpp:90] Creating Layer proposal_cls_score_reshape
+I0713 13:56:22.855710  7504 net.cpp:420] proposal_cls_score_reshape <- proposal_cls_score
+I0713 13:56:22.855710  7504 net.cpp:378] proposal_cls_score_reshape -> proposal_cls_score_reshape
+I0713 13:56:22.855710  7504 net.cpp:120] Setting up proposal_cls_score_reshape
+I0713 13:56:22.855710  7504 net.cpp:127] Top shape: 1 2 56 56 (6272)
+I0713 13:56:22.855710  7504 layer_factory.hpp:74] Creating layer proposal_cls_score_reshape_proposal_cls_score_reshape_0_split
+I0713 13:56:22.855710  7504 net.cpp:90] Creating Layer proposal_cls_score_reshape_proposal_cls_score_reshape_0_split
+I0713 13:56:22.855710  7504 net.cpp:420] proposal_cls_score_reshape_proposal_cls_score_reshape_0_split <- proposal_cls_score_reshape
+I0713 13:56:22.855710  7504 net.cpp:378] proposal_cls_score_reshape_proposal_cls_score_reshape_0_split -> proposal_cls_score_reshape_proposal_cls_score_reshape_0_split_0
+I0713 13:56:22.855710  7504 net.cpp:378] proposal_cls_score_reshape_proposal_cls_score_reshape_0_split -> proposal_cls_score_reshape_proposal_cls_score_reshape_0_split_1
+I0713 13:56:22.871340  7504 net.cpp:120] Setting up proposal_cls_score_reshape_proposal_cls_score_reshape_0_split
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: 1 2 56 56 (6272)
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: 1 2 56 56 (6272)
+I0713 13:56:22.871340  7504 layer_factory.hpp:74] Creating layer labels_reshape
+I0713 13:56:22.871340  7504 net.cpp:90] Creating Layer labels_reshape
+I0713 13:56:22.871340  7504 net.cpp:420] labels_reshape <- labels
+I0713 13:56:22.871340  7504 net.cpp:378] labels_reshape -> labels_reshape
+I0713 13:56:22.871340  7504 net.cpp:120] Setting up labels_reshape
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: 1 1 56 56 (3136)
+I0713 13:56:22.871340  7504 layer_factory.hpp:74] Creating layer labels_reshape_labels_reshape_0_split
+I0713 13:56:22.871340  7504 net.cpp:90] Creating Layer labels_reshape_labels_reshape_0_split
+I0713 13:56:22.871340  7504 net.cpp:420] labels_reshape_labels_reshape_0_split <- labels_reshape
+I0713 13:56:22.871340  7504 net.cpp:378] labels_reshape_labels_reshape_0_split -> labels_reshape_labels_reshape_0_split_0
+I0713 13:56:22.871340  7504 net.cpp:378] labels_reshape_labels_reshape_0_split -> labels_reshape_labels_reshape_0_split_1
+I0713 13:56:22.871340  7504 net.cpp:120] Setting up labels_reshape_labels_reshape_0_split
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: 1 1 56 56 (3136)
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: 1 1 56 56 (3136)
+I0713 13:56:22.871340  7504 layer_factory.hpp:74] Creating layer labels_weights_reshape
+I0713 13:56:22.871340  7504 net.cpp:90] Creating Layer labels_weights_reshape
+I0713 13:56:22.871340  7504 net.cpp:420] labels_weights_reshape <- labels_weights
+I0713 13:56:22.871340  7504 net.cpp:378] labels_weights_reshape -> labels_weights_reshape
+I0713 13:56:22.871340  7504 net.cpp:120] Setting up labels_weights_reshape
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: 1 1 56 56 (3136)
+I0713 13:56:22.871340  7504 layer_factory.hpp:74] Creating layer loss
+I0713 13:56:22.871340  7504 net.cpp:90] Creating Layer loss
+I0713 13:56:22.871340  7504 net.cpp:420] loss <- proposal_cls_score_reshape_proposal_cls_score_reshape_0_split_0
+I0713 13:56:22.871340  7504 net.cpp:420] loss <- labels_reshape_labels_reshape_0_split_0
+I0713 13:56:22.871340  7504 net.cpp:420] loss <- labels_weights_reshape
+I0713 13:56:22.871340  7504 net.cpp:378] loss -> loss_cls
+I0713 13:56:22.871340  7504 net.cpp:120] Setting up loss
+I0713 13:56:22.871340  7504 layer_factory.hpp:74] Creating layer loss
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: (1)
+I0713 13:56:22.871340  7504 net.cpp:129]     with loss weight 1
+I0713 13:56:22.871340  7504 layer_factory.hpp:74] Creating layer accuarcy
+I0713 13:56:22.871340  7504 net.cpp:90] Creating Layer accuarcy
+I0713 13:56:22.871340  7504 net.cpp:420] accuarcy <- proposal_cls_score_reshape_proposal_cls_score_reshape_0_split_1
+I0713 13:56:22.871340  7504 net.cpp:420] accuarcy <- labels_reshape_labels_reshape_0_split_1
+I0713 13:56:22.871340  7504 net.cpp:378] accuarcy -> accuarcy
+I0713 13:56:22.871340  7504 net.cpp:120] Setting up accuarcy
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: (1)
+I0713 13:56:22.871340  7504 layer_factory.hpp:74] Creating layer loss_bbox
+I0713 13:56:22.871340  7504 net.cpp:90] Creating Layer loss_bbox
+I0713 13:56:22.871340  7504 net.cpp:420] loss_bbox <- proposal_bbox_pred
+I0713 13:56:22.871340  7504 net.cpp:420] loss_bbox <- bbox_targets
+I0713 13:56:22.871340  7504 net.cpp:420] loss_bbox <- bbox_loss_weights
+I0713 13:56:22.871340  7504 net.cpp:378] loss_bbox -> loss_bbox
+I0713 13:56:22.871340  7504 net.cpp:120] Setting up loss_bbox
+I0713 13:56:22.871340  7504 net.cpp:127] Top shape: (1)
+I0713 13:56:22.871340  7504 net.cpp:129]     with loss weight 20
+I0713 13:56:22.871340  7504 net.cpp:192] loss_bbox needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:194] accuarcy does not need backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] loss needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:194] labels_weights_reshape does not need backward computation.
+I0713 13:56:22.871340  7504 net.cpp:194] labels_reshape_labels_reshape_0_split does not need backward computation.
+I0713 13:56:22.871340  7504 net.cpp:194] labels_reshape does not need backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] proposal_cls_score_reshape_proposal_cls_score_reshape_0_split needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] proposal_cls_score_reshape needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] proposal_bbox_pred needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] proposal_cls_score needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv_proposal1_relu_proposal1_0_split needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu_proposal1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv_proposal1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv3_norm needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu3_3 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv3_3 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu3_2 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv3_2 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu3_1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv3_1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] pool2 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu2_2 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv2_2 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu2_1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv2_1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] pool1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu1_2 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv1_2 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] relu1_1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:192] conv1_1 needs backward computation.
+I0713 13:56:22.871340  7504 net.cpp:235] This network produces output accuarcy
+I0713 13:56:22.871340  7504 net.cpp:235] This network produces output loss_bbox
+I0713 13:56:22.871340  7504 net.cpp:235] This network produces output loss_cls
+I0713 13:56:22.871340  7504 net.cpp:492] Collecting Learning Rate and Weight Decay.
+I0713 13:56:22.871340  7504 net.cpp:247] Network initialization done.
+I0713 13:56:22.871340  7504 net.cpp:248] Memory required for data: 117411852
+I0713 13:56:22.871340  7504 solver.cpp:42] Solver scaffolding done.
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer conv1_1
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer relu1_1
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer conv1_2
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer relu1_2
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer pool1
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer conv2_1
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer relu2_1
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer conv2_2
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer relu2_2
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer pool2
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer conv3_1
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer relu3_1
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer conv3_2
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer relu3_2
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer conv3_3
+I0713 13:56:23.715175  7504 net.cpp:746] Copying source layer relu3_3
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer pool3
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer conv4_1
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu4_1
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer conv4_2
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu4_2
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer conv4_3
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu4_3
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer pool4
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer conv5_1
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu5_1
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer conv5_2
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu5_2
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer conv5_3
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu5_3
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer pool5
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer fc6
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu6
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer drop6
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer fc7
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer relu7
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer drop7
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer fc8
+I0713 13:56:23.715175  7504 net.cpp:743] Ignoring source layer prob
+I0713 13:56:50.246382  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:56:50.246382  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:56:50.433929  7504 solver.cpp:214] Iteration 0, loss = 0
+I0713 13:56:50.449529  7504 solver.cpp:229]     Train net output #0: accuarcy = 0.969116
+I0713 13:56:50.449529  7504 solver.cpp:229]     Train net output #1: loss_bbox = 0 (* 20 = 0 loss)
+I0713 13:56:50.449529  7504 solver.cpp:229]     Train net output #2: loss_cls = 0 (* 1 = 0 loss)
+I0713 13:56:50.449529  7504 solver.cpp:486] Iteration 0, lr = 0.0005
+I0713 13:56:51.793421  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:56:52.606045  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:56:52.606045  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:56:54.313338  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:56:54.313338  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:56:56.074561  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:56:56.074561  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:56:57.793495  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:56:57.793495  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:56:59.512462  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:56:59.512462  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:01.188477  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:01.188477  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:02.809073  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:02.809073  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:04.465487  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:04.465487  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:06.121914  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:06.121914  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:07.747088  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:07.747088  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:09.419095  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:09.419095  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:11.075556  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:11.075556  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:12.794469  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:12.794469  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:14.419633  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:14.419633  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:16.151898  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:16.151898  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:17.835573  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:17.835573  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:19.492033  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:19.492033  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:21.101552  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:21.101552  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:22.813572  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:22.829200  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:24.481017  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:24.481017  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:24.496644  7504 solver.cpp:214] Iteration 20, loss = 0.356753
+I0713 13:57:24.496644  7504 solver.cpp:229]     Train net output #0: accuarcy = 1
+I0713 13:57:24.496644  7504 solver.cpp:229]     Train net output #1: loss_bbox = 0 (* 20 = 0 loss)
+I0713 13:57:24.496644  7504 solver.cpp:229]     Train net output #2: loss_cls = 0.356753 (* 1 = 0.356753 loss)
+I0713 13:57:24.496644  7504 solver.cpp:486] Iteration 20, lr = 0.0005
+I0713 13:57:26.199985  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:26.199985  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:27.856410  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:27.856410  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:29.501971  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:29.501971  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:31.276937  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:31.276937  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:32.964589  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:32.964589  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:34.621016  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:34.621016  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:36.251255  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:36.251255  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:37.948818  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:37.948818  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:39.605274  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:39.605274  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:41.308553  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:41.308553  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:43.001269  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:43.001269  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:44.637459  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:44.637459  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:46.293889  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:46.293889  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:47.959311  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:47.959311  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:49.615738  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:49.615738  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:51.293195  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:51.293195  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:52.918395  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:52.918395  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:54.465437  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:54.465437  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:56.106245  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:56.106245  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:57.766748  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:57.766748  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:57:57.766748  7504 solver.cpp:214] Iteration 40, loss = 0.0819671
+I0713 13:57:57.766748  7504 solver.cpp:229]     Train net output #0: accuarcy = 1
+I0713 13:57:57.766748  7504 solver.cpp:229]     Train net output #1: loss_bbox = 0 (* 20 = 0 loss)
+I0713 13:57:57.766748  7504 solver.cpp:229]     Train net output #2: loss_cls = 0.0819671 (* 1 = 0.0819671 loss)
+I0713 13:57:57.766748  7504 solver.cpp:486] Iteration 40, lr = 0.0005
+I0713 13:57:59.386515  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:57:59.386515  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:01.042943  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:01.042943  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:02.699373  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:02.699373  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:04.376580  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:04.376580  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:06.043118  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:06.043118  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:07.715183  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:07.715183  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:09.387229  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:09.387229  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:11.032186  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:11.032186  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:12.730995  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:12.730995  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:14.387451  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:14.387451  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:16.090731  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:16.090731  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:17.752904  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:17.752904  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:19.418201  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:19.418201  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:21.105880  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:21.105880  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:22.777935  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:22.777935  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:24.449990  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:24.449990  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:26.152182  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:26.152182  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:27.824209  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:27.824209  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:29.496263  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:29.496263  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:31.121465  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:31.121465  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:31.121465  7504 solver.cpp:214] Iteration 60, loss = 0.0363076
+I0713 13:58:31.121465  7504 solver.cpp:229]     Train net output #0: accuarcy = 1
+I0713 13:58:31.121465  7504 solver.cpp:229]     Train net output #1: loss_bbox = 0 (* 20 = 0 loss)
+I0713 13:58:31.121465  7504 solver.cpp:229]     Train net output #2: loss_cls = 0.0363076 (* 1 = 0.0363076 loss)
+I0713 13:58:31.121465  7504 solver.cpp:486] Iteration 60, lr = 0.0005
+I0713 13:58:32.830024  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:32.830024  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:34.558437  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:34.558437  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:36.261745  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:36.261745  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:37.886921  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:37.886921  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:39.579762  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:39.579762  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:41.231770  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:41.231770  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:42.966325  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:42.966325  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:44.654006  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:44.654006  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:46.360394  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:46.360394  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:47.980962  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:47.980962  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:49.670256  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:49.670256  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:51.389223  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:51.389223  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:53.032104  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:53.032104  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:54.730877  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:54.730877  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:56.418560  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:56.418560  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:58.137466  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:58.153093  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:58:59.809553  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:58:59.825178  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:01.511467  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:01.511467  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:03.136612  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:03.152238  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:04.808665  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:04.808665  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:04.808665  7504 solver.cpp:214] Iteration 80, loss = 0.0119476
+I0713 13:59:04.808665  7504 solver.cpp:229]     Train net output #0: accuarcy = 1
+I0713 13:59:04.808665  7504 solver.cpp:229]     Train net output #1: loss_bbox = 0 (* 20 = 0 loss)
+I0713 13:59:04.808665  7504 solver.cpp:229]     Train net output #2: loss_cls = 0.0119476 (* 1 = 0.0119476 loss)
+I0713 13:59:04.808665  7504 solver.cpp:486] Iteration 80, lr = 0.0005
+I0713 13:59:06.480720  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:06.480720  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:08.136412  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:08.136412  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:09.824095  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:09.824095  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:11.496178  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:11.496178  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:13.199491  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:13.215124  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:14.923475  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:14.923475  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:16.527482  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:16.527482  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:18.230762  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:18.230762  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:19.867597  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:19.867597  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:21.564513  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:21.564513  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768
+I0713 13:59:23.199710  7504 smooth_L1_loss_layer.cu:79] SmoothL1 Forward: normalization_ = 1, pre_fixed_normalizer = 1
+I0713 13:59:23.199710  7504 smooth_L1_loss_layer.cu:118] SmoothL1 Backward: normalizer = 32768

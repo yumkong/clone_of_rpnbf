@@ -1,0 +1,22 @@
+{Undefined function or variable 'seed_rand'.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('helper.rpn_train', 'D:\RPN_BF_master\experiment2\+helper\rpn_train.m', 74)" style="font-weight:bold">helper.rpn_train</a> (<a href="matlab: opentoline('D:\RPN_BF_master\experiment2\+helper\rpn_train.m',74,0)">line 74</a>)
+    prev_rng = seed_rand(conf.rng_seed);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('helper.rpn_train_wrap', 'D:\RPN_BF_master\experiment2\+helper\rpn_train_wrap.m', 8)" style="font-weight:bold">helper.rpn_train_wrap</a> (<a href="matlab: opentoline('D:\RPN_BF_master\experiment2\+helper\rpn_train_wrap.m',8,0)">line 8</a>)
+    model_stage.output_model_file = helper.rpn_train(conf, dataset.imdb_train, dataset.roidb_train, ...
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('script_main', 'D:\RPN_BF_master\experiment2\script_main.m', 110)" style="font-weight:bold">script_main</a> (<a href="matlab: opentoline('D:\RPN_BF_master\experiment2\script_main.m',110,0)">line 110</a>)
+model.stage1_rpn            = helper.rpn_train_wrap(conf_rpn, dataset, model.stage1_rpn, opts.do_val);
+} 
+opentoline('D:\RPN_BF_master\experiment2\+helper\rpn_train.m',74,0)
+uiopen('D:\RPN_BF_master\utils\seed_rand.m',1)
+opentoline('D:\RPN_BF_master\experiment2\+helper\rpn_train.m',74,0)
+script_main
+rpn startup done
+GPU 1: free memory 3540249804
+Use GPU 1
+
+***************
+stage one RPN 
+***************
