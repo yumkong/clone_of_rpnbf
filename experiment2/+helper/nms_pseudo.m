@@ -49,7 +49,7 @@ for i = 1 : numCandidates
 end
 
 % merge nearby detections
-[label, numCandidates] = Partition(predicate);
+[label, numCandidates] = helper.Partition(predicate);
 rects = zeros(numCandidates, 5); % output rects
 
 for i = 1 : numCandidates
@@ -115,7 +115,7 @@ if nms_option >=2
     end
 
     % merge nearby detections
-    [label, numCandidates] = Partition(predicate);
+    [label, numCandidates] = helper.Partition(predicate);
     rects = []; %zeros(numCandidates, 5); % output rects
 
     for i = 1 : numCandidates
@@ -242,7 +242,7 @@ if nms_option >=3
 %     end
     
         % merge nearby detections
-    [label, numCandidates] = Partition(predicate);
+    [label, numCandidates] = helper.Partition(predicate);
     rects = []; %zeros(numCandidates, 5); % output rects
 
     for i = 1 : numCandidates

@@ -17,8 +17,8 @@ function aboxes = rpn_test_wrap(conf, model_stage, imdb, roidb, nms_option)
         % liu@1001: model_stage.nms.after_nms_topN functions as a threshold, indicating how many boxes will be preserved on average
         ave_per_image_topN = model_stage.nms.after_nms_topN;
         model_stage.nms.after_nms_topN = -1;
-        aboxes                      = boxes_filter(aboxes, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN, conf.use_gpu);      
-        fprintf(' Done.\n');  
+        aboxes = boxes_filter(aboxes, model_stage.nms.per_nms_topN, model_stage.nms.nms_overlap_thres, model_stage.nms.after_nms_topN, conf.use_gpu);      
+        fprintf('Done.\n');  
 
         % only use the first max_sample_num images to compute an "expected" lower bound thresh
         max_sample_num = 5000;
@@ -43,13 +43,32 @@ function aboxes = rpn_test_wrap(conf, model_stage, imdb, roidb, nms_option)
                 [~, scores_ind] = sort(aboxes{i}(:,5), 'descend');
                 aboxes{i} = aboxes{i}(scores_ind, :);
             end
+            
         end
         save(box_nms_name, 'aboxes');
     end
+    %%%%% 0714 show some results! %%%%%
+    show_result = true;
+    if show_result
+        for i = 1:length(aboxes)
+            im = imread(imdb.image_at(i));
+            figure(1),clf;
+            imshow(im);
+            keep = helper.nms(aboxes{i}, 0.3);
+            bbs_show = aboxes{i}(keep, :);
+            if ~isempty(bbs_show)
+                bbs_show = bbs_show(bbs_show(:,5) >= 0.8, :);
+                bbs_show(:, 3) = bbs_show(:, 3) - bbs_show(:, 1) + 1;
+                bbs_show(:, 4) = bbs_show(:, 4) - bbs_show(:, 2) + 1;
+                bbApply('draw',bbs_show,'g');
+            end
+        end
+    end
+    %%%%%%%%%%
 
-    % 0206 added
-    thresh_beg = 8; %5
-    thresh_end = 12; % 500
+    % 0714 added [8 12]
+    thresh_beg = 8;
+    thresh_end = 12;
     [gt_num, recall_num] = get_detector_recall(roidb, aboxes, thresh_beg, thresh_end);
     fprintf('gt = %d, recall = %d, recall_rate = %.4f\n', gt_num, recall_num, recall_num/gt_num);
 end
@@ -62,24 +81,25 @@ function [gt_num, recall_num] = get_detector_recall(roidb, aboxes, thresh_beg, t
     for i = 1:length(aboxes)
         gts = roidb.rois(i).boxes; % for widerface, no ignored bboxes
         if ~isempty(gts)
-            % only leave 2x gt_num detected bboxes
-            gt_num = size(gts, 1);
+            face_height = gts(:,4) - gts(:,2) + 1;
+            % total statistics
+            idx_all = (face_height >= thresh_beg & face_height <= thresh_end);  % all:4-inf
+            gts_all = gts(idx_all, :);
+            
+            % only leave 2x gt_num (in range [8 12]) detected bboxes
+            gt_num_this = size(gts_all, 1);
             %rois = aboxes{i}(:, 1:4);
-            this_pred_num = min(2*gt_num, size(aboxes{i}, 1));
+            this_pred_num = min(2*gt_num_this, size(aboxes{i}, 1));
             if this_pred_num ~= 0
                 rois = aboxes{i}(1:this_pred_num, 1:4);
             else
                 rois = [];
             end
             
-            face_height = gts(:,4) - gts(:,2) + 1;
-            % total statistics
-            idx_all = (face_height >= thresh_beg & face_height <= thresh_end);  % all:4-inf
-            gts_all = gts(idx_all, :);
             if ~isempty(gts_all)
                 gt_num = gt_num + size(gts_all, 1);
                 if ~isempty(rois)
-                    max_ols = max(boxoverlap(rois, gts_all));
+                    max_ols = max(helper.boxoverlap(rois, gts_all));
                     if ~isempty(max_ols)
                         recall_num = recall_num + sum(max_ols >= 0.5);
                     end

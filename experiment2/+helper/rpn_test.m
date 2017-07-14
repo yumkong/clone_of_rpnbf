@@ -68,9 +68,8 @@ function aboxes = rpn_test(conf, imdb, varargin)
         disp(conf);
     
 %% testing
-        %******* 0713 temperarily 
-        %num_images = length(imdb.image_ids);
-        num_images = 100;
+        % control number of images to be tested
+        num_images = length(imdb.image_ids);
         % all detections are collected into:
         %    all_boxes[image] = N x 5 array of detections in
         %    (x1, y1, x2, y2, score)
