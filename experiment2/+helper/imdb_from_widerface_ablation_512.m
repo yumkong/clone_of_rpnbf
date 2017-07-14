@@ -29,7 +29,7 @@ end
 try
     load(cache_imdb); %imdb, tmpboxdb
     %0713 reload these handlers
-    if 0 %only use at the first time
+    if 1 %only use at the first time
     imdb = rmfield(imdb, 'eval_func');
     imdb.roidb_func = @roidb_from_wider;
     if ispc
