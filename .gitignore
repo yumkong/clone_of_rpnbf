@@ -28,7 +28,8 @@ external/code3.2.1
 datasets/caltech/test
 datasets/caltech/train
 output/
-output2/* #0713 added
+#0713 added
+output2/*
 output2/old_conv3_s4/*
 output2/old_conv3_s4/rpn_cache/*
 cachedir/
