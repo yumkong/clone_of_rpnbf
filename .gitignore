@@ -28,13 +28,18 @@ external/code3.2.1
 datasets/caltech/test
 datasets/caltech/train
 output/
+#0713 added
+output2/*
+output2/old_conv3_s4/*
+output2/old_conv3_s4/rpn_cache/*
 cachedir/
 imdb/cache
 *.caffemodel
 *.mat
 *.jpg
+*.png
 bin/
-
+test_final/model/*
 
 # Windows Installer files
 *.cab

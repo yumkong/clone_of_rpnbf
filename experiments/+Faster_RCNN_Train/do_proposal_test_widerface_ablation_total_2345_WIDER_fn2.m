@@ -306,7 +306,7 @@ function do_proposal_test_widerface_ablation_total_2345_WIDER_fn2(conf,conf_fast
     end
     hard_fn_num = size(hard_fn_mat, 1);
     fprintf('Total fn num: %d\n',hard_fn_num);
-    if 0
+    if 1
     for j = 1:hard_fn_num
         im_idx = hard_fn_mat(j, 1);
         img = imread(imdb.image_at(im_idx));  

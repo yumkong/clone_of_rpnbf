@@ -15,10 +15,10 @@ function save_model_path = proposal_train_widerface_ablation_batch2(conf, imdb_t
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           1000,                 @isscalar);%201
-    ip.addParamValue('val_interval',        5000,               @isscalar);%1000
+    ip.addParamValue('val_iters',           1000,                 @isscalar);%1000
+    ip.addParamValue('val_interval',        2000,               @isscalar);%2000
     ip.addParamValue('snapshot_interval',...
-                                            5000,              @isscalar); %1000
+                                            2000,              @isscalar); %2000
                                                                        
     % Max pixel size of a scaled input image
     ip.addParamValue('solver_def_file',     fullfile(pwd, 'proposal_models', 'Zeiler_conv5', 'solver.prototxt'), ...
@@ -165,7 +165,7 @@ function save_model_path = proposal_train_widerface_ablation_batch2(conf, imdb_t
         rst = check_error(rst, caffe_solver);
         
         %format long
-        fprintf('Iter %d, Image %d, %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2),sub_db_inds(3), 1/cost_time);
+        fprintf('Iter %d, Image %d, %d: %.1f Hz, ', iter_, sub_db_inds(1), sub_db_inds(2), 1/cost_time);
         for kkk = 1:length(rst)
             fprintf('%s = %.4f, ',rst(kkk).blob_name, rst(kkk).data); 
         end

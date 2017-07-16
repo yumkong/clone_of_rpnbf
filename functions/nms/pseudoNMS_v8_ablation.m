@@ -1,3 +1,4 @@
+%function rects = pseudoNMS_v8_ablation(candi_rects, nms_option)
 function rects = pseudoNMS_v8_ablation(candi_rects, nms_option, img)
 
 % overlapping threshold for grouping nearby detections

@@ -148,6 +148,7 @@ model.stage1_fast_rcnn.init_net_file = model.stage1_rpn.output_model_file; % ini
 %0106 use all test set for final evaluation: dataset.imdb_realtest
 %0125 added: training with score feat map
 model.stage1_fast_rcnn      = Faster_RCNN_Train.do_fast_rcnn_train_widerface_ablation_fastrcnn_cxt(conf_fast_rcnn, dataset, model.stage1_fast_rcnn, opts.do_val);
+%dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
 % test
 Faster_RCNN_Train.do_fast_rcnn_test_widerface_ablation_fastrcnn_cxt(conf_fast_rcnn, model.stage1_fast_rcnn, dataset.imdb_test, dataset.roidb_test);
 end

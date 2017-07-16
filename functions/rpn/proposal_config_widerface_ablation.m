@@ -27,14 +27,14 @@ function conf = proposal_config_widerface_ablation(varargin)
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        512,           @isscalar); %960
     % Images per batch, only supports ims_per_batch = 1 currently
-    ip.addParamValue('ims_per_batch',   3,              @isscalar);%0205:2-->3
+    ip.addParamValue('ims_per_batch',   2,              @isscalar);%0205:2-->3
     % Minibatch size
-    ip.addParamValue('batch_size',      240,            @isscalar); %original 120,0122: 256(for 1 image)  --> 240 (for 3 images) 
+    ip.addParamValue('batch_size',      60,            @isscalar); %0424: 240 (for 3 images) -->120->66
     % Fraction of minibatch that is foreground labeled (class > 0)
-    ip.addParamValue('fg_fraction',     0.25,           @isscalar); %1/6
+    ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0424: 0.3
     % weight of background samples, when weight of foreground samples is
     % 1.0
-    ip.addParamValue('bg_weight',       1,            @isscalar);
+    ip.addParamValue('bg_weight',       1,            @isscalar); %0.5
     % Overlap threshold for a ROI to be considered foreground (if >= fg_thresh)
     ip.addParamValue('fg_thresh',       0.5,            @isscalar);
     % Overlap threshold for a ROI to be considered background (class = 0 if
