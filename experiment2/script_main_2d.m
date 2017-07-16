@@ -110,9 +110,11 @@ conf_rpn.anchors = helper.rpn_generate_anchor(cache_data_this_model_dir, ...
 fprintf('\n***************\nstage one RPN \n***************\n');
 model.stage1_rpn            = helper.rpn_train_wrap(conf_rpn, dataset, model.stage1_rpn, opts.do_val);
 %% test
-nms_option_test = 3;
 % 0129: use full-size validation images instead of 512x512
 %dataset                     = Dataset.widerface_all(dataset, 'test', false, -1, cache_data_this_model_dir, model_name_base);
-helper.rpn_test_wrap(conf_rpn, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+%0715 changed
+%helper.rpn_test_wrap(conf_rpn, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test, nms_option_test);
+%rpn.rpn_test_wrap_2d(conf_rpn, model.stage1_rpn, dataset.imdb_test, dataset.roidb_test);
+rpn.rpn_test_wrap_2d(conf_rpn, model.stage1_rpn, dataset.imdb_test);
 
 end

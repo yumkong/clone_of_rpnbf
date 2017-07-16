@@ -14,7 +14,7 @@ function set_path()
     %addpath(genpath(fullfile(curdir, 'bin')));
     %0711 changed
     %addpath(genpath(fullfile(curdir, 'experiments')));
-    addpath(genpath(fullfile(curdir, 'experiment2'))); %has '+helper','bin' folder
+    addpath(genpath(fullfile(curdir, 'experiment2'))); %has '+helper','bin', 'export_fig' folder
     %addpath(genpath(fullfile(curdir, 'imdb')));
     
     caffe_path = fullfile(curdir, 'external', 'caffe', 'matlab');
