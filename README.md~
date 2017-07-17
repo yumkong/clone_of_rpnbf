@@ -858,5 +858,3 @@ fastrcnn all scales: gt recall rate = 38986 / 69489 = 0.5610
 =============
 0715
 conv3_2d: gt = 13923, recall = 1825, recall_rate = 0.1311
-0716
-conv3_2d (with centerloss's original caffe): gt = 13923, recall = 1880, recall_rate = 0.1350
