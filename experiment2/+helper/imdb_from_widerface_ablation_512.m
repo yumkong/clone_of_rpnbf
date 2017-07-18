@@ -46,8 +46,8 @@ try
                 imdb.image_ids = cellfun(@(x) strrep(x,'/',filesep), imdb.image_ids, 'UniformOutput', false);
                 imdb.image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir, filesep, imdb.image_ids{i}, imdb.extension);
             end
-            save(cache_imdb, 'imdb', 'tmpboxdb');
         end
+        save(cache_imdb, 'imdb', 'tmpboxdb');
     catch
         fprintf('imdb has already updated !!!\n');
     end

@@ -1,0 +1,510 @@
+name: "VGG_ILSVRC_16"
+
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 224
+input_dim: 224
+
+input: "labels"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1        # 1(anchors): [8]
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1        # 1(anchors): [8]   
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_targets"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 4  		# 4 (coords) * 1(anchor)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "bbox_loss_weights"
+input_dim: 1  		# to be changed on-the-fly to match input dim
+input_dim: 4  		# 4 (coords) * 1(anchor)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+
+layer {
+	bottom: "data"
+	top: "conv1_1"
+	name: "conv1_1"
+	type: "Convolution"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_1"
+	name: "relu1_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_1"
+	top: "conv1_2"
+	name: "conv1_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 64
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "conv1_2"
+	name: "relu1_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv1_2"
+	top: "pool1"
+	name: "pool1"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool1"
+	top: "conv2_1"
+	name: "conv2_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_1"
+	name: "relu2_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_1"
+	top: "conv2_2"
+	name: "conv2_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 128
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "conv2_2"
+	name: "relu2_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv2_2"
+	top: "pool2"
+	name: "pool2"
+	type: "Pooling"
+	pooling_param {
+		pool: MAX
+		kernel_size: 2
+		stride: 2
+	}
+}
+
+layer {
+	bottom: "pool2"
+	top: "conv3_1"
+	name: "conv3_1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_1"
+	name: "relu3_1"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_1"
+	top: "conv3_2"
+	name: "conv3_2"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_2"
+	name: "relu3_2"
+	type: "ReLU"
+}
+
+layer {
+	bottom: "conv3_2"
+	top: "conv3_3"
+	name: "conv3_3"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 256
+		pad: 1
+		kernel_size: 3
+	}
+}
+
+layer {
+	bottom: "conv3_3"
+	top: "conv3_3"
+	name: "relu3_3"
+	type: "ReLU"
+}
+
+#0205 added norm layer
+layer {
+  name: "conv3_norm"
+  type: "Normalize"
+  bottom: "conv3_3"
+  top: "conv3_norm"
+  norm_param {
+    across_spatial: false
+    scale_filler {
+      type: "constant"
+      value: 16  #0205: 40-->16 
+    }
+    channel_shared: false
+  }
+}
+
+#-----------------------layer +-------------------------
+layer {
+   name: "conv_proposal1"
+   type: "Convolution"
+   bottom: "conv3_norm"
+   top: "conv_proposal1"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 256  #0205: 512->256
+	   kernel_size: 3
+	   pad: 1
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "relu_proposal1"
+   type: "ReLU"
+   bottom: "conv_proposal1"
+   top: "conv_proposal1"
+}
+
+# 0714 added for 2d visualization
+layer {
+	name: "conv_proposal_2d"
+	bottom: "conv_proposal1"
+	top: "conv_proposal_2d"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 2
+		pad: 0
+		kernel_size: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv_proposal_2d"
+	top: "conv_proposal_2d"
+	name: "relu_conv_proposal_2d"
+	type: "ReLU"
+}
+
+layer {
+   name: "proposal_cls_score"
+   type: "Convolution"
+   bottom: "conv_proposal_2d"
+   top: "proposal_cls_score"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 2   # 2(bg/fg) * 1(anchor)
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+layer {
+   name: "proposal_bbox_pred"
+   type: "Convolution"
+   bottom: "conv_proposal1"
+   top: "proposal_bbox_pred"
+	param {
+		lr_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+	}
+   convolution_param{
+	   num_output: 4	# 4 * 1(anchor) 
+	   kernel_size: 1
+	   pad: 0
+	   stride: 1
+	   weight_filler {
+		 type: "gaussian"
+		 std: 0.01
+	   }
+	   bias_filler {
+		 type: "constant"
+		 value: 0
+	   }
+   }
+}
+
+#-----------------------reshape or permute for output preparation------------------------
+
+# to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
+layer {
+   bottom: "proposal_cls_score"
+   top: "proposal_cls_score_reshape"
+   name: "proposal_cls_score_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 2
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels"
+   top: "labels_reshape"
+   name: "labels_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+
+layer {
+   bottom: "labels_weights"
+   top: "labels_weights_reshape"
+   name: "labels_weights_reshape"
+   type: "Reshape"
+   reshape_param{
+	   shape {
+			dim: 0 
+			dim: 1
+			dim: -1 
+			dim: 0
+		}
+	}
+}
+## num x ch x hei x wid ==> num x hei x wid x chl 
+layer {  
+    bottom: "conv_proposal1"  
+    top: "conv_proposal1_permute"
+    name: "conv_proposal1_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+layer {  
+    bottom: "labels"  
+    top: "labels_permute"
+    name: "labels_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+layer {  
+    bottom: "labels_weights"  
+    top: "labels_weights_permute"
+    name: "labels_weights_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+#-----------------------output------------------------
+
+layer {
+   name: "loss"
+   type: "SoftmaxWithLoss"
+   bottom: "proposal_cls_score_reshape"
+   bottom: "labels_reshape"
+   bottom: "labels_weights_reshape"
+   top: "loss_cls"
+   loss_weight: 1
+}
+
+layer {
+   name: "accuarcy"
+   type: "Accuracy"
+   bottom: "proposal_cls_score_reshape"
+   bottom: "labels_reshape"
+   top: "accuarcy"
+}
+
+layer {
+  name: "loss_bbox"
+  type: "SmoothL1Loss"
+  bottom: "proposal_bbox_pred"
+  bottom: "bbox_targets"
+  bottom: "bbox_loss_weights"
+  top: "loss_bbox"
+  loss_weight: 20
+}
+
+############## 0716 rpn center loss ###############
+layer {
+  name: "center_loss"
+  type: "RpnCenterLoss"
+  bottom: "conv_proposal1_permute"  #num x height x width x chl
+  bottom: "labels_permute"          #num x height x width x 1
+  bottom: "labels_weights_permute"  #num x height x width x 1
+  top: "center_loss"
+  param {
+    lr_mult: 1
+    decay_mult: 2 
+  }
+  center_loss_param {
+    num_output: 2  #two centers: face or non-face
+    center_filler {
+      type: "xavier"
+    }
+    axis: 3  #only last dimension (the original channel dim = feature length = 256)
+  }
+  loss_weight: 0.008
+}
