@@ -370,7 +370,7 @@ layer {
    }
 }
 
-#-----------------------output------------------------
+#-----------------------reshape or permute for output preparation------------------------
 
 # to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
 layer {
@@ -417,6 +417,47 @@ layer {
 		}
 	}
 }
+## num x ch x hei x wid ==> num x hei x wid x chl 
+layer {  
+    bottom: "conv_proposal_2d" #"conv_proposal1"  
+    top: "conv_proposal_2d_permute"
+    name: "conv_proposal_2d_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+layer {  
+    bottom: "labels"  
+    top: "labels_permute"
+    name: "labels_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+layer {  
+    bottom: "labels_weights"  
+    top: "labels_weights_permute"
+    name: "labels_weights_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+#-----------------------output------------------------
 
 layer {
    name: "loss"
@@ -443,5 +484,27 @@ layer {
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 1 #20
+  loss_weight: 1 #20 => because of new smoothl1
+}
+
+############## 0716 rpn center loss ###############
+layer {
+  name: "center_loss"
+  type: "RpnCenterLoss"
+  bottom: "conv_proposal_2d_permute" #"conv_proposal1_permute"  #num x height x width x chl
+  bottom: "labels_permute"          #num x height x width x 1
+  bottom: "labels_weights_permute"  #num x height x width x 1
+  top: "center_loss"
+  param {
+    lr_mult: 1
+    decay_mult: 2 
+  }
+  center_loss_param {
+    num_output: 2  #two centers: face or non-face
+    center_filler {
+      type: "xavier"
+    }
+    axis: 3  #only last dimension (the original channel dim = feature length = 256)
+  }
+  loss_weight: 0.008
 }

@@ -1,4 +1,4 @@
-function script_main_2d()
+function script_main_2d_centerloss()
 %% start
 % --------------------------------------------------------
 % Yuguang Liu
@@ -14,13 +14,13 @@ run(fullfile(fileparts(mfilename('fullpath')), 'set_path'));
 %0930 change caffe folder according to platform
 if ispc
     %opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_bn'; 
-    opts.caffe_version          = 'caffe_centerloss_rpn'; 
+    opts.caffe_version          = 'caffe_centerloss_rpn'; %'caffe_centerloss'
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_centerloss_rpn';%'caffe_faster_rcnn_bn'; %'caffe_faster_rcnn_dilate_ohem';
+    opts.caffe_version          = 'caffe_centerloss_rpn'; %'caffe_faster_rcnn_bn'
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = helper.auto_select_gpu;
@@ -37,7 +37,7 @@ exp_name = 'VGG16_widerface';
 opts.do_val                 = true; 
 % 0714 changed from orginal to 2d
 %model                       = helper.model_conv3_s4(exp_name);
-model                       = rpnmodel.get_prototxt_conv3_2d(exp_name);
+model                       = rpnmodel.get_prototxt_conv3_2d_centerloss(exp_name);
 % cache base
 cache_base_proposal         = 'widerface_VGG16';
 %cache_base_fast_rcnn        = '';
