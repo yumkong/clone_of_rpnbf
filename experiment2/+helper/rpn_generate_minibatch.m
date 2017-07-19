@@ -52,8 +52,8 @@ function [input_blobs, random_scale_inds] = rpn_generate_minibatch(conf, image_r
         bbox_loss_blob(:,:,:,i) = permute(bbox_loss_blob_tmp, [3, 2, 1]);
     end
     
-    % permute data into caffe c++ memory, thus [num, channels, height, width]
     im_blob = im_blob(:, :, [3, 2, 1], :); % from rgb to brg
+    % permute data into caffe c++ memory, thus [width, height, chl, num]
     im_blob = single(permute(im_blob, [2, 1, 3, 4]));
     labels_blob = single(labels_blob);
     labels_blob(labels_blob > 0) = 1; %to binary lable (fg and bg)
