@@ -1,4 +1,4 @@
-function set_path()
+function startup()
 % startup()
 % --------------------------------------------------------
 % Faster R-CNN
@@ -7,8 +7,8 @@ function set_path()
 % --------------------------------------------------------
     %0711 changed
     %curdir = fileparts(mfilename('fullpath'));
-    % this is the father path
-    curdir = fileparts(fileparts(mfilename('fullpath')));
+    % this is the root path
+    curdir = fileparts(mfilename('fullpath'));
     %addpath(genpath(fullfile(curdir, 'utils')));
     %addpath(genpath(fullfile(curdir, 'functions')));
     %addpath(genpath(fullfile(curdir, 'bin')));

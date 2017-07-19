@@ -419,9 +419,9 @@ layer {
 }
 ## num x ch x hei x wid ==> num x hei x wid x chl 
 layer {  
-    bottom: "conv_proposal1"  
-    top: "conv_proposal1_permute"
-    name: "conv_proposal1_permute"  
+    bottom: "conv_proposal_2d" #"conv_proposal1"  
+    top: "conv_proposal_2d_permute"
+    name: "conv_proposal_2d_permute"  
     type: "Permute"  
     permute_param {    
       order: 0 
@@ -491,7 +491,7 @@ layer {
 layer {
   name: "center_loss"
   type: "RpnCenterLoss"
-  bottom: "conv_proposal1_permute"  #num x height x width x chl
+  bottom: "conv_proposal_2d_permute" #"conv_proposal1_permute"  #num x height x width x chl
   bottom: "labels_permute"          #num x height x width x 1
   bottom: "labels_weights_permute"  #num x height x width x 1
   top: "center_loss"

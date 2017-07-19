@@ -17,7 +17,7 @@ function feat_list = rpn_test_wrap_2d(conf, model_stage, imdb)
                                         'three_scales',     false, ...
                                         'feat_per_img',     10); %0124: root switch of test with 1 scale or 3 scales
     % draw 2D distribution plot
-	figure(1);
+	figure(6);
     % liu: scatter plot by group
     gscatter(feat_list(:,1), feat_list(:,2), label_list,'br','xo');
     set(gca, 'FontSize', 12);
