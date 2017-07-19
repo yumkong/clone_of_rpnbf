@@ -15,10 +15,10 @@ function save_model_path = rpn_train(conf, imdb_train, roidb_train, varargin)
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           1000,                 @isscalar);%1000
-    ip.addParamValue('val_interval',        2000,               @isscalar);%2000
+    ip.addParamValue('val_iters',           10,                 @isscalar);%1000
+    ip.addParamValue('val_interval',        20,               @isscalar);%2000
     ip.addParamValue('snapshot_interval',...
-                                            2000,              @isscalar); %2000
+                                            20,              @isscalar); %2000
                                                                        
     % Max pixel size of a scaled input image
     ip.addParamValue('solver_def_file',     fullfile(pwd, 'proposal_models', 'Zeiler_conv5', 'solver.prototxt'), ...
@@ -135,7 +135,7 @@ function save_model_path = rpn_train(conf, imdb_train, roidb_train, varargin)
 
     % 0927 added to record plot info
     modelFigPath = fullfile(cache_dir, 'net-train.pdf');  % plot save path
-    tmp_struct = struct('err_fg', [], 'err_bg', [], 'loss_cls', [], 'loss_bbox', []);
+    tmp_struct = struct('err_fg', [], 'err_bg', [], 'loss_cls', [], 'loss_bbox', [], 'loss_center', []);
     history_rec = struct('train',tmp_struct,'val',tmp_struct, 'num', 0);
     %1009 changed so that validation can be done within while loop
     while (iter_ <= max_iter)
@@ -352,27 +352,33 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     fprintf('Training : err_fg %.3g, err_bg %.3g, loss (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg.data), 1 - mean(train_results.accuracy_bg.data), ...
         mean(train_results.loss_cls.data), ...
-        mean(train_results.loss_bbox.data));
+        mean(train_results.loss_bbox.data), ...
+        mean(train_results.center_loss.data));
     if exist('val_results', 'var') && ~isempty(val_results)
         fprintf('Testing  : err_fg %.3g, err_bg %.3g, loss (cls %.3g + reg %.3g)\n', ...
             1 - mean(val_results.accuracy_fg.data), 1 - mean(val_results.accuracy_bg.data), ...
             mean(val_results.loss_cls.data), ...
-            mean(val_results.loss_bbox.data));
+            mean(val_results.loss_bbox.data), ...
+            mean(val_results.center_loss.data));
     end
     % --------- end previously show_state part ------------
     % ========= newly added plot part =====================
+    % ### train
     history_rec.train.err_fg = [history_rec.train.err_fg; 1 - mean(train_results.accuracy_fg.data)];
     history_rec.train.err_bg = [history_rec.train.err_bg; 1 - mean(train_results.accuracy_bg.data)];
     history_rec.train.loss_cls = [history_rec.train.loss_cls; mean(train_results.loss_cls.data)];
     history_rec.train.loss_bbox = [history_rec.train.loss_bbox; mean(train_results.loss_bbox.data)];
+    history_rec.train.loss_center = [history_rec.train.loss_center; mean(train_results.center_loss.data)];
+    % ### test
     history_rec.val.err_fg = [history_rec.val.err_fg; 1 - mean(val_results.accuracy_fg.data)];
     history_rec.val.err_bg = [history_rec.val.err_bg; 1 - mean(val_results.accuracy_bg.data)];
     history_rec.val.loss_cls = [history_rec.val.loss_cls; mean(val_results.loss_cls.data)];
     history_rec.val.loss_bbox = [history_rec.val.loss_bbox; mean(val_results.loss_bbox.data)];
+    history_rec.val.loss_center = [history_rec.val.loss_center; mean(val_results.center_loss.data)];
     history_rec.num = history_rec.num + 1;
     % draw it
     figure(1) ; clf ;
-    plots = {'err_fg', 'err_bg', 'loss_cls', 'loss_bbox'};
+    plots = {'err_fg', 'err_bg', 'loss_cls', 'loss_bbox', 'loss_center'};
     for p = plots
       c_p = char(p) ;
       values = zeros(0, history_rec.num) ;
