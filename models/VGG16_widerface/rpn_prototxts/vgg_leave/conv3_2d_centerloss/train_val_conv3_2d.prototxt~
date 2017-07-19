@@ -484,7 +484,7 @@ layer {
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 20
+  loss_weight: 1 #20 => because of new smoothl1
 }
 
 ############## 0716 rpn center loss ###############
@@ -506,5 +506,5 @@ layer {
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
   }
-  loss_weight: 0.008
+  loss_weight: 1 #0.008
 }

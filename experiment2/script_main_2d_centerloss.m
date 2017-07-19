@@ -14,13 +14,13 @@ run(fullfile(fileparts(mfilename('fullpath')), 'set_path'));
 %0930 change caffe folder according to platform
 if ispc
     %opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_bn'; 
-    opts.caffe_version          = 'caffe_centerloss_rpn'; %'caffe_centerloss'
+    opts.caffe_version          = 'caffe_centerloss_exp'; %'caffe_centerloss'
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_centerloss_rpn'; %'caffe_faster_rcnn_bn'
+    opts.caffe_version          = 'caffe_centerloss_exp'; %'caffe_faster_rcnn_bn'
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = helper.auto_select_gpu;
