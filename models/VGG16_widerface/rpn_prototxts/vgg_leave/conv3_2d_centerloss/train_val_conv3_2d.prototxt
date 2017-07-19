@@ -506,5 +506,5 @@ layer {
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
   }
-  loss_weight: 0.008
+  loss_weight: 0.1 #0.008
 }
