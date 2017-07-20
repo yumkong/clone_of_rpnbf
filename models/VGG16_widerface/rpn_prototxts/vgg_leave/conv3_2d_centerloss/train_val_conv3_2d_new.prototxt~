@@ -316,6 +316,44 @@ layer {
 	type: "ReLU"
 }
 
+### 0719 added ####
+# 0714 added for 2d visualization
+layer {
+	name: "conv_proposal_2d_cl"
+	bottom: "conv_proposal1"
+	top: "conv_proposal_2d_cl"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 3
+		pad: 0
+		kernel_size: 1
+		weight_filler {
+			type: "xavier"
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv_proposal_2d_cl"
+	top: "conv_proposal_2d_cl"
+	name: "relu_conv_proposal_2d_cl"
+	type: "ReLU"
+}
+
+######
+
 layer {
    name: "proposal_cls_score"
    type: "Convolution"
@@ -419,9 +457,9 @@ layer {
 }
 ## num x ch x hei x wid ==> num x hei x wid x chl 
 layer {  
-    bottom: "conv_proposal_2d" #"conv_proposal1"  
-    top: "conv_proposal_2d_permute"
-    name: "conv_proposal_2d_permute"  
+    bottom: "conv_proposal_2d_cl" #"conv_proposal1"  
+    top: "conv_proposal_2d_cl_permute"
+    name: "conv_proposal_2d_cl_permute"  
     type: "Permute"  
     permute_param {    
       order: 0 
@@ -491,7 +529,7 @@ layer {
 layer {
   name: "center_loss"
   type: "RpnCenterLoss"
-  bottom: "conv_proposal_2d_permute" #"conv_proposal1_permute"  #num x height x width x chl
+  bottom: "conv_proposal_2d_cl_permute" #"conv_proposal1_permute"  #num x height x width x chl
   bottom: "labels_permute"          #num x height x width x 1
   bottom: "labels_weights_permute"  #num x height x width x 1
   top: "center_loss"
@@ -506,5 +544,5 @@ layer {
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
   }
-  loss_weight: 0.1 #0.008
+  loss_weight: 1 #0.008
 }

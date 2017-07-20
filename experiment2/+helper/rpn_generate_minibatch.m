@@ -6,7 +6,7 @@ function [input_blobs, random_scale_inds] = rpn_generate_minibatch(conf, image_r
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------
     num_images = length(image_roidb);
-    assert(num_images == 1 || num_images == 2 || num_images == 3, 'proposal_generate_minibatch_fcn only support num_images == 1,2 or 3');
+    assert(num_images <= 4, 'proposal_generate_minibatch_fcn only support num_images == 1,2,3 or 4');
 
     % Sample random scales to use for each image in this batch
     random_scale_inds = randi(length(conf.scales), num_images, 1);
