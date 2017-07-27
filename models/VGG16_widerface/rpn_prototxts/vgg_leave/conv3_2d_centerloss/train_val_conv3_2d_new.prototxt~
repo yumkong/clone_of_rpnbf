@@ -259,7 +259,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 256  #0205: 512->256
+	   num_output: 256
 	   kernel_size: 3
 	   pad: 1
 	   stride: 1
@@ -332,11 +332,13 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 3
+		num_output: 2
 		pad: 0
 		kernel_size: 1
 		weight_filler {
-			type: "xavier"
+		    #type: "xavier"
+                    type: "gaussian"
+		    std: 0.001
 		}
 		bias_filler{
 			type: "constant"
@@ -345,12 +347,12 @@ layer {
 	}
 }
 
-layer {
-	bottom: "conv_proposal_2d_cl"
-	top: "conv_proposal_2d_cl"
-	name: "relu_conv_proposal_2d_cl"
-	type: "ReLU"
-}
+#layer {
+#	bottom: "conv_proposal_2d_cl"
+#	top: "conv_proposal_2d_cl"
+#	name: "relu_conv_proposal_2d_cl"
+#	type: "ReLU"
+#}
 
 ######
 
@@ -371,8 +373,8 @@ layer {
 	   pad: 0
 	   stride: 1
 	   weight_filler {
-		 type: "gaussian"
-		 std: 0.01
+		 type: "xavier" #"gaussian"
+		 #std: 0.01
 	   }
 	   bias_filler {
 		 type: "constant"
@@ -398,8 +400,8 @@ layer {
 	   pad: 0
 	   stride: 1
 	   weight_filler {
-		 type: "gaussian"
-		 std: 0.01
+		 type: "xavier" #"gaussian"
+		 #std: 0.01
 	   }
 	   bias_filler {
 		 type: "constant"
@@ -542,9 +544,9 @@ layer {
     center_filler {
       type: "uniform" #"xavier"
       min: 0
-      max: 10
+      max: 1
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
   }
-  loss_weight: 1 #0.008
+  loss_weight: 0.003 #0.008
 }
