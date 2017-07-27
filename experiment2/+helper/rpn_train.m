@@ -155,6 +155,49 @@ function save_model_path = rpn_train(conf, imdb_train, roidb_train, varargin)
         caffe_solver.step(1);
         %end time counting
         cost_time = toc(start_time);
+        %0720 for debug
+        if 1 %rem(iter_, 10) == 0
+           fprintf('#################################################\n') 
+           fprintf('##### DATA value ######\n');
+            aa = caffe_solver.net.blobs('center_loss').get_data(); 
+            fprintf('centerloss min = %.4f\n',min(aa(:)));
+            fprintf('centerloss max = %.4f\n',max(aa(:)));
+            aa = caffe_solver.net.blobs('conv_proposal_2d_cl_permute').get_data();  %W
+            fprintf('cl_permute min = %.4f\n',min(aa(:)));
+            fprintf('cl_permute max = %.4f\n',max(aa(:)));
+            aa = caffe_solver.net.blobs('conv_proposal_2d_cl').get_data();  %W
+            fprintf('conv_2d_cl min = %.4f\n',min(aa(:)));
+            fprintf('conv_2d_cl max = %.4f\n',max(aa(:)));
+            
+           fprintf('##### DATA diff ######\n');
+            aa = caffe_solver.net.blobs('center_loss').get_diff(); 
+            fprintf('centerloss min = %.4f\n',min(aa(:)));
+            fprintf('centerloss max = %.4f\n',max(aa(:)));
+            aa = caffe_solver.net.blobs('conv_proposal_2d_cl_permute').get_diff();  %W
+            fprintf('cl_permute min = %.4f\n',min(aa(:)));
+            fprintf('cl_permute max = %.4f\n',max(aa(:)));
+            aa = caffe_solver.net.blobs('conv_proposal_2d_cl').get_diff();  %W
+            fprintf('conv_2d_cl min = %.4f\n',min(aa(:)));
+            fprintf('conv_2d_cl max = %.4f\n',max(aa(:)));
+            
+           fprintf('##### PARAM DATA ######\n');
+            bb = caffe_solver.net.params('center_loss',1).get_data();
+            fprintf('centerloss min = %.4f\n',min(bb(:)));
+            fprintf('centerloss max = %.4f\n',max(bb(:)));
+            bb = caffe_solver.net.params('conv_proposal_2d_cl',1).get_data();
+            fprintf('conv_2d_cl min = %.4f\n',min(bb(:)));
+            fprintf('conv_2d_cl max = %.4f\n',max(bb(:)));
+            
+           fprintf('##### PARAM DIFF ######\n');
+            bb = caffe_solver.net.params('center_loss',1).get_diff();
+            fprintf('centerloss min = %.4f\n',min(bb(:)));
+            fprintf('centerloss max = %.4f\n',max(bb(:)));
+            bb = caffe_solver.net.params('conv_proposal_2d_cl',1).get_diff();
+            fprintf('conv_2d_cl min = %.4f\n',min(bb(:)));
+            fprintf('conv_2d_cl max = %.4f\n',max(bb(:)));
+            
+            fprintf('#################################################\n') 
+        end
 %         fprintf('\n');
 %         for kk = 1:length(caffe_blob_names)
 %            blob_der_compare(caffe_solver.net, caffe_blob_names{kk}, der_cell{mat_blob_indices(2*kk-1)}, der_cell{mat_blob_indices(2*kk)}); 
