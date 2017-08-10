@@ -336,9 +336,9 @@ layer {
 		pad: 0
 		kernel_size: 1
 		weight_filler {
-		    #type: "xavier"
-                    type: "gaussian"
-		    std: 0.001
+		    type: "xavier"
+                    #type: "gaussian"
+		    #std: 0.001
 		}
 		bias_filler{
 			type: "constant"
@@ -524,7 +524,7 @@ layer {
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 0.1 #20 => because of new smoothl1
+  loss_weight: 1 #20 => because of new smoothl1
 }
 
 ############## 0716 rpn center loss ###############
@@ -542,11 +542,11 @@ layer {
   center_loss_param {
     num_output: 2  #two centers: face or non-face
     center_filler {
-      type: "uniform" #"xavier"
-      min: 0
-      max: 1
+      type: "xavier" #"uniform", "xavier"
+      #min: 0
+      #max: 1
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
   }
-  loss_weight: 0.01 #0.008
+  loss_weight: 0.0001 #0.008
 }

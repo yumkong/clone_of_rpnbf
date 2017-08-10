@@ -160,7 +160,7 @@ function save_model_path = rpn_train(conf, imdb_train, roidb_train, varargin)
             aa = caffe_solver.net.blobs('center_loss').get_data(); 
             fprintf('centerloss min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
             aa = caffe_solver.net.blobs('conv_proposal_2d_cl').get_data();  %W
-            fprintf('conv_2d_cl min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
+            fprintf('conv_2d_cl min = %.4f, max = .4f\n',min(aa(:)), max(aa(:)));
            
            fprintf('### PARAM value ####\n');
             bb = caffe_solver.net.params('center_loss',1).get_data();
@@ -173,6 +173,7 @@ function save_model_path = rpn_train(conf, imdb_train, roidb_train, varargin)
            fprintf('#### DATA diff #####\n');
             aa = caffe_solver.net.blobs('center_loss').get_diff(); 
             fprintf('centerloss min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
+            fprintf('centerloss max = %.4f\n',max(aa(:)));
             aa = caffe_solver.net.blobs('conv_proposal_2d_cl').get_diff();  %W
             fprintf('conv_2d_cl min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
 

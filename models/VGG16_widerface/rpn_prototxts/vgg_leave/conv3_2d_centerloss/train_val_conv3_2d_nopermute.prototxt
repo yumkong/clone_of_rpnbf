@@ -336,9 +336,9 @@ layer {
 		pad: 0
 		kernel_size: 1
 		weight_filler {
-		    #type: "xavier"
-                    type: "gaussian"
-		    std: 0.001
+		    type: "xavier"
+                    #type: "gaussian"
+		    #std: 0.001
 		}
 		bias_filler{
 			type: "constant"
@@ -457,45 +457,6 @@ layer {
 		}
 	}
 }
-## num x ch x hei x wid ==> num x hei x wid x chl 
-layer {  
-    bottom: "conv_proposal_2d_cl" #"conv_proposal1"  
-    top: "conv_proposal_2d_cl_permute"
-    name: "conv_proposal_2d_cl_permute"  
-    type: "Permute"  
-    permute_param {    
-      order: 0 
-      order: 2  
-      order: 3
-      order: 1  
-    }
-}
-
-layer {  
-    bottom: "labels"  
-    top: "labels_permute"
-    name: "labels_permute"  
-    type: "Permute"  
-    permute_param {    
-      order: 0 
-      order: 2  
-      order: 3
-      order: 1  
-    }
-}
-
-layer {  
-    bottom: "labels_weights"  
-    top: "labels_weights_permute"
-    name: "labels_weights_permute"  
-    type: "Permute"  
-    permute_param {    
-      order: 0 
-      order: 2  
-      order: 3
-      order: 1  
-    }
-}
 
 #-----------------------output------------------------
 
@@ -530,14 +491,14 @@ layer {
 ############## 0716 rpn center loss ###############
 layer {
   name: "center_loss"
-  type: "RpnCenterLoss"
-  bottom: "conv_proposal_2d_cl_permute" #"conv_proposal1_permute"  #num x height x width x chl
-  bottom: "labels_permute"          #num x height x width x 1
-  bottom: "labels_weights_permute"  #num x height x width x 1
+  type: "RpnCenterLossNew"
+  bottom: "conv_proposal_2d_cl" #num x chl x height x width
+  bottom: "labels"          #num x 1 x height x width
+  bottom: "labels_weights"  #num x 1 x height x width
   top: "center_loss"
   param {
     lr_mult: 1
-    decay_mult: 0 #2 
+    decay_mult: 2 
   }
   center_loss_param {
     num_output: 2  #two centers: face or non-face
@@ -546,7 +507,7 @@ layer {
       #min: 0
       #max: 1
     }
-    axis: 3  #only last dimension (the original channel dim = feature length = 256)
+    axis: 1  #only 2nd dim (aka. chl = 2)
   }
   loss_weight: 0.0001 #0.008
 }
