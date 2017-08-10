@@ -323,6 +323,9 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     output_height = conf.output_width_map.values({size(im_blob, 2)});
     output_height = output_height{1};
     labels_blob = single(zeros(output_width, output_height, anchor_num, conf.ims_per_batch));
+    %0809 added to fix the bug
+    labels_blob(1:20) = 1;
+    
     labels_weights = labels_blob;
     bbox_targets_blob = single(zeros(output_width, output_height, anchor_num*4, conf.ims_per_batch));
     bbox_loss_weights_blob = bbox_targets_blob;

@@ -542,9 +542,10 @@ layer {
   center_loss_param {
     num_output: 2  #two centers: face or non-face
     center_filler {
-      type: "xavier" #"uniform", "xavier"
+      type: "xavier"
+      #type: "uniform"
       #min: 0
-      #max: 1
+      #max: 0.1
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
   }
