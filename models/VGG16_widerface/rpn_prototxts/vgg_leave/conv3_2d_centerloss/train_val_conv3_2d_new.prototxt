@@ -542,7 +542,7 @@ layer {
     center_filler {
       type: "uniform" #"xavier"
       min: 0
-      max: 10
+      max: 0.1
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
   }
