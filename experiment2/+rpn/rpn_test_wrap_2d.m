@@ -23,6 +23,17 @@ function feat_list = rpn_test_wrap_2d(conf, model_stage, imdb)
     set(gca, 'FontSize', 12);
     xlabel('Feature\_1','FontSize', 15, 'FontWeight','bold');
     ylabel('Feature\_2','FontSize', 15, 'FontWeight','bold');
+    %0810 plot two centers
+    if 1
+    hold on
+    plot(0.0012, 0.0182,'-s','MarkerSize',10,...
+    'MarkerEdgeColor','k',...
+    'MarkerFaceColor','k')
+    plot(0.0002, 0.0682,'-s','MarkerSize',10,...
+    'MarkerEdgeColor','k',...
+    'MarkerFaceColor','k')
+    hold off
+    end
     %blue cross -- non-face, red circle-- face
     legend('\fontsize{12} Non-Face','\fontsize{12} Face');
     %%%% save plot %%
