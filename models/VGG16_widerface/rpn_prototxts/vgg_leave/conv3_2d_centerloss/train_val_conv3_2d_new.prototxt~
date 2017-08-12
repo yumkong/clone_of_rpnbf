@@ -347,12 +347,12 @@ layer {
 	}
 }
 
-layer {
-	bottom: "conv_proposal_2d_cl"
-	top: "conv_proposal_2d_cl"
-	name: "relu_conv_proposal_2d_cl"
-	type: "ReLU"
-}
+#layer {
+#	bottom: "conv_proposal_2d_cl"
+#	top: "conv_proposal_2d_cl"
+#	name: "relu_conv_proposal_2d_cl"
+#	type: "ReLU"
+#}
 
 ######
 
@@ -542,17 +542,13 @@ layer {
   center_loss_param {
     num_output: 2  #two centers: face or non-face
     center_filler {
-<<<<<<< HEAD
-      type: "xavier" #"uniform", "xavier"
+      type: "xavier"
+      #type: "uniform"
       #min: 0
-      #max: 1
-=======
-      type: "uniform" #"xavier"
-      min: 0
-      max: 0.1
->>>>>>> 06dda9555886f454a3662a1c6550109226fe7ef3
+      #max: 0.1
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
+    lr: 0.5 #default 0.05
   }
-  loss_weight: 0.0001 #0.008
+  loss_weight: 0.1 #0.001
 }
