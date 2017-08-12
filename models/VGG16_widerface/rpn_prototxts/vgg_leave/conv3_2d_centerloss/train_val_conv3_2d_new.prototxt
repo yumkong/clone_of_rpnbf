@@ -347,12 +347,12 @@ layer {
 	}
 }
 
-layer {
-	bottom: "conv_proposal_2d_cl"
-	top: "conv_proposal_2d_cl"
-	name: "relu_conv_proposal_2d_cl"
-	type: "ReLU"
-}
+#layer {
+#	bottom: "conv_proposal_2d_cl"
+#	top: "conv_proposal_2d_cl"
+#	name: "relu_conv_proposal_2d_cl"
+#	type: "ReLU"
+#}
 
 ######
 
@@ -548,6 +548,7 @@ layer {
       #max: 0.1
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
+    lr: 0.5 #default 0.05
   }
-  loss_weight: 0.0001 #0.008
+  loss_weight: 0.1 #0.001
 }
