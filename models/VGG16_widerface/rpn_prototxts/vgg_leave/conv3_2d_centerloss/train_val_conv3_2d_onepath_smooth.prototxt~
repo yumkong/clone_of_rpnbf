@@ -296,7 +296,7 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 10 # 10, 2,128
+		num_output: 64 # 10, 2,128
 		pad: 0
 		kernel_size: 1
 		weight_filler {
@@ -386,7 +386,7 @@ layer {
 layer {
    name: "proposal_bbox_pred"
    type: "Convolution"
-   bottom: "conv_proposal1"
+   bottom: "conv_proposal_2d" #"conv_proposal1"
    top: "proposal_bbox_pred"
 	param {
 		lr_mult: 1.0
@@ -549,7 +549,6 @@ layer {
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
     lr: 0.1 #default 0.05
-    radius: 1 #default 0.1
   }
   loss_weight: 1 # 0.01
 }

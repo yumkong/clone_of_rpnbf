@@ -52,8 +52,8 @@ layer {
 layer {
 	bottom: "conv1_1"
 	top: "conv1_1"
-	name: "relu1_1"
-	type: "ReLU"
+	name: "relu1_1" #"relu1_1"
+	type: "ReLU" #"ReLU"
 }
 
 layer {
@@ -78,7 +78,7 @@ layer {
 	bottom: "conv1_2"
 	top: "conv1_2"
 	name: "relu1_2"
-	type: "ReLU"
+	type: "ReLU" #"ReLU"
 }
 
 layer {
@@ -115,7 +115,7 @@ layer {
 	bottom: "conv2_1"
 	top: "conv2_1"
 	name: "relu2_1"
-	type: "ReLU"
+	type: "ReLU" #"ReLU"
 }
 
 layer {
@@ -140,7 +140,7 @@ layer {
 	bottom: "conv2_2"
 	top: "conv2_2"
 	name: "relu2_2"
-	type: "ReLU"
+	type: "ReLU" #"ReLU"
 }
 
 layer {
@@ -177,7 +177,7 @@ layer {
 	bottom: "conv3_1"
 	top: "conv3_1"
 	name: "relu3_1"
-	type: "ReLU"
+	type: "ReLU" #"ReLU"
 }
 
 layer {
@@ -202,7 +202,7 @@ layer {
 	bottom: "conv3_2"
 	top: "conv3_2"
 	name: "relu3_2"
-	type: "ReLU"
+	type: "ReLU" #"ReLU"
 }
 
 layer {
@@ -227,7 +227,7 @@ layer {
 	bottom: "conv3_3"
 	top: "conv3_3"
 	name: "relu3_3"
-	type: "ReLU"
+	type: "ReLU" #"ReLU"
 }
 
 #0205 added norm layer
@@ -276,7 +276,7 @@ layer {
 
 layer {
    name: "relu_proposal1"
-   type: "ReLU"
+   type: "ReLU" #"ReLU"
    bottom: "conv_proposal1"
    top: "conv_proposal1"
 }
@@ -313,7 +313,7 @@ layer {
 	bottom: "conv_proposal_2d"
 	top: "conv_proposal_2d"
 	name: "relu_conv_proposal_2d"
-	type: "ReLU"
+	type: "PReLU" #"ReLU"
 }
 
 ### 0719 added ####
@@ -537,7 +537,7 @@ layer {
   top: "center_loss"
   param {
     lr_mult: 1
-    decay_mult: 0 #2 
+    decay_mult: 0 #0 #2 
   }
   center_loss_param {
     num_output: 2  #two centers: face or non-face
@@ -549,7 +549,6 @@ layer {
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
     lr: 0.1 #default 0.05
-    radius: 1 #default 0.1
   }
-  loss_weight: 1 # 0.01
+  loss_weight: 0.8 # 0.01
 }
