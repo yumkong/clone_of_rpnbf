@@ -27,8 +27,8 @@ layer {
 layer {
 	bottom: "conv1_1"
 	top: "conv1_1"
-	name: "relu1_1"
-	type: "ReLU"
+	name: "prelu1_1" #"relu1_1"
+	type: "PReLU" #"ReLU"
 }
 
 layer {
@@ -52,8 +52,8 @@ layer {
 layer {
 	bottom: "conv1_2"
 	top: "conv1_2"
-	name: "relu1_2"
-	type: "ReLU"
+	name: "prelu1_2"
+	type: "PReLU" #"ReLU"
 }
 
 layer {
@@ -89,8 +89,8 @@ layer {
 layer {
 	bottom: "conv2_1"
 	top: "conv2_1"
-	name: "relu2_1"
-	type: "ReLU"
+	name: "prelu2_1"
+	type: "PReLU" #"ReLU"
 }
 
 layer {
@@ -114,8 +114,8 @@ layer {
 layer {
 	bottom: "conv2_2"
 	top: "conv2_2"
-	name: "relu2_2"
-	type: "ReLU"
+	name: "prelu2_2"
+	type: "PReLU" #"ReLU"
 }
 
 layer {
@@ -151,8 +151,8 @@ layer {
 layer {
 	bottom: "conv3_1"
 	top: "conv3_1"
-	name: "relu3_1"
-	type: "ReLU"
+	name: "prelu3_1"
+	type: "PReLU" #"ReLU"
 }
 
 layer {
@@ -176,8 +176,8 @@ layer {
 layer {
 	bottom: "conv3_2"
 	top: "conv3_2"
-	name: "relu3_2"
-	type: "ReLU"
+	name: "prelu3_2"
+	type: "PReLU" #"ReLU"
 }
 
 layer {
@@ -201,8 +201,8 @@ layer {
 layer {
 	bottom: "conv3_3"
 	top: "conv3_3"
-	name: "relu3_3"
-	type: "ReLU"
+	name: "prelu3_3"
+	type: "PReLU" #"ReLU"
 }
 
 #0205 added norm layer
@@ -234,7 +234,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 256  #0205: 512->256
+	   num_output: 256
 	   kernel_size: 3
 	   pad: 1
 	   stride: 1
@@ -250,8 +250,8 @@ layer {
 }
 
 layer {
-   name: "relu_proposal1"
-   type: "ReLU"
+   name: "prelu_proposal1"
+   type: "PReLU" #"ReLU"
    bottom: "conv_proposal1"
    top: "conv_proposal1"
 }
@@ -271,7 +271,7 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 10 #10 2 128
+		num_output: 10 # 10, 2,128
 		pad: 0
 		kernel_size: 1
 		weight_filler {

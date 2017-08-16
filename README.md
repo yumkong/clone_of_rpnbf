@@ -860,3 +860,16 @@ fastrcnn all scales: gt recall rate = 38986 / 69489 = 0.5610
 conv3_2d: gt = 13923, recall = 1825, recall_rate = 0.1311
 0716
 conv3_2d (with centerloss's original caffe): gt = 13923, recall = 1880, recall_rate = 0.1350
+
+====== 0811 get the center of centerloss_onepath ========
+caffe_solver = caffe.Solver(opts.solver_def_file);
+K>> ss = '/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian/output2/old_conv3_s4_2d_onepath/rpn_cache/widerface_VGG16_stage1_rpn/WIDERFACE_train/final';
+K>> caffe_solver.net.copy_from(ss);
+K>> bb = caffe_solver.net.params('center_loss',1).get_data()
+
+for cl weight = 0.01
+    3.7595    0.3660
+    0.0646    2.3275
+for cl weight = 1
+    0.0101    0.9178
+    1.4127    0.1152

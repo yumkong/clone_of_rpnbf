@@ -549,7 +549,7 @@ layer {
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
     lr: 0.1 #default 0.05
-    radius: 1 #default 0.1
+    radius: 0.1 #default 0.1
   }
   loss_weight: 1 # 0.01
 }

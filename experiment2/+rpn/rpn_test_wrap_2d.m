@@ -19,19 +19,19 @@ function feat_list = rpn_test_wrap_2d(conf, model_stage, imdb)
     % draw 2D distribution plot
 	figure(6);
     % liu: scatter plot by group
-    gscatter(feat_list(:,1), feat_list(:,2), label_list,'br','xo');
+    gscatter(feat_list(:,5), feat_list(:,6), label_list,'br','xo');
     set(gca, 'FontSize', 12);
     xlabel('Feature\_1','FontSize', 15, 'FontWeight','bold');
     ylabel('Feature\_2','FontSize', 15, 'FontWeight','bold');
     %0810 plot two centers
     if 1
     hold on
-    plot(0.0012, 0.0182,'-s','MarkerSize',10,...
-    'MarkerEdgeColor','k',...
-    'MarkerFaceColor','k')
-    plot(0.0002, 0.0682,'-s','MarkerSize',10,...
-    'MarkerEdgeColor','k',...
-    'MarkerFaceColor','k')
+    plot(0.0101, 1.4127,'-s','MarkerSize',10,...
+    'MarkerEdgeColor','g',...
+    'MarkerFaceColor','g')
+    plot(0.9178, 0.1152,'-s','MarkerSize',10,...
+    'MarkerEdgeColor','g',...
+    'MarkerFaceColor','g')
     hold off
     end
     %blue cross -- non-face, red circle-- face

@@ -271,7 +271,7 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 10 #10 2 128
+		num_output: 64 #10 2 128
 		pad: 0
 		kernel_size: 1
 		weight_filler {
