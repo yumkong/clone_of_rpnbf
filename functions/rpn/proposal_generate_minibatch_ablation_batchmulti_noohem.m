@@ -36,6 +36,10 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
     feat_chl_s4 = size(conf.anchors_s4, 1);
     labels_blob_conv4 = zeros(feat_wid_s4, feat_hei_s4, feat_chl_s4, num_images);
     label_weights_blob_conv4 = labels_blob_conv4;
+    % liu@20170817 added
+    labels_cl_conv4 = zeros(feat_wid_s4, feat_hei_s4, 1, num_images);
+    label_weights_cl_conv4 = labels_cl_conv4;
+    % end added
     bbox_targets_blob_conv4 = zeros(feat_wid_s4, feat_hei_s4, feat_chl_s4*4, num_images);
     bbox_loss_blob_conv4 = bbox_targets_blob_conv4;
     %s8
@@ -44,6 +48,10 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
     feat_chl_s8 = size(conf.anchors_s8, 1);
     labels_blob_conv5 = zeros(feat_wid_s8, feat_hei_s8, feat_chl_s8, num_images);
     label_weights_blob_conv5 = labels_blob_conv5;
+    % liu@20170817 added
+    labels_cl_conv5 = zeros(feat_wid_s8, feat_hei_s8, 1, num_images);
+    label_weights_cl_conv5 = labels_cl_conv5;
+    % end added
     bbox_targets_blob_conv5 = zeros(feat_wid_s8, feat_hei_s8, feat_chl_s8*4, num_images);
     bbox_loss_blob_conv5 = bbox_targets_blob_conv5;
     %s16
@@ -52,6 +60,10 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
     feat_chl_s16 = size(conf.anchors_s16, 1);
     labels_blob_conv6 = zeros(feat_wid_s16, feat_hei_s16, feat_chl_s16, num_images);
     label_weights_blob_conv6 = labels_blob_conv6;
+    % liu@20170817 added
+    labels_cl_conv6 = zeros(feat_wid_s16, feat_hei_s16, 1, num_images);
+    label_weights_cl_conv6 = labels_cl_conv6;
+    % end added
     bbox_targets_blob_conv6 = zeros(feat_wid_s16, feat_hei_s16, feat_chl_s16*4, num_images);
     bbox_loss_blob_conv6 = bbox_targets_blob_conv6;
     
@@ -73,12 +85,20 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
         output_size_conv4 = cell2mat([conf.output_height_s4.values({img_size(1)}), conf.output_width_s4.values({img_size(2)})]);
         labels_blob_s4_tmp = reshape(labels_conv4, size(conf.anchors_s4, 1), output_size_conv4(1), output_size_conv4(2));
         label_weights_blob_s4_tmp = reshape(label_weights_conv4, size(conf.anchors_s4, 1), output_size_conv4(1), output_size_conv4(2));
+        % liu@20170817 added
+        labels_cl_s4_tmp = max(labels_blob_s4_tmp, [], 1);
+        label_weights_cl_s4_tmp = max(label_weights_blob_s4_tmp, [], 1);
+        % end added
         bbox_targets_blob_s4_tmp = reshape(bbox_targets_conv4', size(conf.anchors_s4, 1)*4, output_size_conv4(1), output_size_conv4(2));
         bbox_loss_blob_s4_tmp = reshape(bbox_loss_conv4', size(conf.anchors_s4, 1)*4, output_size_conv4(1), output_size_conv4(2));
         % permute from [channel, height, width], where channel is the
         % fastest dimension to [width, height, channel]
         labels_blob_conv4(:,:,:,i) = permute(labels_blob_s4_tmp, [3, 2, 1]);
         label_weights_blob_conv4(:,:,:,i) = permute(label_weights_blob_s4_tmp, [3, 2, 1]);
+        % liu@20170817 added
+        labels_cl_conv4(:,:,:,i) = permute(labels_cl_s4_tmp, [3, 2, 1]);
+        label_weights_cl_conv4(:,:,:,i) = permute(label_weights_cl_s4_tmp, [3, 2, 1]);
+        % end added
         bbox_targets_blob_conv4(:,:,:,i) = permute(bbox_targets_blob_s4_tmp, [3, 2, 1]);
         bbox_loss_blob_conv4(:,:,:,i) = permute(bbox_loss_blob_s4_tmp, [3, 2, 1]);
         
@@ -86,12 +106,20 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
         output_size_conv5 = cell2mat([conf.output_height_s8.values({img_size(1)}), conf.output_width_s8.values({img_size(2)})]);
         labels_blob_s8_tmp = reshape(labels_conv5, size(conf.anchors_s8, 1), output_size_conv5(1), output_size_conv5(2));
         label_weights_blob_s8_tmp = reshape(label_weights_conv5, size(conf.anchors_s8, 1), output_size_conv5(1), output_size_conv5(2));
+        % liu@20170817 added
+        labels_cl_s8_tmp = max(labels_blob_s8_tmp, [], 1);
+        label_weights_cl_s8_tmp = max(label_weights_blob_s8_tmp, [], 1);
+        % end added
         bbox_targets_blob_s8_tmp = reshape(bbox_targets_conv5', size(conf.anchors_s8, 1)*4, output_size_conv5(1), output_size_conv5(2));
         bbox_loss_blob_s8_tmp = reshape(bbox_loss_conv5', size(conf.anchors_s8, 1)*4, output_size_conv5(1), output_size_conv5(2));
         % permute from [channel, height, width], where channel is the
         % fastest dimension to [width, height, channel]
         labels_blob_conv5(:,:,:,i) = permute(labels_blob_s8_tmp, [3, 2, 1]);
         label_weights_blob_conv5(:,:,:,i) = permute(label_weights_blob_s8_tmp, [3, 2, 1]);
+        % liu@20170817 added
+        labels_cl_conv5(:,:,:,i) = permute(labels_cl_s8_tmp, [3, 2, 1]);
+        label_weights_cl_conv5(:,:,:,i) = permute(label_weights_cl_s8_tmp, [3, 2, 1]);
+        % end added
         bbox_targets_blob_conv5(:,:,:,i) = permute(bbox_targets_blob_s8_tmp, [3, 2, 1]);
         bbox_loss_blob_conv5(:,:,:,i) = permute(bbox_loss_blob_s8_tmp, [3, 2, 1]);
         
@@ -99,12 +127,20 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
         output_size_conv6 = cell2mat([conf.output_height_s16.values({img_size(1)}), conf.output_width_s16.values({img_size(2)})]);
         labels_blob_s16_tmp = reshape(labels_conv6, size(conf.anchors_s16, 1), output_size_conv6(1), output_size_conv6(2));
         label_weights_blob_s16_tmp = reshape(label_weights_conv6, size(conf.anchors_s16, 1), output_size_conv6(1), output_size_conv6(2));
+        % liu@20170817 added
+        labels_cl_s16_tmp = max(labels_blob_s16_tmp, [], 1);
+        label_weights_cl_s16_tmp = max(label_weights_blob_s16_tmp, [], 1);
+        % end added
         bbox_targets_blob_s16_tmp = reshape(bbox_targets_conv6', size(conf.anchors_s16, 1)*4, output_size_conv6(1), output_size_conv6(2));
         bbox_loss_blob_s16_tmp = reshape(bbox_loss_conv6', size(conf.anchors_s16, 1)*4, output_size_conv6(1), output_size_conv6(2));
         % permute from [channel, height, width], where channel is the
         % fastest dimension to [width, height, channel]
         labels_blob_conv6(:,:,:,i) = permute(labels_blob_s16_tmp, [3, 2, 1]);
         label_weights_blob_conv6(:,:,:,i) = permute(label_weights_blob_s16_tmp, [3, 2, 1]);
+        % liu@20170817 added
+        labels_cl_conv6(:,:,:,i) = permute(labels_cl_s16_tmp, [3, 2, 1]);
+        label_weights_cl_conv6(:,:,:,i) = permute(label_weights_cl_s16_tmp, [3, 2, 1]);
+        % end added
         bbox_targets_blob_conv6(:,:,:,i) = permute(bbox_targets_blob_s16_tmp, [3, 2, 1]);
         bbox_loss_blob_conv6(:,:,:,i) = permute(bbox_loss_blob_s16_tmp, [3, 2, 1]);
     end
@@ -117,38 +153,65 @@ function [input_blobs, random_scale_inds] = proposal_generate_minibatch_ablation
     labels_blob_conv4 = single(labels_blob_conv4);
     labels_blob_conv4(labels_blob_conv4 > 0) = 1; %to binary lable (fg and bg)
     label_weights_blob_conv4 = single(label_weights_blob_conv4);
+    % 0817 liu added
+    labels_cl_conv4 = single(labels_cl_conv4);
+    labels_cl_conv4(labels_cl_conv4 > 0) = 1; %to binary lable (fg and bg)
+    label_weights_cl_conv4 = single(label_weights_cl_conv4);
+    % end added
     bbox_targets_blob_conv4 = single(bbox_targets_blob_conv4); 
     bbox_loss_blob_conv4 = single(bbox_loss_blob_conv4);
     % ======conv5 =============
     labels_blob_conv5 = single(labels_blob_conv5);
     labels_blob_conv5(labels_blob_conv5 > 0) = 1; %to binary lable (fg and bg)
     label_weights_blob_conv5 = single(label_weights_blob_conv5);
+    % 0817 liu added
+    labels_cl_conv5 = single(labels_cl_conv5);
+    labels_cl_conv5(labels_cl_conv5 > 0) = 1; %to binary lable (fg and bg)
+    label_weights_cl_conv5 = single(label_weights_cl_conv5);
+    % end added
     bbox_targets_blob_conv5 = single(bbox_targets_blob_conv5); 
     bbox_loss_blob_conv5 = single(bbox_loss_blob_conv5);
     % ======conv6 =============
     labels_blob_conv6 = single(labels_blob_conv6);
     labels_blob_conv6(labels_blob_conv6 > 0) = 1; %to binary lable (fg and bg)
     label_weights_blob_conv6 = single(label_weights_blob_conv6);
+    % 0817 liu added
+    labels_cl_conv6 = single(labels_cl_conv6);
+    labels_cl_conv6(labels_cl_conv6 > 0) = 1; %to binary lable (fg and bg)
+    label_weights_cl_conv6 = single(label_weights_cl_conv6);
+    % end added
     bbox_targets_blob_conv6 = single(bbox_targets_blob_conv6); 
     bbox_loss_blob_conv6 = single(bbox_loss_blob_conv6);
     
     assert(~isempty(im_blob));
     assert(~isempty(labels_blob_conv4));
     assert(~isempty(label_weights_blob_conv4));
+    %0817 added
+    assert(~isempty(labels_cl_conv4));
+    assert(~isempty(label_weights_cl_conv4));
+    %end added
     assert(~isempty(bbox_targets_blob_conv4));
     assert(~isempty(bbox_loss_blob_conv4));
     assert(~isempty(labels_blob_conv5));
     assert(~isempty(label_weights_blob_conv5));
+    %0817 added
+    assert(~isempty(labels_cl_conv5));
+    assert(~isempty(label_weights_cl_conv5));
+    %end added
     assert(~isempty(bbox_targets_blob_conv5));
     assert(~isempty(bbox_loss_blob_conv5));
     assert(~isempty(labels_blob_conv6));
     assert(~isempty(label_weights_blob_conv6));
+    %0817 added
+    assert(~isempty(labels_cl_conv6));
+    assert(~isempty(label_weights_cl_conv6));
+    %end added
     assert(~isempty(bbox_targets_blob_conv6));
     assert(~isempty(bbox_loss_blob_conv6));
-    
-    input_blobs = {im_blob, labels_blob_conv4, label_weights_blob_conv4, bbox_targets_blob_conv4, bbox_loss_blob_conv4, ...
-                            labels_blob_conv5, label_weights_blob_conv5, bbox_targets_blob_conv5, bbox_loss_blob_conv5, ...
-                            labels_blob_conv6, label_weights_blob_conv6, bbox_targets_blob_conv6, bbox_loss_blob_conv6};
+    % 0817 changed
+    input_blobs = {im_blob, labels_blob_conv4, label_weights_blob_conv4, labels_cl_conv4, label_weights_cl_conv4, bbox_targets_blob_conv4, bbox_loss_blob_conv4, ...
+                            labels_blob_conv5, label_weights_blob_conv5, labels_cl_conv5, label_weights_cl_conv5, bbox_targets_blob_conv5, bbox_loss_blob_conv5, ...
+                            labels_blob_conv6, label_weights_blob_conv6, labels_cl_conv6, label_weights_cl_conv6, bbox_targets_blob_conv6, bbox_loss_blob_conv6};
     
     % ======= recover random seed=======
 %     if debug_flag

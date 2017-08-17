@@ -19,6 +19,19 @@ input_dim: 1            # 1 anchor
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
+##### centerloss label for conv23 at stride 4
+input: "labels_s4_cl"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_s4_cl"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 56  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+####  end center loss
 input: "bbox_targets_s4"
 input_dim: 1  		# to be changed on-the-fly to match input dim
 input_dim: 4  		# 4 (coords) * 1 anchor
@@ -44,6 +57,20 @@ input_dim: 4           # 3(anchors): [8 16 32]
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 
+##### centerloss label for conv23 at stride 4
+input: "labels_s8_cl"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_s8_cl"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 28  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+####  end center loss
+
 input: "bbox_targets_s8"
 input_dim: 1  		# to be changed on-the-fly to match input dim
 input_dim: 16  		# 4 (coords) * 3(anchors): [8 16 32] 
@@ -68,6 +95,20 @@ input_dim: 1 		# to be changed on-the-fly to match input dim
 input_dim: 3           # 4(anchors)        
 input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
 input_dim: 14 		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+##### centerloss label for conv23 at stride 4
+input: "labels_s16_cl"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+
+input: "labels_weights_s16_cl"
+input_dim: 1 		# to be changed on-the-fly to match input dim
+input_dim: 1            # 1 anchor
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+input_dim: 14  		# size for 224 input image, to be changed on-the-fly to match input dim, 14--> 28 (resolution doubled)
+####  end center loss
 
 input: "bbox_targets_s16"
 input_dim: 1  		# to be changed on-the-fly to match input dim
@@ -1212,7 +1253,7 @@ layer {
 }
 
 layer {  
-    bottom: "labels_s4"  
+    bottom: "labels_s4_cl" #"labels_s4"  
     top: "labels_s4_permute"
     name: "labels_s4_permute"  
     type: "Permute"  
@@ -1225,7 +1266,7 @@ layer {
 }
 
 layer {  
-    bottom: "labels_weights_s4"  
+    bottom: "labels_weights_s4_cl"  #"labels_weights_s4"  
     top: "labels_weights_s4_permute"
     name: "labels_weights_s4_permute"  
     type: "Permute"  
@@ -1356,7 +1397,7 @@ layer {
 }
 
 layer {  
-    bottom: "labels_s8"  
+    bottom: "labels_s8_cl"  #"labels_s8"
     top: "labels_s8_permute"
     name: "labels_s8_permute"  
     type: "Permute"  
@@ -1369,7 +1410,7 @@ layer {
 }
 
 layer {  
-    bottom: "labels_weights_s8"  
+    bottom: "labels_weights_s8_cl"  #"labels_weights_s8" 
     top: "labels_weights_s8_permute"
     name: "labels_weights_s8_permute"  
     type: "Permute"  
@@ -1501,7 +1542,7 @@ layer {
 }
 
 layer {  
-    bottom: "labels_s16"  
+    bottom: "labels_s16_cl"  #"labels_s16"  
     top: "labels_s16_permute"
     name: "labels_s16_permute"  
     type: "Permute"  
@@ -1514,7 +1555,7 @@ layer {
 }
 
 layer {  
-    bottom: "labels_weights_s16"  
+    bottom: "labels_weights_s16_cl"  #"labels_weights_s16"  
     top: "labels_weights_s16_permute"
     name: "labels_weights_s16_permute"  
     type: "Permute"  
