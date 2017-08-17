@@ -29,25 +29,29 @@ end
 try
     load(cache_imdb); %imdb, tmpboxdb
     %0713 reload these handlers
-    if 1 %only use at the first time
-    imdb = rmfield(imdb, 'eval_func');
-    imdb.roidb_func = @roidb_from_wider;
-    if ispc
-        devkit = 'D:\\datasets\\WIDERFACE';
-        %train
-        if(strcmp(image_set, 'trainval'))
-            imdb.image_dir = fullfile(devkit, 'WIDER_train_ablation', 'images');
-            imdb.image_ids = cellfun(@(x) strrep(x,'/',filesep), imdb.image_ids, 'UniformOutput', false);
-            imdb.image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir, filesep, imdb.image_ids{i}, imdb.extension);
-        elseif(strcmp(image_set, 'test'))
-        %val
-            imdb.image_dir = fullfile(devkit, 'WIDER_val_ablation', 'images');
-            imdb.image_ids = cellfun(@(x) strrep(x,'/',filesep), imdb.image_ids, 'UniformOutput', false);
-            imdb.image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir, filesep, imdb.image_ids{i}, imdb.extension);
+    try
+        %%% liu@0713: If this is an old-style imdb, upgrade it %%%
+        imdb = rmfield(imdb, 'eval_func');
+        imdb.roidb_func = @roidb_from_wider;
+        if ispc
+            devkit = 'D:\\datasets\\WIDERFACE';
+            %train
+            if(strcmp(image_set, 'trainval'))
+                imdb.image_dir = fullfile(devkit, 'WIDER_train_ablation', 'images');
+                imdb.image_ids = cellfun(@(x) strrep(x,'/',filesep), imdb.image_ids, 'UniformOutput', false);
+                imdb.image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir, filesep, imdb.image_ids{i}, imdb.extension);
+            elseif(strcmp(image_set, 'test'))
+            %val
+                imdb.image_dir = fullfile(devkit, 'WIDER_val_ablation', 'images');
+                imdb.image_ids = cellfun(@(x) strrep(x,'/',filesep), imdb.image_ids, 'UniformOutput', false);
+                imdb.image_at = @(i) sprintf('%s%c%s.%s', imdb.image_dir, filesep, imdb.image_ids{i}, imdb.extension);
+            end
         end
         save(cache_imdb, 'imdb', 'tmpboxdb');
+    catch
+        fprintf('imdb has already updated !!!\n');
     end
-    end
+
 catch
     imdb = [];
     %(1)

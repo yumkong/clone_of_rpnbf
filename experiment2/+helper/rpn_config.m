@@ -27,9 +27,10 @@ function conf = rpn_config(varargin)
     % Max pixel size of a scaled input image
     ip.addParamValue('max_size',        512,           @isscalar); %960
     % Images per batch, only supports ims_per_batch = 1 currently
-    ip.addParamValue('ims_per_batch',   2,              @isscalar);%0205:2-->3
+    % 0719 to guarante ~= 2.32 positive samples/ img
+    ip.addParamValue('ims_per_batch',   4,              @isscalar);%0719:2-->4
     % Minibatch size
-    ip.addParamValue('batch_size',      20,            @isscalar); %0713: 60 -> 20
+    ip.addParamValue('batch_size',      24,            @isscalar); %0713: 60 -> 20
     % Fraction of minibatch that is foreground labeled (class > 0)
     ip.addParamValue('fg_fraction',     0.5,           @isscalar); %0424: 0.3
     % weight of background samples, when weight of foreground samples is

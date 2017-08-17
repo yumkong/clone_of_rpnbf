@@ -5,31 +5,29 @@ function startup()
 % Copyright (c) 2015, Shaoqing Ren
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------
-
+    %0711 changed
+    %curdir = fileparts(mfilename('fullpath'));
+    % this is the root path
     curdir = fileparts(mfilename('fullpath'));
-    addpath(genpath(fullfile(curdir, 'utils')));
-    addpath(genpath(fullfile(curdir, 'functions')));
-    addpath(genpath(fullfile(curdir, 'bin')));
-    addpath(genpath(fullfile(curdir, 'experiments')));
-    addpath(genpath(fullfile(curdir, 'imdb')));
+    %addpath(genpath(fullfile(curdir, 'utils')));
+    %addpath(genpath(fullfile(curdir, 'functions')));
+    %addpath(genpath(fullfile(curdir, 'bin')));
+    %0711 changed
+    %addpath(genpath(fullfile(curdir, 'experiments')));
+    addpath(genpath(fullfile(curdir, 'experiment2'))); %has '+helper','bin', 'export_fig' folder
+    %addpath(genpath(fullfile(curdir, 'imdb')));
     
-    addpath(fullfile(curdir, 'datasets/caltech'));
-
-    addpath(genpath(fullfile(curdir, 'external/toolbox')));
-    %0612 added
-    addpath(genpath(fullfile(curdir, 'test_final')));
-
     caffe_path = fullfile(curdir, 'external', 'caffe', 'matlab');
     if exist(caffe_path, 'dir') == 0
         error('matcaffe is missing from external/caffe/matlab; See README.md');
     end
     addpath(genpath(caffe_path));
 
-    mkdir_if_missing(fullfile(curdir, 'imdb', 'cache'));
+    %0711 changed
+    %mkdir_if_missing(fullfile(curdir, 'output'));
+    helper.mkdir_if_missing(fullfile(curdir, 'output2'));
 
-    mkdir_if_missing(fullfile(curdir, 'output'));
+    helper.mkdir_if_missing(fullfile(curdir, 'models'));
 
-    mkdir_if_missing(fullfile(curdir, 'models'));
-
-    fprintf('RPN_BF startup done\n');
+    fprintf('rpn startup done\n');
 end

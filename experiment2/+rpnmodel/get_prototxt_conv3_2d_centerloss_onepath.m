@@ -1,4 +1,4 @@
-function model = get_prototxt_conv3_2d(exp_name, model)
+function model = get_prototxt_conv3_2d_centerloss_onepath(exp_name, model)
 
 
 model.mean_image                                = fullfile(pwd, 'models', exp_name, 'pre_trained_models', 'vgg_16layers', 'mean_image');
@@ -7,8 +7,13 @@ model.pre_trained_net_file                      = fullfile(pwd, 'models', exp_na
 model.feat_stride                               = 4;
 
 %% stage 1 rpn, inited from pre-trained network
-model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_leave','conv3_2d', 'solver_30k40k_conv3.prototxt'); 
-model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_leave','conv3_2d', 'test_conv3_2.prototxt');
+% conv3_2d + solver_30k40k_conv3_2d => without centerloss
+% conv3_2d_centerloss + solver_30k40k_conv3_2d_new => with center_loss, 
+% solver_30k40k_conv3_2d_nopermute => centerloss withou permute
+% solver_30k40k_conv3_2d_onepath => center loss one_path
+% solver_30k40k_conv3_2d_onepath_smothh => center loss one_path (smoothl1 is also)
+model.stage1_rpn.solver_def_file                = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_leave','conv3_2d_centerloss', 'solver_30k40k_conv3_2d_onepath.prototxt'); 
+model.stage1_rpn.test_net_def_file              = fullfile(pwd, 'models', exp_name, 'rpn_prototxts', 'vgg_leave','conv3_2d_centerloss', 'test_conv3_2d_new_onepath.prototxt');
 model.stage1_rpn.init_net_file                  = model.pre_trained_net_file;
 
 % rpn test setting

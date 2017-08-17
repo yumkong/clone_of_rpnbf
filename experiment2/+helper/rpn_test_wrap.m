@@ -48,7 +48,7 @@ function aboxes = rpn_test_wrap(conf, model_stage, imdb, roidb, nms_option)
         save(box_nms_name, 'aboxes');
     end
     %%%%% 0714 show some results! %%%%%
-    show_result = true;
+    show_result = false;
     if show_result
         for i = 1:length(aboxes)
             im = imread(imdb.image_at(i));

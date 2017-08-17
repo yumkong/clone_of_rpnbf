@@ -259,7 +259,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 256  #0205: 512->256
+	   num_output: 256
 	   kernel_size: 3
 	   pad: 1
 	   stride: 1
@@ -316,6 +316,46 @@ layer {
 	type: "ReLU"
 }
 
+### 0719 added ####
+# 0714 added for 2d visualization
+layer {
+	name: "conv_proposal_2d_cl"
+	bottom: "conv_proposal1"
+	top: "conv_proposal_2d_cl"
+	param {
+		lr_mult: 1.0
+		decay_mult: 1.0
+	}
+	param {
+		lr_mult: 2.0
+		decay_mult: 0
+	}
+	type: "Convolution"
+	convolution_param {
+		num_output: 2
+		pad: 0
+		kernel_size: 1
+		weight_filler {
+		    type: "xavier"
+                    #type: "gaussian"
+		    #std: 0.001
+		}
+		bias_filler{
+			type: "constant"
+			value: 0
+		}
+	}
+}
+
+layer {
+	bottom: "conv_proposal_2d_cl"
+	top: "conv_proposal_2d_cl"
+	name: "relu_conv_proposal_2d_cl"
+	type: "ReLU"
+}
+
+######
+
 layer {
    name: "proposal_cls_score"
    type: "Convolution"
@@ -333,8 +373,8 @@ layer {
 	   pad: 0
 	   stride: 1
 	   weight_filler {
-		 type: "gaussian"
-		 std: 0.01
+		 type: "xavier" #"gaussian"
+		 #std: 0.01
 	   }
 	   bias_filler {
 		 type: "constant"
@@ -360,8 +400,8 @@ layer {
 	   pad: 0
 	   stride: 1
 	   weight_filler {
-		 type: "gaussian"
-		 std: 0.01
+		 type: "xavier" #"gaussian"
+		 #std: 0.01
 	   }
 	   bias_filler {
 		 type: "constant"
@@ -370,7 +410,7 @@ layer {
    }
 }
 
-#-----------------------output------------------------
+#-----------------------reshape or permute for output preparation------------------------
 
 # to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
 layer {
@@ -418,6 +458,8 @@ layer {
 	}
 }
 
+#-----------------------output------------------------
+
 layer {
    name: "loss"
    type: "SoftmaxWithLoss"
@@ -443,5 +485,29 @@ layer {
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 1 #20
+  loss_weight: 1 #20 => because of new smoothl1
+}
+
+############## 0716 rpn center loss ###############
+layer {
+  name: "center_loss"
+  type: "RpnCenterLossNew"
+  bottom: "conv_proposal_2d_cl" #num x chl x height x width
+  bottom: "labels"          #num x 1 x height x width
+  bottom: "labels_weights"  #num x 1 x height x width
+  top: "center_loss"
+  param {
+    lr_mult: 1
+    decay_mult: 2 
+  }
+  center_loss_param {
+    num_output: 2  #two centers: face or non-face
+    center_filler {
+      type: "xavier" #"uniform", "xavier"
+      #min: 0
+      #max: 1
+    }
+    axis: 1  #only 2nd dim (aka. chl = 2)
+  }
+  loss_weight: 0.0001 #0.008
 }

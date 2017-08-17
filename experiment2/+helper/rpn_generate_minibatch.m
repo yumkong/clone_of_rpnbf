@@ -6,7 +6,7 @@ function [input_blobs, random_scale_inds] = rpn_generate_minibatch(conf, image_r
 % Licensed under The MIT License [see LICENSE for details]
 % --------------------------------------------------------
     num_images = length(image_roidb);
-    assert(num_images == 1 || num_images == 2 || num_images == 3, 'proposal_generate_minibatch_fcn only support num_images == 1,2 or 3');
+    assert(num_images <= 4, 'proposal_generate_minibatch_fcn only support num_images == 1,2,3 or 4');
 
     % Sample random scales to use for each image in this batch
     random_scale_inds = randi(length(conf.scales), num_images, 1);
@@ -52,8 +52,8 @@ function [input_blobs, random_scale_inds] = rpn_generate_minibatch(conf, image_r
         bbox_loss_blob(:,:,:,i) = permute(bbox_loss_blob_tmp, [3, 2, 1]);
     end
     
-    % permute data into caffe c++ memory, thus [num, channels, height, width]
     im_blob = im_blob(:, :, [3, 2, 1], :); % from rgb to brg
+    % permute data into caffe c++ memory, thus [width, height, chl, num]
     im_blob = single(permute(im_blob, [2, 1, 3, 4]));
     labels_blob = single(labels_blob);
     labels_blob(labels_blob > 0) = 1; %to binary lable (fg and bg)
@@ -104,7 +104,6 @@ function [labels, label_weights, bbox_targets, bbox_loss_weights] = ...
     bg_inds = find(bbox_targets(:, 1) < 0);
     
     % select foreground when no_ohem
-
     fg_num = min(fg_rois_per_image, length(fg_inds));
     fg_inds = fg_inds(randperm(length(fg_inds), fg_num));
     bg_num = min(rois_per_image - fg_num, length(bg_inds));

@@ -135,7 +135,7 @@ function save_model_path = rpn_train(conf, imdb_train, roidb_train, varargin)
 
     % 0927 added to record plot info
     modelFigPath = fullfile(cache_dir, 'net-train.pdf');  % plot save path
-    tmp_struct = struct('err_fg', [], 'err_bg', [], 'loss_cls', [], 'loss_bbox', []);
+    tmp_struct = struct('err_fg', [], 'err_bg', [], 'loss_cls', [], 'loss_bbox', [], 'loss_center', []);
     history_rec = struct('train',tmp_struct,'val',tmp_struct, 'num', 0);
     %1009 changed so that validation can be done within while loop
     while (iter_ <= max_iter)
@@ -152,7 +152,35 @@ function save_model_path = rpn_train(conf, imdb_train, roidb_train, varargin)
 
         % one iter SGD update
         caffe_solver.net.set_input_data(net_inputs);
+        % ### 0727 split the step into forward and backward process
         caffe_solver.step(1);
+        %caffe_solver.net.forward_prefilled(); 
+        %caffe_solver.net.forward(net_inputs); 
+%            fprintf('## DATA value ##\n');
+%             aa = caffe_solver.net.blobs('center_loss').get_data(); 
+%             fprintf('centerloss min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
+%             aa = caffe_solver.net.blobs('conv_proposal_2d_cl').get_data();  %W
+%             fprintf('conv_2d_cl min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
+%            
+%            fprintf('### PARAM value ####\n');
+%             bb = caffe_solver.net.params('center_loss',1).get_data();
+%             fprintf('centerloss min = %.4f, max = %.4f\n',min(bb(:)), max(bb(:)));
+%             bb = caffe_solver.net.params('conv_proposal_2d_cl',1).get_data();
+%             fprintf('conv_2d_cl min = %.4f, max = %.4f\n',min(bb(:)), max(bb(:)));
+
+        %caffe_solver.net.backward_prefilled();
+        %caffe_solver.net.backward({1,1,0.0001, 1});
+%            fprintf('#### DATA diff #####\n');
+%             aa = caffe_solver.net.blobs('center_loss').get_diff(); 
+%             fprintf('centerloss min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
+%             aa = caffe_solver.net.blobs('conv_proposal_2d_cl').get_diff();  %W
+%             fprintf('conv_2d_cl min = %.4f, max = %.4f\n',min(aa(:)), max(aa(:)));
+% 
+%             fprintf('##### PARAM diff ######\n');
+%             bb = caffe_solver.net.params('center_loss',1).get_diff();
+%             fprintf('centerloss min = %.4f, max = %.4f\n',min(bb(:)), max(bb(:)));
+%             bb = caffe_solver.net.params('conv_proposal_2d_cl',1).get_diff();
+%             fprintf('conv_2d_cl min = %.4f, max = %.4f\n',min(bb(:)), max(bb(:)));
         %end time counting
         cost_time = toc(start_time);
 %         fprintf('\n');
@@ -295,6 +323,9 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     output_height = conf.output_width_map.values({size(im_blob, 2)});
     output_height = output_height{1};
     labels_blob = single(zeros(output_width, output_height, anchor_num, conf.ims_per_batch));
+    %0809 added to fix the bug
+    labels_blob(1:20) = 1;
+    
     labels_weights = labels_blob;
     bbox_targets_blob = single(zeros(output_width, output_height, anchor_num*4, conf.ims_per_batch));
     bbox_loss_weights_blob = bbox_targets_blob;
@@ -352,27 +383,33 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     fprintf('Training : err_fg %.3g, err_bg %.3g, loss (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg.data), 1 - mean(train_results.accuracy_bg.data), ...
         mean(train_results.loss_cls.data), ...
-        mean(train_results.loss_bbox.data));
+        mean(train_results.loss_bbox.data), ...
+        mean(train_results.center_loss.data));
     if exist('val_results', 'var') && ~isempty(val_results)
         fprintf('Testing  : err_fg %.3g, err_bg %.3g, loss (cls %.3g + reg %.3g)\n', ...
             1 - mean(val_results.accuracy_fg.data), 1 - mean(val_results.accuracy_bg.data), ...
             mean(val_results.loss_cls.data), ...
-            mean(val_results.loss_bbox.data));
+            mean(val_results.loss_bbox.data), ...
+            mean(val_results.center_loss.data));
     end
     % --------- end previously show_state part ------------
     % ========= newly added plot part =====================
+    % ### train
     history_rec.train.err_fg = [history_rec.train.err_fg; 1 - mean(train_results.accuracy_fg.data)];
     history_rec.train.err_bg = [history_rec.train.err_bg; 1 - mean(train_results.accuracy_bg.data)];
     history_rec.train.loss_cls = [history_rec.train.loss_cls; mean(train_results.loss_cls.data)];
     history_rec.train.loss_bbox = [history_rec.train.loss_bbox; mean(train_results.loss_bbox.data)];
+    history_rec.train.loss_center = [history_rec.train.loss_center; mean(train_results.center_loss.data)];
+    % ### test
     history_rec.val.err_fg = [history_rec.val.err_fg; 1 - mean(val_results.accuracy_fg.data)];
     history_rec.val.err_bg = [history_rec.val.err_bg; 1 - mean(val_results.accuracy_bg.data)];
     history_rec.val.loss_cls = [history_rec.val.loss_cls; mean(val_results.loss_cls.data)];
     history_rec.val.loss_bbox = [history_rec.val.loss_bbox; mean(val_results.loss_bbox.data)];
+    history_rec.val.loss_center = [history_rec.val.loss_center; mean(val_results.center_loss.data)];
     history_rec.num = history_rec.num + 1;
     % draw it
     figure(1) ; clf ;
-    plots = {'err_fg', 'err_bg', 'loss_cls', 'loss_bbox'};
+    plots = {'err_fg', 'err_bg', 'loss_cls', 'loss_bbox', 'loss_center'};
     for p = plots
       c_p = char(p) ;
       values = zeros(0, history_rec.num) ;

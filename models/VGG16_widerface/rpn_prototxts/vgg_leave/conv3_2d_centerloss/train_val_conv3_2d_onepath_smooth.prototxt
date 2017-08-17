@@ -259,7 +259,7 @@ layer {
 		lr_mult: 2.0
 	}
    convolution_param{
-	   num_output: 256  #0205: 512->256
+	   num_output: 256
 	   kernel_size: 3
 	   pad: 1
 	   stride: 1
@@ -296,7 +296,7 @@ layer {
 	}
 	type: "Convolution"
 	convolution_param {
-		num_output: 2
+		num_output: 64 # 10, 2,128
 		pad: 0
 		kernel_size: 1
 		weight_filler {
@@ -316,6 +316,46 @@ layer {
 	type: "ReLU"
 }
 
+### 0719 added ####
+### 0811 masked: directly use conv_proposal_2d s.t. center_loss and softmax share one path
+#layer {
+#	name: "conv_proposal_2d_cl"
+#	bottom: "conv_proposal1"
+#	top: "conv_proposal_2d_cl"
+#	param {
+#		lr_mult: 1.0
+#		decay_mult: 1.0
+#	}
+#	param {
+#		lr_mult: 2.0
+#		decay_mult: 0
+#	}
+#	type: "Convolution"
+#	convolution_param {
+#		num_output: 2
+#		pad: 0
+#		kernel_size: 1
+#		weight_filler {
+#		    type: "xavier"
+#           #type: "gaussian"
+#		    #std: 0.001
+#		}
+#		bias_filler{
+#			type: "constant"
+#			value: 0
+#		}
+#	}
+#}
+
+#layer {
+#	bottom: "conv_proposal_2d_cl"
+#	top: "conv_proposal_2d_cl"
+#	name: "relu_conv_proposal_2d_cl"
+#	type: "ReLU"
+#}
+
+######
+
 layer {
    name: "proposal_cls_score"
    type: "Convolution"
@@ -333,8 +373,8 @@ layer {
 	   pad: 0
 	   stride: 1
 	   weight_filler {
-		 type: "gaussian"
-		 std: 0.01
+		 type: "xavier" #"gaussian"
+		 #std: 0.01
 	   }
 	   bias_filler {
 		 type: "constant"
@@ -346,7 +386,7 @@ layer {
 layer {
    name: "proposal_bbox_pred"
    type: "Convolution"
-   bottom: "conv_proposal1"
+   bottom: "conv_proposal_2d" #"conv_proposal1"
    top: "proposal_bbox_pred"
 	param {
 		lr_mult: 1.0
@@ -360,8 +400,8 @@ layer {
 	   pad: 0
 	   stride: 1
 	   weight_filler {
-		 type: "gaussian"
-		 std: 0.01
+		 type: "xavier" #"gaussian"
+		 #std: 0.01
 	   }
 	   bias_filler {
 		 type: "constant"
@@ -370,7 +410,7 @@ layer {
    }
 }
 
-#-----------------------output------------------------
+#-----------------------reshape or permute for output preparation------------------------
 
 # to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
 layer {
@@ -417,6 +457,47 @@ layer {
 		}
 	}
 }
+## num x ch x hei x wid ==> num x hei x wid x chl 
+layer {  
+    bottom: "conv_proposal_2d" #"conv_proposal_2d_cl"  
+    top: "conv_proposal_2d_cl_permute"
+    name: "conv_proposal_2d_cl_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+layer {  
+    bottom: "labels"  
+    top: "labels_permute"
+    name: "labels_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+layer {  
+    bottom: "labels_weights"  
+    top: "labels_weights_permute"
+    name: "labels_weights_permute"  
+    type: "Permute"  
+    permute_param {    
+      order: 0 
+      order: 2  
+      order: 3
+      order: 1  
+    }
+}
+
+#-----------------------output------------------------
 
 layer {
    name: "loss"
@@ -443,5 +524,32 @@ layer {
   bottom: "bbox_targets"
   bottom: "bbox_loss_weights"
   top: "loss_bbox"
-  loss_weight: 1 #20
+  loss_weight: 1 #20 => because of new smoothl1
+}
+
+############## 0716 rpn center loss ###############
+layer {
+  name: "center_loss"
+  type: "RpnCenterLoss"
+  bottom: "conv_proposal_2d_cl_permute" #"conv_proposal1_permute"  #num x height x width x chl
+  bottom: "labels_permute"          #num x height x width x 1
+  bottom: "labels_weights_permute"  #num x height x width x 1
+  top: "center_loss"
+  param {
+    lr_mult: 1
+    decay_mult: 0 #2 
+  }
+  center_loss_param {
+    num_output: 2  #two centers: face or non-face
+    center_filler {
+      type: "xavier"
+      #type: "uniform"
+      #min: 0
+      #max: 0.1
+    }
+    axis: 3  #only last dimension (the original channel dim = feature length = 256)
+    lr: 0.1 #default 0.05
+    radius: 0.2 #default 0.1
+  }
+  loss_weight: 1 # 0.01
 }

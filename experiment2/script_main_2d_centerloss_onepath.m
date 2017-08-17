@@ -1,4 +1,4 @@
-function script_main_2d()
+function script_main_2d_centerloss_onepath()
 %% start
 % --------------------------------------------------------
 % Yuguang Liu
@@ -14,13 +14,13 @@ run(fullfile(fileparts(mfilename('fullpath')), 'set_path'));
 %0930 change caffe folder according to platform
 if ispc
     %opts.caffe_version          = 'caffe_faster_rcnn_win_cudnn_bn'; 
-    opts.caffe_version          = 'caffe_centerloss_rpn'; 
+    opts.caffe_version          = 'caffe_centerloss_exp'; %'caffe_centerloss_rpn';
     cd('D:\\RPN_BF_master');
 elseif isunix
     % caffe_faster_rcnn_rfcn is from caffe-rfcn-r-fcn_othersoft
     % caffe_faster_rcnn_rfcn_normlayer is also from
     % caffe-rfcn-r-fcn_othersoft with l2-normalization layer added
-    opts.caffe_version          = 'caffe_centerloss_rpn';%'caffe_faster_rcnn_bn'; %'caffe_faster_rcnn_dilate_ohem';
+    opts.caffe_version          = 'caffe_centerloss_exp'; %'caffe_faster_rcnn_bn'
     cd('/usr/local/data/yuguang/git_all/RPN_BF_pedestrain/RPN_BF-RPN-pedestrian');
 end
 opts.gpu_id                 = helper.auto_select_gpu;
@@ -37,7 +37,7 @@ exp_name = 'VGG16_widerface';
 opts.do_val                 = true; 
 % 0714 changed from orginal to 2d
 %model                       = helper.model_conv3_s4(exp_name);
-model                       = rpnmodel.get_prototxt_conv3_2d(exp_name);
+model                       = rpnmodel.get_prototxt_conv3_2d_centerloss_onepath(exp_name);
 % cache base
 cache_base_proposal         = 'widerface_VGG16';
 %cache_base_fast_rcnn        = '';
@@ -52,7 +52,7 @@ cache_data_root = 'output2';  %cache_data
 helper.mkdir_if_missing(cache_data_root);
 addpath(cache_data_root);  %0713 added to fix warning of "could not find path"
 %1009 change exp here for output
-exp_name = 'old_conv3_s4_2d';
+exp_name = 'old_conv3_s4_2d_onepath';
 % the dir holding intermediate data paticular
 cache_data_this_model_dir = fullfile(cache_data_root, exp_name, 'rpn_cache');
 helper.mkdir_if_missing(cache_data_this_model_dir);
