@@ -19,7 +19,7 @@ function feat_list = rpn_test_wrap_2d(conf, model_stage, imdb)
     % draw 2D distribution plot
 	figure(6);
     % liu: scatter plot by group
-    gscatter(feat_list(:,5), feat_list(:,6), label_list,'br','xo');
+    gscatter(feat_list(:,9), feat_list(:,10), label_list,'br','xo');
     set(gca, 'FontSize', 12);
     xlabel('Feature\_1','FontSize', 15, 'FontWeight','bold');
     ylabel('Feature\_2','FontSize', 15, 'FontWeight','bold');
