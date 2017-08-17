@@ -351,6 +351,11 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     output_height = output_height{1};
     labels_blob_s4 = single(zeros(output_width, output_height, anchor_num_s4, conf.ims_per_batch));
     labels_weights_s4 = labels_blob_s4;
+    % 0817 added
+    labels_cl_s4 = single(zeros(output_width, output_height, 1, conf.ims_per_batch));
+    labels_cl_s4(1:100) = 1;
+    labels_weights_cl_s4 = labels_cl_s4;
+    % end added
     bbox_targets_blob_s4 = single(zeros(output_width, output_height, anchor_num_s4*4, conf.ims_per_batch));
     bbox_loss_weights_blob_s4 = bbox_targets_blob_s4;
     % stride8
@@ -361,6 +366,11 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     output_height = output_height{1};
     labels_blob_s8 = single(zeros(output_width, output_height, anchor_num_s8, conf.ims_per_batch));
     labels_weights_s8 = labels_blob_s8;
+    % 0817 added
+    labels_cl_s8 = single(zeros(output_width, output_height, 1, conf.ims_per_batch));
+    labels_cl_s8(1:100) = 1;
+    labels_weights_cl_s8 = labels_cl_s8;
+    % end added
     bbox_targets_blob_s8 = single(zeros(output_width, output_height, anchor_num_s8*4, conf.ims_per_batch));
     bbox_loss_weights_blob_s8 = bbox_targets_blob_s8;
     % stride16
@@ -371,12 +381,17 @@ function check_gpu_memory(conf, caffe_solver, do_val)
     output_height = output_height{1};
     labels_blob_s16 = single(zeros(output_width, output_height, anchor_num_s16, conf.ims_per_batch));
     labels_weights_s16 = labels_blob_s16;
+    % 0817 added
+    labels_cl_s16 = single(zeros(output_width, output_height, 1, conf.ims_per_batch));
+    labels_cl_s16(1:100) = 1;
+    labels_weights_cl_s16 = labels_cl_s16;
+    % end added
     bbox_targets_blob_s16 = single(zeros(output_width, output_height, anchor_num_s16*4, conf.ims_per_batch));
     bbox_loss_weights_blob_s16 = bbox_targets_blob_s16;
 
-    net_inputs = {im_blob, labels_blob_s4, labels_weights_s4, bbox_targets_blob_s4, bbox_loss_weights_blob_s4, ...
-                            labels_blob_s8, labels_weights_s8, bbox_targets_blob_s8, bbox_loss_weights_blob_s8,...
-                            labels_blob_s16, labels_weights_s16, bbox_targets_blob_s16, bbox_loss_weights_blob_s16};
+    net_inputs = {im_blob, labels_blob_s4, labels_weights_s4,labels_cl_s4, labels_weights_cl_s4, bbox_targets_blob_s4, bbox_loss_weights_blob_s4, ...
+                            labels_blob_s8, labels_weights_s8, labels_cl_s8, labels_weights_cl_s8, bbox_targets_blob_s8, bbox_loss_weights_blob_s8,...
+                            labels_blob_s16, labels_weights_s16, labels_cl_s16, labels_weights_cl_s16, bbox_targets_blob_s16, bbox_loss_weights_blob_s16};
     
      % Reshape net's input blobs
     caffe_solver.net.reshape_as_input(net_inputs);
