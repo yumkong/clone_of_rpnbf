@@ -414,8 +414,8 @@ layer {
 
 # to enable the calculation of softmax loss, we first reshape blobs related to SoftmaxWithLoss
 layer {
-   bottom: "proposal_cls_score"
-   top: "proposal_cls_score_reshape"
+   bottom: "proposal_cls_score"  #num x chl (#anchor x 2) x height x width
+   top: "proposal_cls_score_reshape"  #num x 2 x (#anchor x height) x width
    name: "proposal_cls_score_reshape"
    type: "Reshape"
    reshape_param{
@@ -549,7 +549,7 @@ layer {
     }
     axis: 3  #only last dimension (the original channel dim = feature length = 256)
     lr: 0.1 #default 0.05
-    radius: 1 #default 0.1
+    radius: 0.1 #default 0.1
   }
   loss_weight: 1 # 0.01
 }
