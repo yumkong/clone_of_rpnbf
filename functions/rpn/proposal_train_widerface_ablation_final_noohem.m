@@ -15,10 +15,10 @@ function save_model_path = proposal_train_widerface_ablation_final_noohem(conf, 
     ip.addParamValue('imdb_val',            struct(),           @isstruct);
     ip.addParamValue('roidb_val',           struct(),           @isstruct);
     
-    ip.addParamValue('val_iters',           500,                 @isscalar);%1000
-    ip.addParamValue('val_interval',        2000,               @isscalar);%5000
+    ip.addParamValue('val_iters',           10,                 @isscalar);%1000
+    ip.addParamValue('val_interval',        20,               @isscalar);%2000
     ip.addParamValue('snapshot_interval',...
-                                            2000,              @isscalar); %5000
+                                            20,              @isscalar); %2000
                                                                        
     % Max pixel size of a scaled input image
     ip.addParamValue('solver_def_file',     fullfile(pwd, 'proposal_models', 'Zeiler_conv5', 'solver.prototxt'), ...
@@ -139,9 +139,9 @@ function save_model_path = proposal_train_widerface_ablation_final_noohem(conf, 
     modelFigPath1 = fullfile(cache_dir, 'net-train-s4.pdf');  % plot save path
     modelFigPath2 = fullfile(cache_dir, 'net-train-s8.pdf');  % plot save path
     modelFigPath3 = fullfile(cache_dir, 'net-train-s16.pdf');  % plot save path
-    tmp_struct = struct('err_fg_s4', [], 'err_bg_s4', [], 'loss_cls_s4', [], 'loss_bbox_s4', [], ...
-                        'err_fg_s8', [], 'err_bg_s8', [], 'loss_cls_s8', [], 'loss_bbox_s8', [], ...
-                        'err_fg_s16', [], 'err_bg_s16', [], 'loss_cls_s16', [], 'loss_bbox_s16', []);
+    tmp_struct = struct('err_fg_s4', [], 'err_bg_s4', [], 'loss_cls_s4', [], 'loss_bbox_s4', [],'loss_center_s4', [], ...
+                        'err_fg_s8', [], 'err_bg_s8', [], 'loss_cls_s8', [], 'loss_bbox_s8', [], 'loss_center_s8', [],...
+                        'err_fg_s16', [], 'err_bg_s16', [], 'loss_cls_s16', [], 'loss_bbox_s16', [],'loss_center_s16', []);
     history_rec = struct('train',tmp_struct,'val',tmp_struct, 'num', 0);
     %1009 changed so that validation can be done within while loop
     while (iter_ <= max_iter)
@@ -492,29 +492,35 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     fprintf('Training : err_fg_s4 %.3g, err_bg_s4 %.3g, loss_s4 (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg_s4.data), 1 - mean(train_results.accuracy_bg_s4.data), ...
         mean(train_results.loss_cls_s4.data), ...
-        mean(train_results.loss_bbox_s4.data));
+        mean(train_results.loss_bbox_s4.data), ...
+		mean(train_results.center_loss_s4.data));
     fprintf('\t err_fg_s8 %.3g, err_bg_s8 %.3g, loss_s8 (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg_s8.data), 1 - mean(train_results.accuracy_bg_s8.data), ...
         mean(train_results.loss_cls_s8.data), ...
-        mean(train_results.loss_bbox_s8.data));
+        mean(train_results.loss_bbox_s8.data), ...
+		mean(train_results.center_loss_s8.data));
     fprintf('\t err_fg_s16 %.3g, err_bg_s16 %.3g, loss_s16 (cls %.3g + reg %.3g)\n', ...
         1 - mean(train_results.accuracy_fg_s16.data), 1 - mean(train_results.accuracy_bg_s16.data), ...
         mean(train_results.loss_cls_s16.data), ...
-        mean(train_results.loss_bbox_s16.data));
+        mean(train_results.loss_bbox_s16.data), ...
+		mean(train_results.center_loss_s16.data));
     
     if exist('val_results', 'var') && ~isempty(val_results)
         fprintf('Testing  : err_fg_s4 %.3g, err_bg_s4 %.3g, loss_s4 (cls %.3g + reg %.3g)\n', ...
             1 - mean(val_results.accuracy_fg_s4.data), 1 - mean(val_results.accuracy_bg_s4.data), ...
             mean(val_results.loss_cls_s4.data), ...
-            mean(val_results.loss_bbox_s4.data));
+            mean(val_results.loss_bbox_s4.data), ...
+		    mean(val_results.center_loss_s4.data));
         fprintf('\t err_fg_s8 %.3g, err_bg_s8 %.3g, loss_s8 (cls %.3g + reg %.3g)\n', ...
             1 - mean(val_results.accuracy_fg_s8.data), 1 - mean(val_results.accuracy_bg_s8.data), ...
             mean(val_results.loss_cls_s8.data), ...
-            mean(val_results.loss_bbox_s8.data));
+            mean(val_results.loss_bbox_s8.data), ...
+		    mean(val_results.center_loss_s8.data));
         fprintf('\t err_fg_s16 %.3g, err_bg_s16 %.3g, loss_s16 (cls %.3g + reg %.3g)\n', ...
             1 - mean(val_results.accuracy_fg_s16.data), 1 - mean(val_results.accuracy_bg_s16.data), ...
             mean(val_results.loss_cls_s16.data), ...
-            mean(val_results.loss_bbox_s16.data));
+            mean(val_results.loss_bbox_s16.data), ...
+		    mean(val_results.center_loss_s16.data));
     end
     % --------- end previously show_state part ------------
     % ========= newly added plot part =====================
@@ -523,34 +529,45 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     history_rec.train.err_bg_s4 = [history_rec.train.err_bg_s4; 1 - mean(train_results.accuracy_bg_s4.data)];
     history_rec.train.loss_cls_s4 = [history_rec.train.loss_cls_s4; mean(train_results.loss_cls_s4.data)];
     history_rec.train.loss_bbox_s4 = [history_rec.train.loss_bbox_s4; mean(train_results.loss_bbox_s4.data)];
-    history_rec.val.err_fg_s4 = [history_rec.val.err_fg_s4; 1 - mean(val_results.accuracy_fg_s4.data)];
+    history_rec.train.loss_center_s4 = [history_rec.train.loss_center_s4; mean(train_results.center_loss_s4.data)];
+    
+	history_rec.val.err_fg_s4 = [history_rec.val.err_fg_s4; 1 - mean(val_results.accuracy_fg_s4.data)];
     history_rec.val.err_bg_s4 = [history_rec.val.err_bg_s4; 1 - mean(val_results.accuracy_bg_s4.data)];
     history_rec.val.loss_cls_s4 = [history_rec.val.loss_cls_s4; mean(val_results.loss_cls_s4.data)];
     history_rec.val.loss_bbox_s4 = [history_rec.val.loss_bbox_s4; mean(val_results.loss_bbox_s4.data)];
-    %conv5
+    history_rec.val.loss_center_s4 = [history_rec.val.loss_center_s4; mean(val_results.center_loss_s4.data)];
+    
+	%conv5
     history_rec.train.err_fg_s8 = [history_rec.train.err_fg_s8; 1 - mean(train_results.accuracy_fg_s8.data)];
     history_rec.train.err_bg_s8 = [history_rec.train.err_bg_s8; 1 - mean(train_results.accuracy_bg_s8.data)];
     history_rec.train.loss_cls_s8 = [history_rec.train.loss_cls_s8; mean(train_results.loss_cls_s8.data)];
     history_rec.train.loss_bbox_s8 = [history_rec.train.loss_bbox_s8; mean(train_results.loss_bbox_s8.data)];
-    history_rec.val.err_fg_s8 = [history_rec.val.err_fg_s8; 1 - mean(val_results.accuracy_fg_s8.data)];
+    history_rec.train.loss_center_s8 = [history_rec.train.loss_center_s8; mean(train_results.center_loss_s8.data)];
+    
+	history_rec.val.err_fg_s8 = [history_rec.val.err_fg_s8; 1 - mean(val_results.accuracy_fg_s8.data)];
     history_rec.val.err_bg_s8 = [history_rec.val.err_bg_s8; 1 - mean(val_results.accuracy_bg_s8.data)];
     history_rec.val.loss_cls_s8 = [history_rec.val.loss_cls_s8; mean(val_results.loss_cls_s8.data)];
     history_rec.val.loss_bbox_s8 = [history_rec.val.loss_bbox_s8; mean(val_results.loss_bbox_s8.data)];
-    %conv6
+    history_rec.val.loss_center_s8 = [history_rec.val.loss_center_s8; mean(val_results.center_loss_s8.data)];
+    
+	%conv6
     history_rec.train.err_fg_s16 = [history_rec.train.err_fg_s16; 1 - mean(train_results.accuracy_fg_s16.data)];
     history_rec.train.err_bg_s16 = [history_rec.train.err_bg_s16; 1 - mean(train_results.accuracy_bg_s16.data)];
     history_rec.train.loss_cls_s16 = [history_rec.train.loss_cls_s16; mean(train_results.loss_cls_s16.data)];
     history_rec.train.loss_bbox_s16 = [history_rec.train.loss_bbox_s16; mean(train_results.loss_bbox_s16.data)];
-    history_rec.val.err_fg_s16 = [history_rec.val.err_fg_s16; 1 - mean(val_results.accuracy_fg_s16.data)];
+    history_rec.train.loss_center_s16 = [history_rec.train.loss_center_s16; mean(train_results.center_loss_s16.data)];
+    
+	history_rec.val.err_fg_s16 = [history_rec.val.err_fg_s16; 1 - mean(val_results.accuracy_fg_s16.data)];
     history_rec.val.err_bg_s16 = [history_rec.val.err_bg_s16; 1 - mean(val_results.accuracy_bg_s16.data)];
     history_rec.val.loss_cls_s16 = [history_rec.val.loss_cls_s16; mean(val_results.loss_cls_s16.data)];
     history_rec.val.loss_bbox_s16 = [history_rec.val.loss_bbox_s16; mean(val_results.loss_bbox_s16.data)];
+    history_rec.val.loss_center_s16 = [history_rec.val.loss_center_s16; mean(val_results.center_loss_s16.data)];
     
     history_rec.num = history_rec.num + 1;
     % draw it
     figure(1) ; clf ;
-    titles1 = {'err\_fg\_s4', 'err\_bg\_s4', 'loss\_cls\_s4', 'loss\_bbox\_s4'};
-    plots1 = {'err_fg_s4', 'err_bg_s4', 'loss_cls_s4', 'loss_bbox_s4'};
+    titles1 = {'err\_fg\_s4', 'err\_bg\_s4', 'loss\_cls\_s4', 'loss\_bbox\_s4', 'loss\_center\_s4'};
+    plots1 = {'err_fg_s4', 'err_bg_s4', 'loss_cls_s4', 'loss_bbox_s4', 'loss_center_s4'};
 
     %half_plot_num = ceil(numel(plots)/2);
     cnt = 0;
@@ -582,8 +599,8 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     
     % for conv5
     figure(2) ; clf ;
-    titles2 = {'err\_fg\_s8', 'err\_bg\_s8', 'loss\_cls\_s8', 'loss\_bbox\_s8'};
-    plots2 = {'err_fg_s8', 'err_bg_s8', 'loss_cls_s8', 'loss_bbox_s8'};
+    titles2 = {'err\_fg\_s8', 'err\_bg\_s8', 'loss\_cls\_s8', 'loss\_bbox\_s8', 'loss\_center\_s8'};
+    plots2 = {'err_fg_s8', 'err_bg_s8', 'loss_cls_s8', 'loss_bbox_s8', 'loss_center_s8'};
 
     %half_plot_num = ceil(numel(plots)/2);
     cnt = 0;
@@ -615,8 +632,8 @@ function history_rec = show_state_and_plot(iter, train_results, val_results, his
     
     % for conv6
     figure(3) ; clf ;
-    titles3 = {'err\_fg\_s16', 'err\_bg\_s16', 'loss\_cls\_s16', 'loss\_bbox\_s16'};
-    plots3 = {'err_fg_s16', 'err_bg_s16', 'loss_cls_s16', 'loss_bbox_s16'};
+    titles3 = {'err\_fg\_s16', 'err\_bg\_s16', 'loss\_cls\_s16', 'loss\_bbox\_s16', 'loss\_center\_s16'};
+    plots3 = {'err_fg_s16', 'err_bg_s16', 'loss_cls_s16', 'loss_bbox_s16', 'loss_center_s16'};
 
     %half_plot_num = ceil(numel(plots)/2);
     cnt = 0;
